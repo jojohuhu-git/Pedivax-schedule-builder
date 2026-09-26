@@ -132,4 +132,83 @@ export const SERIES = {
       },
     ],
   },
+
+  // Hib is the third series (with Rotavirus and MenB) whose brand choice sets
+  // the length of the whole series — decisions.md: "PedvaxHIB start to
+  // finish is 3 doses. Any PRP-T product, or any mix of brands, is 4."
+  Hib: {
+    key: 'Hib',
+    name: 'Haemophilus influenzae type b',
+    abbr: 'Hib',
+    route: 'injection',
+    variants: [
+      {
+        id: 'pedvax',
+        label: 'PedvaxHIB for every dose',
+        doseCount: 3,
+        requiresAllDosesFrom: ['PedvaxHIB'],
+        doses: [
+          { n: 1, at: ['m2'], minAgeDays: 42 },
+          { n: 2, at: ['m4'], minIntervalFromPrevDays: 28 },
+          {
+            n: 3,
+            at: ['m12', 'm15'],
+            booster: true,
+            minAgeDays: 365,
+            minIntervalFromPrevDays: 56,
+          },
+        ],
+      },
+      {
+        id: 'prpt',
+        label: 'Any PRP-T product (ActHIB, Hiberix), or any mix of brands',
+        doseCount: 4,
+        fallback: true,
+        doses: [
+          { n: 1, at: ['m2'], minAgeDays: 42 },
+          { n: 2, at: ['m4'], minIntervalFromPrevDays: 28 },
+          { n: 3, at: ['m6'], minIntervalFromPrevDays: 28 },
+          {
+            n: 4,
+            at: ['m12', 'm15'],
+            booster: true,
+            minAgeDays: 365,
+            minIntervalFromPrevDays: 56,
+          },
+        ],
+      },
+    ],
+    facts: [
+      {
+        claim:
+          'PedvaxHIB is a 3-dose series (2 doses at 2 and 4 months, booster at 12-15 ' +
+          'months). Any PRP-T product (ActHIB, Hiberix) or a mix of brands is 4 doses ' +
+          '(3 doses at 2, 4, 6 months, booster at 12-15 months).',
+        source: 'cdc2025HibNotes',
+        verified: '2026-09-25',
+        quote:
+          'ActHIB, Hiberix, Pentacel, or Vaxelis: 4-dose series (3-dose primary series ' +
+          'at age 2, 4, and 6 months, followed by a booster dose at age 12–15 months) / ' +
+          'PedvaxHIB: 3-dose series (2-dose primary series at age 2 and 4 months, ' +
+          'followed by a booster dose at age 12–15 months)',
+      },
+      {
+        claim: 'The routine minimum age for dose 1 is 6 weeks.',
+        source: 'cdc2025HibIntervals',
+        verified: '2026-09-25',
+        quote: 'Minimum age for dose 1: 6 weeks',
+      },
+      {
+        claim:
+          "ActHIB and Hiberix's own package inserts put the booster at 15-18 months; " +
+          'CDC/ACIP allows it as early as 12 months and governs. PedvaxHIB\'s insert ' +
+          'already matches CDC exactly (12-15 months).',
+        source: 'insertActHIB',
+        verified: '2026-09-25',
+        quote:
+          'A three-dose primary series administered at 2, 4, and 6 months of age. ' +
+          'A single booster dose administered at 15-18 months of age.',
+      },
+    ],
+  },
 };

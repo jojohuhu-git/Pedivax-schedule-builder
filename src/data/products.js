@@ -122,4 +122,84 @@ export const PRODUCTS = [
       },
     ],
   },
+  {
+    name: 'ActHIB',
+    group: 'Hib',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'Hib', doses: [1, 4] }],
+    minAgeDays: 42,
+    maxAgeDays: null,
+    insertMinAgeDays: null,
+    lineage: null,
+    setsSeriesLength: { Hib: 4 },
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          "This product's own insert puts the booster at 15-18 months; CDC/ACIP allows " +
+          'it as early as 12 months and governs, so a 12-month booster is still valid.',
+        source: 'insertActHIB',
+        verified: '2026-09-25',
+        quote:
+          'A three-dose primary series administered at 2, 4, and 6 months of age. ' +
+          'A single booster dose administered at 15-18 months of age.',
+      },
+    ],
+  },
+  {
+    name: 'Hiberix',
+    group: 'Hib',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'Hib', doses: [1, 4] }],
+    minAgeDays: 42,
+    maxAgeDays: null,
+    insertMinAgeDays: 42,
+    lineage: null,
+    setsSeriesLength: { Hib: 4 },
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed 6 weeks through 4 years for the full primary-plus-booster series ' +
+          "(a stale web search claimed booster-only; the live insert does not say that). " +
+          "This product's own insert puts the booster at 15-18 months; CDC/ACIP allows " +
+          'it as early as 12 months and governs.',
+        source: 'insertHiberix',
+        verified: '2026-09-25',
+        quote: 'HIBERIX is approved for use in children aged 6 weeks through 4 years (prior to fifth birthday).',
+      },
+    ],
+  },
+  {
+    name: 'PedvaxHIB',
+    group: 'Hib',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'Hib', doses: [1, 3] }],
+    minAgeDays: 42,
+    maxAgeDays: null,
+    insertMinAgeDays: 42,
+    lineage: null,
+    setsSeriesLength: { Hib: 3 },
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          '2-dose primary series (2 and 4 months) plus a booster at 12-15 months, at ' +
+          'least 2 months after dose 2 — matches CDC/ACIP exactly, no gap.',
+        source: 'insertPedvaxHIB',
+        verified: '2026-09-25',
+        quote:
+          'Infants 2 to 14 months of age should receive a 0.5 mL dose of vaccine ' +
+          'ideally beginning at 2 months of age followed by a 0.5 mL dose 2 months ' +
+          'later ... a booster dose (0.5 mL) should be administered at 12 to 15 ' +
+          'months of age, but not earlier than 2 months after the second dose.',
+      },
+    ],
+  },
 ];
