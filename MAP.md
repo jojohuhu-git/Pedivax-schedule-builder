@@ -41,8 +41,9 @@ Pedivax-schedule-builder/
     │   ├── sources/  saved copies of pages and PDFs, so a quote stays traceable
     │   └── applied/  one dated note per link, saying what changed and what did not
     └── archive/       finished plans and end-of-session handoffs go here
-        └── handoff-2026-09-25-b1-b2-partial.md   ← start here (supersedes the
-            planning-complete handoff — B1 is done, B2 is partly done)
+        └── handoff-2026-09-26-b3-plan-js.md   ← start here (supersedes the
+            two 2026-09-25 handoffs — B1/B2 are done, plan.js is done,
+            score.js/suggest.js are next)
 ```
 
 `src/data/` (B2) and `src/logic/` (B3 — `cover.js`, `seriesLength.js`, `plan.js`)
