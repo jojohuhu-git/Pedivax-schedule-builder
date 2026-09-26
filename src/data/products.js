@@ -389,6 +389,230 @@ export const PRODUCTS = [
     ],
   },
   {
+    name: 'Pediarix',
+    group: 'Combination products',
+    kind: 'combination',
+    route: 'injection',
+    covers: [
+      { series: 'DTaP', doses: [1, 3] },
+      { series: 'HepB', doses: [1, 3] },
+      { series: 'IPV', doses: [1, 3] },
+    ],
+    minAgeDays: 42,
+    maxAgeDays: 2192,
+    insertMinAgeDays: 42,
+    insertMaxAgeDays: 2192,
+    lineage: null,
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed 6 weeks through 6 years (prior to 7th birthday); covers only the ' +
+          'first 3 doses of DTaP, HepB, and IPV, all at 2, 4, 6 months.',
+        source: 'insertPediarix',
+        verified: '2026-09-25',
+        quote:
+          'PEDIARIX may be given as early as 6 weeks of age through 6 years of age ' +
+          '(prior to the seventh birthday). Three doses (0.5 mL each) administered ' +
+          'at 2, 4, and 6 months of age.',
+      },
+      {
+        claim: 'Licensed for only the first 3 doses of the DTaP series.',
+        source: 'izPediarix',
+        verified: '2026-09-25',
+        quote:
+          'Pediarix is licensed by the Food and Drug Administration (FDA) for only ' +
+          'the first 3 doses of the DTaP series.',
+      },
+    ],
+  },
+  {
+    name: 'Pentacel',
+    group: 'Combination products',
+    kind: 'combination',
+    route: 'injection',
+    covers: [
+      { series: 'DTaP', doses: [1, 4] },
+      { series: 'IPV', doses: [1, 4] },
+      { series: 'Hib', doses: [1, 4] },
+    ],
+    minAgeDays: 42,
+    maxAgeDays: 1461,
+    insertMinAgeDays: 42,
+    insertMaxAgeDays: 1461,
+    lineage: null,
+    setsSeriesLength: { Hib: 4 },
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed 6 weeks through 4 years (prior to 5th birthday); covers doses 1-4 ' +
+          'of DTaP, IPV, and Hib, at 2, 4, 6, 15-18 months. Sets the Hib series to 4 ' +
+          'doses, same path as ActHIB/Hiberix.',
+        source: 'insertPentacel',
+        verified: '2026-09-25',
+        quote:
+          'Pentacel is approved for use as a four dose series in children 6 weeks ' +
+          'through 4 years of age (prior to fifth birthday). Pentacel is to be ' +
+          'administered as a 4-dose series at 2, 4, 6 and 15-18 months of age.',
+      },
+      {
+        claim:
+          'Not for use as any primary-series dose at age 5+, and not the 4-6 year ' +
+          'DTaP/IPV booster — that role belongs to Kinrix/Quadracel.',
+        source: 'izPentacel',
+        verified: '2026-09-25',
+        quote:
+          'should not be used for any dose in the primary series for children age 5 ' +
+          'years or older or as the booster dose for children ages 4 through 6 years.',
+      },
+    ],
+  },
+  {
+    name: 'Vaxelis',
+    group: 'Combination products',
+    kind: 'combination',
+    route: 'injection',
+    covers: [
+      { series: 'DTaP', doses: [1, 3] },
+      { series: 'IPV', doses: [1, 3] },
+      { series: 'Hib', doses: [1, 3] },
+      { series: 'HepB', doses: [1, 3] },
+    ],
+    minAgeDays: 42,
+    maxAgeDays: 1461,
+    insertMinAgeDays: 42,
+    insertMaxAgeDays: 1461,
+    lineage: null,
+    setsSeriesLength: { Hib: 4 },
+    cannotBeBooster: ['DTaP', 'IPV', 'Hib'],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed 6 weeks through 4 years; 3-dose series at 2, 4, 6 months covering ' +
+          'DTaP, IPV, Hib, and HepB. Sets the Hib series to 4 doses, same path as ' +
+          'Pentacel/ActHIB/Hiberix.',
+        source: 'insertVaxelis',
+        verified: '2026-09-25',
+        quote:
+          'VAXELIS is approved for use as a 3-dose series in children from 6 weeks ' +
+          'through 4 years of age. VAXELIS is to be administered as a 3-dose series ' +
+          'at 2, 4, and 6 months of age.',
+      },
+      {
+        claim:
+          'Not approved as the booster dose of DTaP, IPV, or Hib — broader than the ' +
+          'Hib-only restriction the frozen mockup assumed; corrected here to all ' +
+          'three (in practice the dose-number licence above already excludes dose ' +
+          '4/5 for each, so this mainly documents the restriction for the rulebook).',
+        source: 'izVaxelis',
+        verified: '2026-09-25',
+        quote: 'It is not approved as the booster dose of DTaP [dose 4 or 5] or IPV [dose 4] or Hib [dose 4].',
+      },
+    ],
+  },
+  {
+    name: 'Kinrix',
+    group: 'Combination products',
+    kind: 'combination',
+    route: 'injection',
+    covers: [
+      { series: 'DTaP', doses: [5, 5] },
+      { series: 'IPV', doses: [4, 4] },
+    ],
+    minAgeDays: 1461,
+    maxAgeDays: 2557,
+    insertMinAgeDays: 1461,
+    insertMaxAgeDays: 2557,
+    lineage: {
+      prefer: ['Infanrix', 'Pediarix'],
+      escape:
+        'Either Kinrix or Quadracel may be used when the earlier brand is unknown, ' +
+        'or when Kinrix or Quadracel is the only product stocked.',
+    },
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Approved as the 5th DTaP dose and 4th IPV dose, ages 4-6 years, for ' +
+          'children who received Infanrix (first 3 DTaP) and/or Pediarix, then ' +
+          'Infanrix as dose 4.',
+        source: 'izDtapIpv',
+        verified: '2026-09-25',
+        quote:
+          'Kinrix: approved for use as the fifth dose of DTaP and the fourth dose ' +
+          'of IPV in children ages 4 through 6 years who received DTaP (Infanrix) ' +
+          "and/or DTaP-HepB-IPV (Pediarix) as the first three doses and DTaP " +
+          '(Infanrix) as the fourth dose.',
+      },
+      {
+        claim: 'The brand-lineage match is a preference, not a bar.',
+        source: 'izDtapIpv',
+        verified: '2026-09-25',
+        quote:
+          "Although it is preferable to use the same manufacturer's DTaP vaccine " +
+          'for all of the doses in the series, you can give either Kinrix or ' +
+          'Quadracel as the fifth dose of DTaP and fourth dose of IPV at age 4 ' +
+          'through 6 years if the previous brand is unknown or if Kinrix or ' +
+          'Quadracel is the only product stocked.',
+      },
+    ],
+  },
+  {
+    name: 'Quadracel',
+    group: 'Combination products',
+    kind: 'combination',
+    route: 'injection',
+    covers: [
+      { series: 'DTaP', doses: [5, 5] },
+      { series: 'IPV', doses: [4, 5] },
+    ],
+    minAgeDays: 1461,
+    maxAgeDays: 2557,
+    insertMinAgeDays: 1461,
+    insertMaxAgeDays: 2557,
+    lineage: {
+      prefer: ['Daptacel', 'Pentacel'],
+      escape:
+        'Either Kinrix or Quadracel may be used when the earlier brand is unknown, ' +
+        'or when Kinrix or Quadracel is the only product stocked.',
+    },
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Approved (2015) as the 5th DTaP dose and 4th-or-5th IPV dose, ages 4-6 ' +
+          'years, for children who received Pentacel and/or Daptacel.',
+        source: 'izDtapIpv',
+        verified: '2026-09-25',
+        quote:
+          'Quadracel: approved by the FDA in 2015 for use in children 4 through 6 ' +
+          'years of age ... for use in children who have received 4 doses of ' +
+          'Pentacel (DTaP-IPV-Hib, Sanofi) and/or Daptacel (DTaP, Sanofi) vaccine ' +
+          '... approved ... as the fourth or fifth dose in the IPV series.',
+      },
+      {
+        claim: 'The brand-lineage match is a preference, not a bar.',
+        source: 'izDtapIpv',
+        verified: '2026-09-25',
+        quote:
+          "Although it is preferable to use the same manufacturer's DTaP vaccine " +
+          'for all of the doses in the series, you can give either Kinrix or ' +
+          'Quadracel as the fifth dose of DTaP and fourth dose of IPV at age 4 ' +
+          'through 6 years if the previous brand is unknown or if Kinrix or ' +
+          'Quadracel is the only product stocked.',
+      },
+    ],
+  },
+  {
     name: 'Prevnar 13',
     group: 'Pneumococcal',
     kind: 'single',
