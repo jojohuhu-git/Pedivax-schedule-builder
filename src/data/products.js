@@ -717,9 +717,14 @@ export const PRODUCTS = [
     group: 'Combination products',
     kind: 'combination',
     route: 'injection',
+    // HepB is [2,4], not [1,3] like DTaP/IPV — corrected 2026-09-26. Pediarix
+    // starts at 2 months (minAgeDays below), so it can never give the HepB
+    // birth dose (dose 1, monovalent, within 24 hours per ACIP). Given after
+    // a separate birth dose, its three administrations are HepB doses 2, 3,
+    // and 4 of a 4-dose series — see the correction fact below.
     covers: [
       { series: 'DTaP', doses: [1, 3] },
-      { series: 'HepB', doses: [1, 3] },
+      { series: 'HepB', doses: [2, 4] },
       { series: 'IPV', doses: [1, 3] },
     ],
     minAgeDays: 42,
@@ -733,8 +738,8 @@ export const PRODUCTS = [
     facts: [
       {
         claim:
-          'Licensed 6 weeks through 6 years (prior to 7th birthday); covers only the ' +
-          'first 3 doses of DTaP, HepB, and IPV, all at 2, 4, 6 months.',
+          'Licensed 6 weeks through 6 years (prior to 7th birthday); three doses, ' +
+          'all at 2, 4, 6 months.',
         source: 'insertPediarix',
         verified: '2026-09-25',
         quote:
@@ -749,6 +754,21 @@ export const PRODUCTS = [
         quote:
           'Pediarix is licensed by the Food and Drug Administration (FDA) for only ' +
           'the first 3 doses of the DTaP series.',
+      },
+      {
+        claim:
+          'For HepB specifically, Pediarix cannot be the birth dose (it starts at 6 ' +
+          "weeks; the birth dose is due within 24 hours). Given after a separate " +
+          "monovalent birth dose — the only way this app's on-time plan uses it — " +
+          "its 3 administrations are HepB doses 2, 3, and 4 of a 4-dose series, not " +
+          "1-3. Found and corrected 2026-09-26: the covers[] entry had copied DTaP/" +
+          "IPV's [1,3] pattern onto HepB without checking that HepB's own dose 1 is " +
+          'the birth dose specifically.',
+        source: 'cdc2025HepbNotes',
+        verified: '2026-09-26',
+        quote:
+          'Administration of 4 doses is permitted when a combination vaccine ' +
+          'containing HepB is used after the birth dose.',
       },
     ],
   },
@@ -800,11 +820,15 @@ export const PRODUCTS = [
     group: 'Combination products',
     kind: 'combination',
     route: 'injection',
+    // HepB is [2,4], not [1,3] — same correction and reasoning as Pediarix
+    // (2026-09-26): Vaxelis starts at 6 weeks, so it can never be the HepB
+    // birth dose; given after a separate birth dose its 3 administrations
+    // are HepB doses 2, 3, and 4. See the correction fact below.
     covers: [
       { series: 'DTaP', doses: [1, 3] },
       { series: 'IPV', doses: [1, 3] },
       { series: 'Hib', doses: [1, 3] },
-      { series: 'HepB', doses: [1, 3] },
+      { series: 'HepB', doses: [2, 4] },
     ],
     minAgeDays: 42,
     maxAgeDays: 1461,
@@ -836,6 +860,19 @@ export const PRODUCTS = [
         source: 'izVaxelis',
         verified: '2026-09-25',
         quote: 'It is not approved as the booster dose of DTaP [dose 4 or 5] or IPV [dose 4] or Hib [dose 4].',
+      },
+      {
+        claim:
+          'For HepB specifically, Vaxelis cannot be the birth dose (it starts at 6 ' +
+          "weeks; the birth dose is due within 24 hours). Given after a separate " +
+          "monovalent birth dose — the only way this app's on-time plan uses it — " +
+          "its 3 administrations are HepB doses 2, 3, and 4 of a 4-dose series, not " +
+          '1-3. Same correction as Pediarix, found 2026-09-26.',
+        source: 'cdc2025HepbNotes',
+        verified: '2026-09-26',
+        quote:
+          'Administration of 4 doses is permitted when a combination vaccine ' +
+          'containing HepB is used after the birth dose.',
       },
     ],
   },
