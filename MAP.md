@@ -45,6 +45,7 @@ Pedivax-schedule-builder/
             planning-complete handoff — B1 is done, B2 is partly done)
 ```
 
-`src/ui/Formulary.jsx`, `Plan.jsx`, and `Rulebook.jsx`, plus the data files' real
-content and the logic layer, are not built yet (queue items B2–B5). `App.jsx` is
-currently a placeholder shell.
+`src/data/` (B2) and `src/logic/` (B3 — `cover.js`, `seriesLength.js`, `plan.js`)
+are built and tested. `score.js`, `suggest.js`, and the three UI screens
+(`Formulary.jsx`, `Plan.jsx`, `Rulebook.jsx`) are not built yet (queue items
+B3's remainder + B4). `App.jsx` is currently a placeholder shell.
