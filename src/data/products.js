@@ -202,4 +202,56 @@ export const PRODUCTS = [
       },
     ],
   },
+  {
+    name: 'Bexsero',
+    group: 'Shared-decision products',
+    sdm: true,
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'MenB', doses: [1, 2] }],
+    minAgeDays: 3653, // 10 years, per insert; the SDM population this app plans for is 16-18
+    maxAgeDays: 9131, // 25 years
+    insertMinAgeDays: 3653,
+    insertMaxAgeDays: 9131,
+    lineage: null,
+    setsSeriesLength: { MenB: 2 },
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim: 'Licensed 10 through 25 years; 2-dose series at 0 and 6 months.',
+        source: 'insertBexsero',
+        verified: '2026-09-25',
+        quote:
+          'BEXSERO is approved for use in individuals aged 10 through 25 years. ... ' +
+          'Administer a dose (0.5 mL) at 0 and 6 months.',
+      },
+    ],
+  },
+  {
+    name: 'Trumenba',
+    group: 'Shared-decision products',
+    sdm: true,
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'MenB', doses: [1, 2] }],
+    minAgeDays: 3653,
+    maxAgeDays: 9131,
+    insertMinAgeDays: 3653,
+    insertMaxAgeDays: 9131,
+    lineage: null,
+    setsSeriesLength: { MenB: 2 },
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim: 'Licensed 10 through 25 years; 2-dose series at 0 and 6 months.',
+        source: 'insertTrumenba',
+        verified: '2026-09-25',
+        quote:
+          'Trumenba is approved for use in individuals 10 through 25 years of age. ... ' +
+          'Administer a dose (0.5 mL) at 0 and 6 months.',
+      },
+    ],
+  },
 ];

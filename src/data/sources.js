@@ -107,4 +107,25 @@ export const SOURCES = {
     snapshot: '2026-09-25-hib.md',
     tier: 'insert',
   },
+  cdc2025MenBNotes: {
+    label: 'CDC Child Immunization Schedule Notes, 2025 — MenB',
+    edition: 'last reviewed July 2, 2025',
+    url: 'https://www.cdc.gov/vaccines/hcp/imz-schedules/child-adolescent-notes.html',
+    snapshot: '2026-09-25-menb.md',
+    tier: 'organization',
+  },
+  insertBexsero: {
+    label: 'Bexsero package insert (DailyMed)',
+    edition: 'label revision 8/2024',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=f70cf2fc-6e6d-4a74-9f7a-db8fec072fd7&type=display',
+    snapshot: '2026-09-25-menb.md',
+    tier: 'insert',
+  },
+  insertTrumenba: {
+    label: 'Trumenba package insert (DailyMed)',
+    edition: 'label revision 1/2026',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=bcaf5f75-caaf-41fd-875b-5800310070d1&type=display',
+    snapshot: '2026-09-25-menb.md',
+    tier: 'insert',
+  },
 };
