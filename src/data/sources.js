@@ -303,4 +303,32 @@ export const SOURCES = {
     snapshot: '2026-09-25-mmr-varicella.md',
     tier: 'insert',
   },
+  cdc2025HepaNotes: {
+    label: 'CDC Child Immunization Schedule Notes, 2025 — Hepatitis A',
+    edition: 'last reviewed July 2, 2025',
+    url: 'https://www.cdc.gov/vaccines/hcp/imz-schedules/child-adolescent-notes.html',
+    snapshot: '2026-09-25-hepa.md',
+    tier: 'organization',
+  },
+  cdc2025HepaIntervals: {
+    label: 'CDC child/adolescent catch-up table — Hepatitis A minimum intervals',
+    edition: '2025 schedule cycle',
+    url: 'https://www.cdc.gov/vaccines/schedules/wcms-inc/child-schedule-table-catchup_TP4.html',
+    snapshot: '2026-09-25-hepa.md',
+    tier: 'organization',
+  },
+  insertHavrix: {
+    label: 'Havrix package insert (DailyMed)',
+    edition: 'label revision 11/2013 — unusually old, flagged to re-check',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=135ff1b4-c21f-4df1-97be-9475680e9e44&type=display',
+    snapshot: '2026-09-25-hepa.md',
+    tier: 'insert',
+  },
+  insertVaqta: {
+    label: 'Vaqta package insert (DailyMed)',
+    edition: 'label revision 9/2025',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=89191ae9-7f2b-4206-8397-bf7fce3436ac&type=display',
+    snapshot: '2026-09-25-hepa.md',
+    tier: 'insert',
+  },
 };

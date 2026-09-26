@@ -524,6 +524,61 @@ export const PRODUCTS = [
     ],
   },
   {
+    name: 'Havrix',
+    group: 'Hepatitis A',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'HepA', doses: [1, 2] }],
+    minAgeDays: 365,
+    maxAgeDays: null,
+    insertMinAgeDays: 365,
+    insertMaxAgeDays: null,
+    lineage: null,
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed 12 months through 18 years; primary dose plus booster 6-12 ' +
+          "months later — CDC/ACIP sets no ceiling on the interval, so the insert's " +
+          'own 12-month ceiling is not a gap.',
+        source: 'insertHavrix',
+        verified: '2026-09-25',
+        quote:
+          'A single 0.5-mL dose and a 0.5-mL booster dose administered between 6 to ' +
+          '12 months later.',
+      },
+    ],
+  },
+  {
+    name: 'Vaqta',
+    group: 'Hepatitis A',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'HepA', doses: [1, 2] }],
+    minAgeDays: 365,
+    maxAgeDays: null,
+    insertMinAgeDays: 365,
+    lineage: null,
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed 12 months and older; primary dose plus booster 6-18 months ' +
+          'later — matches CDC/ACIP exactly, no gap.',
+        source: 'insertVaqta',
+        verified: '2026-09-25',
+        quote:
+          'Children/Adolescents: vaccination consists of a 0.5-mL primary dose ' +
+          'administered intramuscularly, and a 0.5-mL booster dose administered ' +
+          'intramuscularly 6 to 18 months later.',
+      },
+    ],
+  },
+  {
     name: 'Pediarix',
     group: 'Combination products',
     kind: 'combination',

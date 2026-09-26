@@ -577,4 +577,45 @@ export const SERIES = {
       },
     ],
   },
+
+  // Hepatitis A is the first series where the minimum-interval floor
+  // actually binds an on-time plan: both doses land in the 12-23-month
+  // window, only 6 months apart at minimum, so which visit is valid for
+  // dose 2 depends on when dose 1 happened (m12 -> m18 works; m15 needs
+  // m24, since m18 would be only 3 months later). Both are listed as valid
+  // `at` options and the interval does the real gating — the frozen mockup
+  // hardcoded m18 alone, which would silently violate the floor for a
+  // child whose dose 1 ran at 15 months.
+  HepA: {
+    key: 'HepA',
+    name: 'Hepatitis A',
+    abbr: 'HepA',
+    route: 'injection',
+    doses: [
+      { n: 1, at: ['m12', 'm15'], minAgeDays: 365 },
+      { n: 2, at: ['m18', 'm24'], minIntervalFromPrevDays: 183 },
+    ],
+    facts: [
+      {
+        claim: '2-dose series, both doses at 12-23 months, minimum 6 months apart.',
+        source: 'cdc2025HepaNotes',
+        verified: '2026-09-25',
+        quote: '2-dose series (minimum interval: 6 months) at age 12–23 months',
+      },
+      {
+        claim: 'The routine minimum age for dose 1 is 12 months.',
+        source: 'cdc2025HepaIntervals',
+        verified: '2026-09-25',
+        quote: 'Minimum age for dose 1: 12 months',
+      },
+      {
+        claim:
+          'Minimum interval dose 1 to dose 2 is 6 months — no maximum interval set ' +
+          'by CDC/ACIP, unlike the two inserts below.',
+        source: 'cdc2025HepaIntervals',
+        verified: '2026-09-25',
+        quote: 'Minimum interval dose 1 to dose 2: 6 months',
+      },
+    ],
+  },
 };
