@@ -1,0 +1,47 @@
+// Every citable source, with edition, date and a snapshot in
+// docs/updates/sources/. See docs/data-design.md for the field shapes and
+// CLAUDE.md for the authority rule (ACIP/CDC/AAP/immunize.org > FDA insert;
+// AAP governs where AAP and CDC 2025 disagree; this app is pinned to
+// guidance as it stood before the federal changes that began mid-2025 —
+// docs/decisions.md, "Clinical authority — the edition this app is pinned to").
+//
+// `tier`: 'organization' (CDC/ACIP/AAP/immunize.org) or 'insert' (FDA package
+// insert). sources.test.js enforces that no 'insert' fact narrows a rule an
+// organization has already made — an insert may only fill a gap.
+export const SOURCES = {
+  cdc2025HepbNotes: {
+    label: 'CDC Child Immunization Schedule Notes, 2025 — Hepatitis B',
+    edition: 'last reviewed July 2, 2025',
+    url: 'https://www.cdc.gov/vaccines/hcp/imz-schedules/child-adolescent-notes.html',
+    snapshot: '2026-09-25-cdc2025-hepb-notes.md',
+    tier: 'organization',
+  },
+  cdc2025HepbIntervals: {
+    label: 'CDC child/adolescent catch-up table — Hepatitis B minimum intervals',
+    edition: '2025 schedule cycle',
+    url: 'https://www.cdc.gov/vaccines/schedules/wcms-inc/child-schedule-table-catchup_TP4.html',
+    snapshot: '2026-09-25-cdc2025-hepb-catchup-intervals.md',
+    tier: 'organization',
+  },
+  brightFuturesPeriodicity: {
+    label: 'Bright Futures/AAP Periodicity Schedule — well-child visit ages',
+    edition: 'Bright Futures Pocket Guide appendices (accessed 2026-09-25)',
+    url: 'https://www.brightfutures.org/pocket/pdf/appendices.pdf',
+    snapshot: '2026-09-25-brightfutures-periodicity.md',
+    tier: 'organization',
+  },
+  insertEngerixB: {
+    label: 'Engerix-B package insert (DailyMed)',
+    edition: 'label revision 3/2010 — unusually old, flagged to re-check',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=4d930f24-4ddb-488d-9e79-3f495972733b&type=display',
+    snapshot: '2026-09-25-hepb-inserts.md',
+    tier: 'insert',
+  },
+  insertRecombivaxHB: {
+    label: 'Recombivax HB package insert (DailyMed)',
+    edition: 'label revision 6/2021',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=f1ad4bca-839d-41cd-a132-a6984780912e&type=display',
+    snapshot: '2026-09-25-hepb-inserts.md',
+    tier: 'insert',
+  },
+};
