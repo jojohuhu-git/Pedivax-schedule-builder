@@ -204,7 +204,8 @@ function coverVisit(due, ticked) {
 // stocked product is always worse, no matter how few injections it uses —
 // "fewest injections" is a score over deliverable plans, not a way to make
 // gaps disappear. Only once two assignments tie on gaps does injection count
-// decide.
+// decide, and only once THAT ties too does visit count. `visits` (distinct
+// visit ids touched) is tallied for both objectives below.
 function evaluateAssignment(dueByVisit, ticked) {
   let gaps = 0;
   let injections = 0;
@@ -213,7 +214,37 @@ function evaluateAssignment(dueByVisit, ticked) {
     gaps += result.gaps.length;
     injections += result.injections.length;
   }
-  return { gaps, injections };
+  return { gaps, injections, visits: Object.keys(dueByVisit).length };
+}
+
+// Which of two candidate assignments wins. Gaps always decide first,
+// regardless of objective — "fewest injections" (or "fewest visits") is a
+// score over deliverable plans, never a way to make a gap disappear.
+//
+// Default objective ('injections', what the shipped app always uses):
+// fewest shots wins outright. When two assignments cost the SAME number of
+// shots, prefer the one touching fewer checkups — this is never a
+// shots-for-visits trade (owner confirmed 2026-09-26: a real case is a
+// clinic without an all-in-one combo product, where hepatitis B's 2nd dose
+// can land at the 1-month or 2-month checkup for the same one shot either
+// way; landing it on the 2-month visit, already busy with other vaccines,
+// leaves the 1-month line off the schedule entirely instead of showing it
+// with one shot alone). Only a true tie on both gets resolved by traversal
+// order (earliest visit / preferred variant first).
+//
+// `objective: 'visits'` inverts the first two: fewest visits wins outright,
+// shots break ties. Used solely by score.js's needles-vs-visits test, to
+// build the alternate plan it compares against — the shipped app never
+// passes it.
+function isBetter(score, best, objective) {
+  if (!best) return true;
+  if (score.gaps !== best.gaps) return score.gaps < best.gaps;
+  if (objective === 'visits') {
+    if (score.visits !== best.visits) return score.visits < best.visits;
+    return score.injections < best.injections;
+  }
+  if (score.injections !== best.injections) return score.injections < best.injections;
+  return score.visits < best.visits;
 }
 
 function dueListFor(seriesKey, doses, sequence, allowedProducts) {
@@ -235,7 +266,7 @@ function dueListFor(seriesKey, doses, sequence, allowedProducts) {
 // evaluateAssignment, first-found wins a tie — sequences and variants are
 // both generated preferred/earliest-first, so a tie means "don't shift a
 // dose, and don't switch to the longer variant, unless it actually helps."
-function searchCluster(clusterKeys, resolved, ticked) {
+function searchCluster(clusterKeys, resolved, ticked, objective) {
   const members = clusterKeys
     .map((key) => {
       const series = SERIES[key];
@@ -265,7 +296,7 @@ function searchCluster(clusterKeys, resolved, ticked) {
         }
       });
       const score = evaluateAssignment(dueByVisit, ticked);
-      if (!best || score.gaps < best.gaps || (score.gaps === best.gaps && score.injections < best.injections)) {
+      if (isBetter(score, best, objective)) {
         best = { ...score, chosen: chosen.slice() };
       }
       return;
@@ -284,6 +315,10 @@ function searchCluster(clusterKeys, resolved, ticked) {
 }
 
 // Builds the whole schedule for a ticked formulary (Set of product names).
+// The second argument's `objective` is 'injections' (the default, and the
+// only thing the shipped app ever asks for) or 'visits' — score.js's
+// needles-vs-visits test uses 'visits' to build the alternate plan it
+// compares against; nothing else should ever pass it.
 // Returns:
 //   visits         — in calendar order, only visits with something due, each
 //                     { visit, injections: [{product, covers}], oral, gaps }
@@ -298,7 +333,7 @@ function searchCluster(clusterKeys, resolved, ticked) {
 //                     came from the cluster search, corrected from
 //                     `resolved`'s note when the search overrode it (Hib/
 //                     HepB only — see clusterVariantOptions)
-export function buildPlan(ticked) {
+export function buildPlan(ticked, { objective = 'injections' } = {}) {
   const resolved = {};
   for (const [key, series] of Object.entries(SERIES)) {
     resolved[key] = resolveSeriesLength(series, ticked);
@@ -310,7 +345,7 @@ export function buildPlan(ticked) {
   const clusters = buildClusters(schedulable);
   const placements = {};
   for (const cluster of clusters) {
-    Object.assign(placements, searchCluster(cluster, resolved, ticked));
+    Object.assign(placements, searchCluster(cluster, resolved, ticked, objective));
   }
 
   const dueByVisit = {};

@@ -27,6 +27,7 @@
 | **A package insert may fill a gap, never narrow a rule.** Where CDC/AAP say nothing brand-specific, the insert is an acceptable source — recorded with its revision date and marked on the rulebook as resting on an insert alone. It may never override an age or dose rule an organization has already made. | 2026-09-25 |
 | **"What you could add" ships** — the planner names products the clinic did *not* tick and says what stocking one would save. | 2026-09-25 |
 | **One update inbox per repo.** `docs/updates/INBOX.md` lives here; MeningoVax and PneumoVax keep their own. Each applied note names the other apps that owe the same change. | 2026-09-25 |
+| **Refines the row above:** when two visit choices cost the exact same number of shots, the app picks the one touching fewer checkups — free tidiness, never a shots-for-visits trade. There is still no toggle and no alternate plan shown; visit count remains display-only otherwise. | 2026-09-26 |
 
 ## Found while mocking up
 
@@ -174,9 +175,12 @@ Futures well-child check the child attends anyway; the app never invents a visit
 "empty" visit is a check-up with no shot, not a trip avoided. Needles are the only cost
 the child actually bears.
 
-**Proposed rule (awaiting owner confirmation):** fewest injections is the score; fewest
-visits is a display tie-break only; a test flags any plan where the two disagree, so a
-real case is reported rather than silently resolved.
+**Settled 2026-09-25** (see the Settled table above): fewest injections is the score;
+fewest visits is a display tie-break only; a test flags any plan where the two disagree,
+so a real case is reported rather than silently resolved. The Pentacel/hepatitis-A
+scenario above is a hypothetical illustrating *why* the two goals can diverge in
+principle — see "Found while building score.js" below for what actually happens when
+`plan.js`'s search is asked to optimize for visits instead.
 
 ## Found while building B3 (plan.js), 2026-09-26
 
@@ -213,6 +217,32 @@ that young).
 RV and MenB don't need this — no combination product touches either, so
 their variant genuinely can't be entangled with another series' choice, and
 seriesLength.js's simpler formulary-only resolution stays correct for them.
+
+## Found while building score.js, 2026-09-26
+
+**The Pentacel/hepatitis-A "visits-first" story above can't actually happen with
+plan.js's search, and testing turned up a different, real, cost-free case instead.**
+`plan.js` only ever looks for savings *within* one cluster of series that share a
+combination product (built structurally from every product that exists, not just what's
+stocked). Hepatitis A never shares a combination product with DTaP/Hib, so it is always
+its own cluster — the search has no way to know a DTaP dose could land on the same visit
+as a hepatitis A dose, and so never tries. The worked example was a good illustration of
+the *idea* (combination-product licensing can pin a dose to one visit), but not a
+schedule this app can actually produce.
+
+Running both objectives (`buildPlan(ticked)` vs. `buildPlan(ticked, { objective: 'visits'
+})`) against every formulary the app can build — every product stocked, and every
+single-product-removed variant of that, in `needles-vs-visits.test.js` — found zero cases
+where optimizing for visits costs a shot. It did find real, harmless disagreements in
+visit count alone: when a clinic has no all-in-one product covering a flexible dose (for
+example hepatitis B's 2nd dose, legally due at the 1-month **or** 2-month checkup, with
+nothing to combine it with either way), the shot costs the same regardless of which visit
+it lands on. **Owner decision, 2026-09-26:** since this is genuinely free — not a
+shots-for-visits trade — `plan.js`'s default tie-break (`isBetter`, still optimizing on
+injections first) now also prefers the visit choice that touches fewer checkups whenever
+two choices cost the exact same number of shots (see the Settled table above). There is
+still no toggle and no alternate plan ever shown to the clinician; this only changes which
+one of several equally-good-on-shots schedules the app picks.
 
 ## Still open
 

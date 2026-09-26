@@ -46,7 +46,7 @@ Pedivax-schedule-builder/
             score.js/suggest.js are next)
 ```
 
-`src/data/` (B2) and `src/logic/` (B3 — `cover.js`, `seriesLength.js`, `plan.js`)
-are built and tested. `score.js`, `suggest.js`, and the three UI screens
+`src/data/` (B2) and `src/logic/` (B3 — `cover.js`, `seriesLength.js`, `plan.js`,
+`score.js`) are built and tested. `suggest.js` and the three UI screens
 (`Formulary.jsx`, `Plan.jsx`, `Rulebook.jsx`) are not built yet (queue items
 B3's remainder + B4). `App.jsx` is currently a placeholder shell.

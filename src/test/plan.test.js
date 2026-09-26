@@ -120,11 +120,18 @@ describe('buildPlan — no combination products stocked', () => {
   const ticked = new Set(['Engerix-B', 'ActHIB', 'Daptacel', 'IPOL', 'Prevnar 20', 'Rotarix']);
   const plan = buildPlan(ticked);
 
-  it('does not shift Hib\'s booster later than its own earliest visit when no combo would benefit from it', () => {
+  // Hib's booster window is {m12,m15}; DTaP's is fixed at m15 (its `at`
+  // array has no m12 option). No product here combines the two into one
+  // shot, so both visit choices cost the exact same 2 injections — a true
+  // tie plan.js's default tie-break now resolves in favor of fewer visits
+  // touched (owner confirmed 2026-09-26: free consolidation, not a
+  // shots-for-visits trade, since m12 and m15 are both Bright Futures
+  // checkups the child attends regardless).
+  it('shifts Hib\'s booster onto DTaP\'s fixed m15 visit when doing so is free — same 2 shots, one fewer visit line', () => {
     const hibBooster = plan.visits
       .flatMap((v) => v.injections.map((i) => ({ visitId: v.visit.id, covers: i.covers })))
       .find((entry) => entry.covers.some((c) => c.seriesKey === 'Hib' && c.dose.booster));
-    expect(hibBooster.visitId).toBe('m12');
+    expect(hibBooster.visitId).toBe('m15');
   });
 
   it('DTaP\'s booster stays at its own earliest visit too', () => {
