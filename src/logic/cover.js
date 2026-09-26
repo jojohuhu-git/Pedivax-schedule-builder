@@ -59,9 +59,11 @@ export function canCover({ product, ticked, seriesKey, dose, visit, prevVisit })
 }
 
 // Is `visit` a legal place for this dose, given where the previous dose in
-// the same series/variant actually landed? Not exported past this module —
-// `canCover` is the single public gate, per the rule at the top of this file.
-function doseWindowOk(dose, visit, prevVisit) {
+// the same series/variant actually landed? Exported so plan.js can ask the
+// same pure-calendar question (no product involved) when it searches for
+// where a dose could go — `canCover` stays the only place that adds a
+// product to the question, which is the rule this file is for.
+export function doseWindowOk(dose, visit, prevVisit) {
   if (!dose.at.includes(visit.id)) {
     return { ok: false, reason: 'not-a-nominal-visit-for-this-dose' };
   }

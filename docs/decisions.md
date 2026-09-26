@@ -178,6 +178,42 @@ the child actually bears.
 visits is a display tie-break only; a test flags any plan where the two disagree, so a
 real case is reported rather than silently resolved.
 
+## Found while building B3 (plan.js), 2026-09-26
+
+**A brand-length-setting series' variant can't be decided before the visit
+search — it has to be decided BY it.** seriesLength.js resolves Hib/HepB's
+variant purely from what's ticked, independent of anything else. But Hib and
+HepB both share a combination product with DTaP/IPV (Pentacel, Vaxelis) —
+and using that combo for even one dose silently commits the WHOLE series to
+the longer path, regardless of what seriesLength.js picked in isolation.
+
+A first version of plan.js pre-resolved each series' variant via
+seriesLength.js, then let the visit/product search run against that fixed
+dose list. Built against a formulary stocking PedvaxHIB (3-dose, the
+"shorter" path) AND Pentacel, it produced a schedule that labeled the series
+PedvaxHIB's 3-dose path while actually giving every real dose via Pentacel
+(PRP-T) — a genuine under-dose, one real Hib shot short of what "any mix of
+brands is 4" (above) requires. cover.test.js's own `dosesForProduct` helper
+already carried a comment naming this exact gap as plan.js's job to close,
+not a new problem.
+
+**Fix:** for the two series that both (a) have a brand-restricted shorter
+path and (b) share a combo product with another series — only Hib and HepB
+today — the variant choice is now a branch INSIDE the same joint visit
+search as DTaP/IPV/HepB, not a fact decided beforehand. Each branch commits
+consistently to one variant's own product list for every dose in that
+branch, so a product from the wrong variant can never cover one of its
+doses. Regression test: `plan.test.js`'s brand-mixing invariant — for any
+product that itself sets a series' dose count (`setsSeriesLength`), the
+total doses that series actually received in the plan must match that
+count, everywhere except HepB's dose 1 (identical across variants, and
+physically only a monovalent product can give it — no combo is licensed
+that young).
+
+RV and MenB don't need this — no combination product touches either, so
+their variant genuinely can't be entangled with another series' choice, and
+seriesLength.js's simpler formulary-only resolution stays correct for them.
+
 ## Still open
 
 - **Re-fetch Pfizer's Prevnar 13 discontinuation letter** to confirm 30 April 2024 from
