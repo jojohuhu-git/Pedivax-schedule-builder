@@ -1,5 +1,10 @@
 # Pedivax-schedule-builder — Handoff after planning completed (2026-09-25)
 
+**SUPERSEDED 2026-09-25 — see
+[handoff-2026-09-25-b1-b2-partial.md](handoff-2026-09-25-b1-b2-partial.md).** B1 (the
+scaffold this file said was "nothing has been built") is now done, and B2 is roughly a
+third done (visits.js, HepB, Rotavirus, Hib, MenB). Everything below is historical.
+
 Repo: `~/Downloads/Pedivax-schedule-builder`.
 GitHub: https://github.com/jojohuhu-git/Pedivax-schedule-builder — **public, and
 completely empty.** No branches, no commits.
