@@ -389,6 +389,141 @@ export const PRODUCTS = [
     ],
   },
   {
+    name: 'M-M-R II',
+    group: 'MMR',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'MMR', doses: [1, 2] }],
+    minAgeDays: 365,
+    maxAgeDays: null,
+    insertMinAgeDays: 365,
+    lineage: null,
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed 12 months and older; 2-dose series at 12-15 months and 4-6 ' +
+          'years — matches CDC/ACIP exactly, no gap.',
+        source: 'insertMMRII',
+        verified: '2026-09-25',
+        quote:
+          'The first dose is administered at 12 to 15 months of age. A second dose ' +
+          'is administered at 4 to 6 years of age.',
+      },
+    ],
+  },
+  {
+    name: 'Priorix',
+    group: 'MMR',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'MMR', doses: [1, 2] }],
+    minAgeDays: 365,
+    maxAgeDays: null,
+    insertMinAgeDays: 365,
+    lineage: null,
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed 12 months and older; 2-dose series at 12-15 months and 4-6 ' +
+          'years — matches CDC/ACIP exactly, no gap.',
+        source: 'insertPriorix',
+        verified: '2026-09-25',
+        quote: 'First dose – 12 through 15 months of age. Second dose – 4 through 6 years of age.',
+      },
+    ],
+  },
+  {
+    name: 'Varivax',
+    group: 'Varicella',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'VAR', doses: [1, 2] }],
+    minAgeDays: 365,
+    maxAgeDays: null,
+    insertMinAgeDays: 365,
+    lineage: null,
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed 12 months and older; 2-dose series at 12-15 months and 4-6 ' +
+          'years — matches CDC/ACIP exactly, no gap.',
+        source: 'insertVarivax',
+        verified: '2026-09-25',
+        quote:
+          'The first dose is administered at 12 to 15 months of age. The second ' +
+          'dose is administered at 4 to 6 years of age. There should be a minimum ' +
+          'interval of 3 months between doses.',
+      },
+    ],
+  },
+  {
+    name: 'ProQuad',
+    group: 'Combination products',
+    kind: 'combination',
+    route: 'injection',
+    covers: [
+      { series: 'MMR', doses: [1, 2] },
+      { series: 'VAR', doses: [1, 2] },
+    ],
+    minAgeDays: 365,
+    maxAgeDays: 4383,
+    insertMinAgeDays: 365,
+    insertMaxAgeDays: 4383,
+    lineage: null,
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed 12 months through 12 years; covers doses 1-2 of both MMR and ' +
+          'Varicella, at the same 12-15 month / 4-6 year visits either series uses ' +
+          'alone.',
+        source: 'insertProQuad',
+        verified: '2026-09-25',
+        quote:
+          'ProQuad is a vaccine indicated for active immunization for the ' +
+          'prevention of measles, mumps, rubella, and varicella in children 12 ' +
+          'months through 12 years of age. The first dose is administered at 12 ' +
+          'to 15 months of age. The second dose is administered at 4 to 6 years of ' +
+          'age.',
+      },
+      {
+        claim:
+          'CDC prefers separate MMR/varicella products at dose 1 because ProQuad ' +
+          'roughly doubles the rate of fever/febrile seizure 5-12 days after a ' +
+          "first dose in previously-unvaccinated 12-23-month-olds, versus M-M-R II " +
+          'and Varivax given separately (0.70 vs. 0.32 per 1000 children) — the ' +
+          "insert's own safety data, not a narrower insert overriding CDC/AAP.",
+        source: 'insertProQuad',
+        verified: '2026-09-25',
+        quote:
+          'The incidence of febrile seizures 5 to 12 days after ProQuad (dose 1) ' +
+          '(0.70 per 1000 children) was higher than that in children receiving ' +
+          'M-M-R II and VARIVAX concomitantly (0.32 per 1000 children).',
+      },
+      {
+        claim:
+          'AAP prefers ProQuad at dose 2 (4-6 years) to save an injection, where ' +
+          'CDC 2025 is silent — this is the pairing this app recommends at that visit.',
+        source: 'aapChildSchedule2026',
+        verified: '2026-09-24',
+        quote:
+          'For the 2nd dose at 4–6 years, MMRV generally is preferred over MMR ' +
+          'plus monovalent varicella to minimize the number of injections.',
+      },
+    ],
+  },
+  {
     name: 'Pediarix',
     group: 'Combination products',
     kind: 'combination',

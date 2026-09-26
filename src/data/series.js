@@ -478,4 +478,103 @@ export const SERIES = {
       },
     ],
   },
+
+  // MMR and Varicella are both plain 2-dose series at the same two visits
+  // (12-15 months, 4-6 years) — modeled separately (matching the mockup's
+  // separate MMR/VAR abbreviations) even though ProQuad delivers both at
+  // once, because the series' own dose ages/intervals never depend on which
+  // product gives them.
+  MMR: {
+    key: 'MMR',
+    name: 'Measles, mumps, rubella',
+    abbr: 'MMR',
+    route: 'injection',
+    doses: [
+      { n: 1, at: ['m12', 'm15'], minAgeDays: 365 },
+      {
+        n: 2,
+        at: ['y4', 'y5', 'y6'],
+        booster: false,
+        minIntervalFromPrevDays: 28,
+      },
+    ],
+    facts: [
+      {
+        claim: '2-dose series at 12-15 months and 4-6 years.',
+        source: 'cdc2025MmrVarNotes',
+        verified: '2026-09-25',
+        quote: 'MMR: 2-dose series at age 12–15 months, age 4–6 years',
+      },
+      {
+        claim:
+          'Minimum age for dose 1 is 12 months; minimum interval to dose 2 is 4 ' +
+          "weeks (3 months if either dose is the MMRV combination). Neither floor " +
+          "binds this app's on-time plan, which spaces the two doses years apart.",
+        source: 'cdc2025MmrVarIntervals',
+        verified: '2026-09-25',
+        quote: 'Minimum age for dose 1: 12 months / minimum interval dose 1 to dose 2: 4 weeks',
+      },
+      {
+        claim:
+          'CDC 2025 recommends separate MMR and varicella for dose 1 (12-47 months), ' +
+          'with MMRV only if the family prefers it. AAP expresses no preference at ' +
+          'dose 1 — so there is no real disagreement to resolve there. At dose 2, AAP ' +
+          "actively prefers the MMRV combination to save an injection, which CDC 2025 " +
+          "doesn't address either way. Documentary: it changes which product " +
+          "(ProQuad vs. separate M-M-R II/Varivax) the plan prefers, not this series' " +
+          'own dose ages.',
+        source: 'aapChildSchedule2026',
+        verified: '2026-09-24',
+        quote:
+          'The AAP expresses no preference between MMR plus monovalent varicella ' +
+          'vaccine or MMRV for toddlers receiving their first immunization of this ' +
+          'kind. ... For the 2nd dose at 4–6 years, MMRV generally is preferred over ' +
+          'MMR plus monovalent varicella to minimize the number of injections.',
+      },
+    ],
+  },
+
+  VAR: {
+    key: 'VAR',
+    name: 'Varicella',
+    abbr: 'VAR',
+    route: 'injection',
+    doses: [
+      { n: 1, at: ['m12', 'm15'], minAgeDays: 365 },
+      {
+        n: 2,
+        at: ['y4', 'y5', 'y6'],
+        booster: false,
+        minIntervalFromPrevDays: 90,
+      },
+    ],
+    facts: [
+      {
+        claim: '2-dose series at 12-15 months and 4-6 years — same visits as MMR.',
+        source: 'cdc2025MmrVarNotes',
+        verified: '2026-09-25',
+        quote: 'Varicella: 2-dose series at age 12–15 months, 4–6 years',
+      },
+      {
+        claim:
+          "Minimum age for dose 1 is 12 months; minimum interval to dose 2 is 3 " +
+          "months. Doesn't bind this app's on-time plan, which spaces the two doses " +
+          'years apart.',
+        source: 'cdc2025MmrVarIntervals',
+        verified: '2026-09-25',
+        quote: 'Varicella — minimum age for dose 1: 12 months; minimum interval dose 1 to dose 2: 3 months.',
+      },
+      {
+        claim:
+          'Same AAP/CDC MMRV preference nuance as MMR: no real disagreement at dose ' +
+          '1; AAP prefers the combination at dose 2. See the MMR series facts for ' +
+          'the full quote — documentary, does not change this series\' dose ages.',
+        source: 'aapChildSchedule2026',
+        verified: '2026-09-24',
+        quote:
+          'For the 2nd dose at 4–6 years, MMRV generally is preferred over MMR plus ' +
+          'monovalent varicella to minimize the number of injections.',
+      },
+    ],
+  },
 };
