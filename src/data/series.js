@@ -11,22 +11,68 @@
 // antigen is added as its own group is fetched and quoted, never guessed to
 // fill the shape in early.
 export const SERIES = {
+  // HepB became a brand-length-setting series (with Hib, RV, MenB) on
+  // 2026-09-26, once cover.test.js's exhaustive check caught Pediarix and
+  // Vaxelis being modeled as covering HepB doses 1-3 — impossible, since
+  // dose 1 is specifically the birth dose and neither product is licensed
+  // before 6 weeks. Given after a separate birth dose, a HepB-containing
+  // combo product makes this a 4-dose series (CDC 2025: "Administration of
+  // 4 doses is permitted when a combination vaccine containing HepB is used
+  // after the birth dose" / "substitute 'dose 4' for 'dose 3' [in minimum-
+  // interval calculations]" — see the 2026-09-26 addition to
+  // docs/updates/sources/2026-09-25-cdc2025-hepb-notes.md). Unlike Hib/RV/
+  // MenB, dose 1 (the birth dose) is identical and unaffected in both
+  // variants — only doses 2 onward differ, which is why both variants below
+  // repeat the same dose-1 definition rather than sharing one series-level
+  // list. `requiresAllDosesFrom` here means "any of these products", not
+  // "all" (seriesLength.js) — either monovalent brand alone is enough.
   HepB: {
     key: 'HepB',
     name: 'Hepatitis B',
     abbr: 'HepB',
     route: 'injection',
-    doses: [
-      { n: 1, at: ['birth'], minAgeDays: 0 },
-      { n: 2, at: ['m1', 'm2'], minIntervalFromPrevDays: 28 },
+    variants: [
       {
-        n: 3,
-        at: ['m6', 'm9', 'm12', 'm15', 'm18'],
-        minAgeDays: 168,
-        minIntervalFromPrevDays: 56,
-        note:
-          'Also requires at least 16 weeks (112 days) since dose 1 — whichever ' +
-          'of the two interval floors is later governs.',
+        id: 'monovalent',
+        label: 'Engerix-B and/or Recombivax HB (standalone hepatitis B)',
+        doseCount: 3,
+        requiresAllDosesFrom: ['Engerix-B', 'Recombivax HB'],
+        doses: [
+          { n: 1, at: ['birth'], minAgeDays: 0 },
+          { n: 2, at: ['m1', 'm2'], minIntervalFromPrevDays: 28 },
+          {
+            n: 3,
+            at: ['m6', 'm9', 'm12', 'm15', 'm18'],
+            booster: false,
+            minAgeDays: 168,
+            minIntervalFromPrevDays: 56,
+            note:
+              'Also requires at least 16 weeks (112 days) since dose 1 — whichever ' +
+              'of the two interval floors is later governs.',
+          },
+        ],
+      },
+      {
+        id: 'combo',
+        label: 'Pediarix or Vaxelis for doses 2 through 4',
+        doseCount: 4,
+        fallback: true,
+        doses: [
+          { n: 1, at: ['birth'], minAgeDays: 0 },
+          { n: 2, at: ['m1', 'm2'], minIntervalFromPrevDays: 28 },
+          { n: 3, at: ['m4'], minIntervalFromPrevDays: 28 },
+          {
+            n: 4,
+            at: ['m6'],
+            booster: false,
+            minAgeDays: 168,
+            minIntervalFromPrevDays: 56,
+            note:
+              "CDC: 'substitute dose 4 for dose 3' — this dose carries the same " +
+              'gating the 3-dose path puts on dose 3 (also requires at least 16 ' +
+              'weeks since dose 1).',
+          },
+        ],
       },
     ],
     facts: [
@@ -64,6 +110,19 @@ export const SERIES = {
         quote:
           'Administration of 4 doses is permitted when a combination vaccine ' +
           'containing HepB is used after the birth dose',
+      },
+      {
+        claim:
+          "In the 4-dose path, CDC's own rule for spacing is 'substitute dose 4 for " +
+          "dose 3' — it does not separately state a dose 2→dose 3 interval. This app " +
+          'reads that as: whichever administration ends up last keeps the old dose-3 ' +
+          'gating (quoted above), and the step before it uses the same 4-week floor ' +
+          "as every other primary-series step in this app (DTaP/IPV/PCV/Hib). This is " +
+          'a reasoned reading of the quote, not a separately quoted number — see the ' +
+          '2026-09-26 addition to the snapshot for the full reasoning.',
+        source: 'cdc2025HepbNotes',
+        verified: '2026-09-26',
+        quote: "Minimum intervals (see Table 2): when 4 doses are administered, substitute 'dose 4' for 'dose 3' in these calculations",
       },
     ],
   },

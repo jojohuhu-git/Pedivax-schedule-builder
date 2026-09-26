@@ -15,8 +15,12 @@ export function resolveSeriesLength(series, ticked) {
   }
 
   const fallback = series.variants.find((v) => v.fallback) ?? null;
+  // "Any of" these products, not "all of" — for Hib/RV/MenB the list is
+  // always a single product so the two read the same, but HepB's
+  // monovalent variant lists two interchangeable products (Engerix-B,
+  // Recombivax HB), either of which is enough to run the shorter path.
   const eligible = series.variants
-    .filter((v) => !v.fallback && v.requiresAllDosesFrom.every((name) => ticked.has(name)))
+    .filter((v) => !v.fallback && v.requiresAllDosesFrom.some((name) => ticked.has(name)))
     .sort((a, b) => a.doseCount - b.doseCount);
 
   const chosen = eligible[0] ?? fallback;

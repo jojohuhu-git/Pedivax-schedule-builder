@@ -29,7 +29,7 @@ export const PRODUCTS = [
     maxAgeDays: null,
     insertMinAgeDays: 0,
     lineage: null,
-    setsSeriesLength: null,
+    setsSeriesLength: { HepB: 3 },
     cannotBeBooster: [],
     retired: null,
     facts: [
@@ -54,7 +54,7 @@ export const PRODUCTS = [
     maxAgeDays: null,
     insertMinAgeDays: 0,
     lineage: null,
-    setsSeriesLength: null,
+    setsSeriesLength: { HepB: 3 },
     cannotBeBooster: [],
     retired: null,
     facts: [
@@ -732,7 +732,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 42,
     insertMaxAgeDays: 2192,
     lineage: null,
-    setsSeriesLength: null,
+    setsSeriesLength: { HepB: 4 },
     cannotBeBooster: [],
     retired: null,
     facts: [
@@ -835,7 +835,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 42,
     insertMaxAgeDays: 1461,
     lineage: null,
-    setsSeriesLength: { Hib: 4 },
+    setsSeriesLength: { Hib: 4, HepB: 4 },
     cannotBeBooster: ['DTaP', 'IPV', 'Hib'],
     retired: null,
     facts: [

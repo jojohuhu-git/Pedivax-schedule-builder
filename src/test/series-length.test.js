@@ -93,6 +93,31 @@ describe('seriesLength.js — MenB', () => {
   });
 });
 
+describe('seriesLength.js — Hepatitis B (added 2026-09-26, same pattern as Hib)', () => {
+  it('is 3 doses when a monovalent product is stocked', () => {
+    const result = resolveSeriesLength(SERIES.HepB, new Set(['Engerix-B']));
+    expect(result.doseCount).toBe(3);
+    expect(result.variant.id).toBe('monovalent');
+  });
+
+  it('either monovalent brand alone is enough — requiresAllDosesFrom means "any of", not "all of", here', () => {
+    const result = resolveSeriesLength(SERIES.HepB, new Set(['Recombivax HB']));
+    expect(result.doseCount).toBe(3);
+  });
+
+  it('is 4 doses when only a HepB-containing combo is stocked', () => {
+    const result = resolveSeriesLength(SERIES.HepB, new Set(['Pediarix']));
+    expect(result.doseCount).toBe(4);
+    expect(result.variant.id).toBe('combo');
+  });
+
+  it('still defaults to the shorter monovalent path when both a monovalent product and a combo are stocked', () => {
+    const result = resolveSeriesLength(SERIES.HepB, new Set(['Engerix-B', 'Pediarix']));
+    expect(result.doseCount).toBe(3);
+    expect(result.variant.id).toBe('monovalent');
+  });
+});
+
 describe('seriesLength.js — plain series pass through untouched', () => {
   it('a series with no variants just returns its own doses', () => {
     const result = resolveSeriesLength(SERIES.DTaP, new Set(['Daptacel']));
