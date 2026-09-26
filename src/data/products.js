@@ -658,6 +658,61 @@ export const PRODUCTS = [
     ],
   },
   {
+    name: 'Menveo',
+    group: 'MenACWY',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'MenACWY', doses: [1, 2] }],
+    minAgeDays: 61,
+    maxAgeDays: 20089,
+    insertMinAgeDays: 61,
+    insertMaxAgeDays: 20089,
+    lineage: null,
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed 2 months through 55 years; single dose covers either the 11-12 ' +
+          'year primary or the 16-year booster — matches CDC/ACIP\'s routine ' +
+          'schedule (the insert\'s own booster language is framed around ' +
+          '"continued risk," reflecting its original trials, not ACIP\'s later ' +
+          'routine-for-everyone policy; the age window still covers it).',
+        source: 'insertMenveo',
+        verified: '2026-09-25',
+        quote:
+          'MENVEO is a vaccine indicated for active immunization ... in ' +
+          'individuals 2 months through 55 years of age.',
+      },
+    ],
+  },
+  {
+    name: 'MenQuadfi',
+    group: 'MenACWY',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'MenACWY', doses: [1, 2] }],
+    minAgeDays: 42,
+    maxAgeDays: null,
+    insertMinAgeDays: 42,
+    lineage: null,
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed from 6 weeks of age (matches AAP, not CDC 2025\'s 2-year ' +
+          'figure — see the MenACWY series facts). A single dose covers either the ' +
+          '11-12 year primary or the 16-year booster.',
+        source: 'insertMenQuadfi',
+        verified: '2026-09-25',
+        quote: 'MenQuadfi is approved for use in individuals 6 weeks of age and older.',
+      },
+    ],
+  },
+  {
     name: 'Pediarix',
     group: 'Combination products',
     kind: 'combination',

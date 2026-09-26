@@ -695,4 +695,47 @@ export const SERIES = {
       },
     ],
   },
+
+  // MenACWY, routine healthy-adolescent schedule only (this app's v1 has no
+  // risk-condition/infant branch). No variants — Menveo and MenQuadfi both
+  // cover both doses identically for this population.
+  MenACWY: {
+    key: 'MenACWY',
+    name: 'Meningococcal ACWY',
+    abbr: 'MenACWY',
+    route: 'injection',
+    doses: [
+      { n: 1, at: ['y11', 'y12'], minAgeDays: 4018 },
+      { n: 2, at: ['y16'], booster: true, minIntervalFromPrevDays: 56 },
+    ],
+    facts: [
+      {
+        claim: '2-dose series: primary at 11-12 years, booster at 16.',
+        source: 'cdc2025MenacwyNotes',
+        verified: '2026-09-25',
+        quote: '2-dose series at age 11–12 years; 16 years',
+      },
+      {
+        claim:
+          'Minimum interval between doses is 8 weeks — never binds this app\'s ' +
+          'on-time plan, which spaces the two doses roughly 4 years apart.',
+        source: 'cdc2025MenacwyIntervals',
+        verified: '2026-09-25',
+        quote: 'Minimum interval between doses: 8 weeks',
+      },
+      {
+        claim:
+          "CDC 2025 gives MenQuadfi a 2-year minimum age; AAP says 6 weeks, and " +
+          "MenQuadfi's own FDA insert independently agrees with AAP, not CDC. AAP " +
+          'governs (never adopt a CDC revision narrower than AAP) — MeningoVax ' +
+          'already ships this; this app matches it.',
+        source: 'waDohMenQuadfiAapAlignment',
+        verified: '2026-09-22',
+        quote:
+          'Updated MenACWY recommendations to align with the American Academy of ' +
+          'Pediatrics. The minimum age for the first MenQuadfi dose is now 6 weeks, ' +
+          'instead of 2 years for children who meet the recommendation.',
+      },
+    ],
+  },
 };
