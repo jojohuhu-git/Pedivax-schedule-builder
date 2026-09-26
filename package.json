@@ -1,0 +1,27 @@
+{
+  "name": "pedivax-schedule-builder",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "A clinician ticks the vaccine products their clinic stocks; the app plans the most efficient birth-to-18 schedule for a healthy child with no prior vaccines.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.8",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.6.7",
+    "@vitejs/plugin-react": "^4.3.1",
+    "happy-dom": "^14.12.3",
+    "vite": "^5.4.2",
+    "vitest": "^2.0.5"
+  }
+}

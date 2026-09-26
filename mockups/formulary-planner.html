@@ -1,0 +1,529 @@
+<title>Formulary Schedule Builder</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#f7f9fa; --surface:#ffffff; --surface-2:#eff3f5;
+  --ink:#16202b; --ink-2:#4c5a67; --ink-3:#77858f;
+  --line:#dbe2e7; --line-strong:#b9c5cd;
+  --accent:#0d5b6b; --accent-soft:#e2f0f2; --accent-line:#8fc2cb;
+  --warn:#8a5410; --warn-soft:#fbf0de; --warn-line:#e0bc84;
+  --gap:#8c2f2f; --gap-soft:#fbeaea; --gap-line:#dda2a2;
+  --oral:#3d5a2b; --oral-soft:#eaf1e4; --oral-line:#a9c295;
+  --sdm:#4a4080; --sdm-soft:#eceaf6; --sdm-line:#a9a2cf;
+  --r:5px;
+  --f-sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0e141a; --surface:#161e26; --surface-2:#1d2831;
+    --ink:#e7edf2; --ink-2:#a3b2bf; --ink-3:#77878f;
+    --line:#2a3741; --line-strong:#3c4c58;
+    --accent:#5cb4c6; --accent-soft:#132c33; --accent-line:#2d6272;
+    --warn:#dda45c; --warn-soft:#2e2414; --warn-line:#6b5227;
+    --gap:#e09393; --gap-soft:#301919; --gap-line:#6d3636;
+    --oral:#a3c78c; --oral-soft:#1b2617; --oral-line:#415633;
+    --sdm:#a8a0dc; --sdm-soft:#1e1b2e; --sdm-line:#453f6b;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0e141a; --surface:#161e26; --surface-2:#1d2831;
+  --ink:#e7edf2; --ink-2:#a3b2bf; --ink-3:#77878f;
+  --line:#2a3741; --line-strong:#3c4c58;
+  --accent:#5cb4c6; --accent-soft:#132c33; --accent-line:#2d6272;
+  --warn:#dda45c; --warn-soft:#2e2414; --warn-line:#6b5227;
+  --gap:#e09393; --gap-soft:#301919; --gap-line:#6d3636;
+  --oral:#a3c78c; --oral-soft:#1b2617; --oral-line:#415633;
+  --sdm:#a8a0dc; --sdm-soft:#1e1b2e; --sdm-line:#453f6b;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-sans);line-height:1.5;
+  padding-block:0;padding-left:20px;padding-right:20px;max-width:1240px;margin:0 auto}
+h1,h2,h3{text-wrap:balance;margin:0}
+.eyebrow{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+
+header{padding-block:28px 18px;border-bottom:1px solid var(--line)}
+.h-top{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.h-top>div:first-child{flex:1;min-width:250px}
+h1{font-size:25px;font-weight:600;letter-spacing:-.015em}
+.sub{color:var(--ink-2);font-size:14px;margin-top:5px;max-width:62ch}
+#print{font:inherit;font-size:13px;font-weight:500;border:1px solid var(--line-strong);background:var(--surface);
+  color:var(--ink);border-radius:var(--r);padding:7px 15px;cursor:pointer}
+#print:hover{border-color:var(--accent);color:var(--accent)}
+.banner{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.note{border:1px solid var(--line);border-left:3px solid var(--warn-line);background:var(--warn-soft);
+  padding:10px 13px;border-radius:var(--r);font-size:13px;color:var(--ink)}
+.note.draft{border-left-color:var(--gap-line);background:var(--gap-soft)}
+.note b{font-weight:600}
+
+.wrap{display:grid;grid-template-columns:288px 1fr;gap:28px;align-items:start;padding-block:22px 44px}
+@media(max-width:860px){.wrap{grid-template-columns:1fr;gap:20px}}
+
+.rail{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  position:sticky;top:12px;max-height:calc(100vh - 28px);overflow-y:auto}
+@media(max-width:860px){.rail{position:static;max-height:none}}
+.rail-head{padding:13px 15px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.rail-head h2{font-size:14px;font-weight:600}
+.linkbtn{background:none;border:none;color:var(--accent);font:inherit;font-size:12px;cursor:pointer;padding:0;text-decoration:underline}
+.linkbtn:hover{opacity:.75}
+.grp{border-bottom:1px solid var(--line);padding:10px 15px 12px}
+.grp:last-child{border-bottom:none}
+.grp-t{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:7px}
+.grp.combo{background:var(--surface-2)}
+.grp.sdmgrp{background:var(--sdm-soft)}
+.grp.sdmgrp .grp-t{color:var(--sdm)}
+label.chk{display:flex;gap:9px;align-items:flex-start;padding:3px 0;cursor:pointer;font-size:13px}
+label.chk input{margin:3px 0 0;accent-color:var(--accent);flex:none;width:14px;height:14px}
+label.chk .nm{font-weight:500}
+label.chk .cv{display:block;color:var(--ink-3);font-size:11.5px;font-family:var(--f-mono);margin-top:1px}
+label.chk:has(input:checked) .nm{color:var(--accent)}
+label.chk input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.commit{margin-top:8px;border:1px solid var(--warn-line);background:var(--warn-soft);border-radius:var(--r);padding:8px 10px}
+.commit p{margin:0 0 6px;font-size:12px;color:var(--ink);line-height:1.4}
+.commit select{font:inherit;font-size:12.5px;width:100%;padding:4px 6px;border:1px solid var(--line-strong);
+  border-radius:3px;background:var(--surface);color:var(--ink)}
+.commit .cost{display:block;margin-top:5px;font-size:11.5px;color:var(--warn);font-family:var(--f-mono)}
+
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:10px}
+@media(max-width:520px){.sum{grid-template-columns:1fr}}
+.sum div{background:var(--surface);padding:13px 15px}
+.sum .n{font-family:var(--f-mono);font-size:27px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.15}
+.sum .l{font-size:12px;color:var(--ink-2);margin-top:2px}
+.sum .bad .n{color:var(--gap)}
+.sum .sd .n{color:var(--sdm);font-size:22px}
+.quiet{font-size:12.5px;color:var(--ink-2);margin:0 0 18px;line-height:1.45}
+.quiet b{font-weight:600;color:var(--ink)}
+
+.visit{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);margin-bottom:11px;overflow:hidden}
+.visit.sdmvisit{border-left:3px solid var(--sdm-line)}
+.v-head{display:flex;align-items:baseline;gap:11px;padding:10px 15px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.v-age{font-weight:600;font-size:15px;min-width:86px}
+.v-meta{font-size:12px;color:var(--ink-2);font-family:var(--f-mono);margin-left:auto}
+.shots{padding:4px 0}
+.shot{display:flex;gap:12px;padding:9px 15px;align-items:flex-start;border-top:1px solid var(--line)}
+.shot:first-child{border-top:none}
+.shot.sdmshot{background:var(--sdm-soft)}
+.shot-n{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);width:18px;flex:none;padding-top:3px;text-align:right}
+.shot-body{flex:1;min-width:0}
+.shot-nm{font-weight:600;font-size:14px}
+.tag{display:inline-block;font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  padding:1px 6px;border-radius:3px;margin-left:7px;vertical-align:1px}
+.tag.combo{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-line)}
+.tag.oral{background:var(--oral-soft);color:var(--oral);border:1px solid var(--oral-line)}
+.tag.sdm{background:var(--sdm-soft);color:var(--sdm);border:1px solid var(--sdm-line)}
+.ants{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.ant{border:1px solid var(--line-strong);border-radius:3px;padding:2px 7px;font-size:12px;background:var(--paper);
+  display:flex;gap:7px;align-items:baseline}
+.ant .a{font-weight:600}
+.ant .d{font-family:var(--f-mono);font-size:11px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.ant.boost{border-color:var(--warn-line);background:var(--warn-soft)}
+.ant.boost .d{color:var(--warn)}
+.moved,.sdmline{font-size:11.5px;margin-top:5px;line-height:1.4}
+.moved{color:var(--warn)}
+.sdmline{color:var(--sdm)}
+
+.panel{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:14px 16px;margin-bottom:22px}
+.panel.gap{border-left:3px solid var(--gap-line);background:var(--gap-soft)}
+.panel h3{font-size:14px;font-weight:600;margin-bottom:7px}
+.panel p{font-size:13px;color:var(--ink-2);margin:0 0 9px}
+.gaplist{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:5px}
+.gaplist li{font-size:13px;display:flex;gap:9px}
+.gaplist b{font-weight:600;min-width:74px}
+.sugg{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.sugg-row{background:var(--surface);display:flex;gap:12px;align-items:center;padding:9px 13px;flex-wrap:wrap}
+.sugg-row .s-nm{font-weight:600;font-size:13.5px;min-width:96px}
+.sugg-row .s-cv{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3);flex:1;min-width:130px}
+.sugg-row .s-win{font-family:var(--f-mono);font-size:12.5px;font-weight:600;color:var(--accent);white-space:nowrap}
+.sugg-row .s-win.none{color:var(--ink-3);font-weight:400}
+.sugg-row button{font:inherit;font-size:12px;border:1px solid var(--line-strong);background:var(--paper);
+  color:var(--ink);border-radius:3px;padding:3px 10px;cursor:pointer}
+.sugg-row button:hover{border-color:var(--accent);color:var(--accent)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);padding-block:4px 16px}
+.legend span{display:flex;gap:6px;align-items:center}
+.sw{width:11px;height:11px;border-radius:2px;border:1px solid}
+.sw.b{background:var(--warn-soft);border-color:var(--warn-line)}
+.sw.c{background:var(--accent-soft);border-color:var(--accent-line)}
+.sw.o{background:var(--oral-soft);border-color:var(--oral-line)}
+.sw.s{background:var(--sdm-soft);border-color:var(--sdm-line)}
+footer{border-top:1px solid var(--line);padding-block:16px 30px;font-size:12px;color:var(--ink-3)}
+
+@media print{
+  body{max-width:none;padding:0;background:#fff;color:#000;font-size:11pt}
+  .rail,#print,#sugg-panel,.linkbtn,footer{display:none!important}
+  .wrap{display:block;padding:0}
+  .visit,.panel,.sum{break-inside:avoid;box-shadow:none}
+  .sum{margin-bottom:8px}
+  header{padding-block:0 10px}
+  .note{background:#fff;border-color:#999}
+}
+</style>
+
+<header>
+  <div class="h-top">
+    <div>
+      <div class="eyebrow">Design mockup &middot; not a clinical tool</div>
+      <h1>Formulary Schedule Builder</h1>
+      <p class="sub">Tick the vaccine products your clinic stocks. The plan below shows every visit from birth
+      to 18 years for a healthy child with no prior vaccines, and which antigen each shot covers.</p>
+    </div>
+    <button id="print" type="button">Print / save PDF</button>
+  </div>
+  <div class="banner">
+    <div class="note draft"><b>Draft clinical data.</b> Drafted from vaxapp's data files as a layout example.
+      Every age, dose count and product rule must be re-checked against CDC/AAP live before this is a real app.</div>
+    <div class="note"><b>Not included in this plan:</b> influenza (every year from 6 months) and COVID-19
+      (per current season) follow their own annual cadence, not fixed well-child ages. RSV antibody is
+      seasonal and is not a vaccine series. Give these alongside the plan below.</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside class="rail">
+    <div class="rail-head">
+      <h2>What we stock</h2>
+      <button class="linkbtn" id="reset" type="button">Reset</button>
+    </div>
+    <div id="rail-body"></div>
+  </aside>
+
+  <main>
+    <div class="sum" id="sum"></div>
+    <p class="quiet" id="quiet"></p>
+    <div class="legend">
+      <span><span class="sw c"></span>Combination product</span>
+      <span><span class="sw b"></span>Booster dose</span>
+      <span><span class="sw o"></span>Oral &mdash; not an injection</span>
+      <span><span class="sw s"></span>Shared decision &mdash; not routine</span>
+    </div>
+    <div id="gaps"></div>
+    <div id="visits"></div>
+    <div class="panel" id="sugg-panel">
+      <h3>What you could add</h3>
+      <p>Products you don't stock, and how many injections each would save across the whole
+      birth-to-18 plan.</p>
+      <div class="sugg" id="sugg"></div>
+    </div>
+  </main>
+</div>
+
+<footer>Mockup for Pedivax-schedule-builder &middot; healthy child, no prior doses, no risk factors.</footer>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────
+// DRAFT DATA — layout example only. Every row needs live CDC/AAP verification.
+// Hib dose counts + the brand-mixing rule WERE verified live 2026-09-24:
+//   CDC child/adolescent schedule notes (Hib) and immunize.org Ask the Experts (Hib).
+// ─────────────────────────────────────────────────────────────────────────
+const VISITS = [
+  {id:'b',  label:'Birth'},     {id:'m2', label:'2 months'},  {id:'m4', label:'4 months'},
+  {id:'m6', label:'6 months'},  {id:'m12',label:'12 months'}, {id:'m15',label:'15 months'},
+  {id:'m18',label:'18 months'}, {id:'y4', label:'4 years'},   {id:'y11',label:'11 years'},
+  {id:'y12',label:'12 years'},  {id:'y16',label:'16 years'},  {id:'y17',label:'17 years'}
+];
+const VI = Object.fromEntries(VISITS.map((v,i)=>[v.id,i]));
+
+// Well-child visits in the Bright Futures periodicity schedule where this plan
+// needs nothing. Listed so nobody wonders whether the app dropped them.
+const NO_VAX_VISITS = ['1 month','9 months','2 years','2½ years','3 years','5 years',
+  '6 years','7 years','8 years','9 years','10 years','13 years','14 years','15 years','18 years'];
+
+const SERIES = {
+  HepB:   {name:'Hepatitis B', doses:[{ok:['b']},{ok:['m2']},{ok:['m6','m12','m15','m18']}]},
+  RV:     {name:'Rotavirus', oral:true, doses:[{ok:['m2']},{ok:['m4']},{ok:['m6']}]},
+  DTaP:   {name:'DTaP', doses:[{ok:['m2']},{ok:['m4']},{ok:['m6']},{ok:['m15','m18'],boost:1},{ok:['y4'],boost:1}]},
+  Hib:    {name:'Hib', doses:[{ok:['m2']},{ok:['m4']},{ok:['m6']},{ok:['m12','m15'],boost:1}]},
+  PCV:    {name:'Pneumococcal', doses:[{ok:['m2']},{ok:['m4']},{ok:['m6']},{ok:['m12','m15'],boost:1}]},
+  IPV:    {name:'Polio', doses:[{ok:['m2']},{ok:['m4']},{ok:['m6','m12','m15','m18']},{ok:['y4'],boost:1}]},
+  MMR:    {name:'MMR', doses:[{ok:['m12','m15']},{ok:['y4']}]},
+  VAR:    {name:'Varicella', doses:[{ok:['m12','m15']},{ok:['y4']}]},
+  HepA:   {name:'Hepatitis A', doses:[{ok:['m12','m15']},{ok:['m18']}]},
+  Tdap:   {name:'Tdap', doses:[{ok:['y11'],boost:1}]},
+  HPV:    {name:'HPV', doses:[{ok:['y11']},{ok:['y12']}]},
+  MenACWY:{name:'MenACWY', doses:[{ok:['y11']},{ok:['y16'],boost:1}]},
+  MenB:   {name:'MenB', sdm:'Not a routine dose. CDC has MenB at 16–23 years by shared clinical decision-making with the family.',
+           doses:[{ok:['y16']},{ok:['y17']}]}
+};
+
+// A series whose dose COUNT depends on which brand is used start to finish.
+// The clinician must commit to one; the app must not guess.
+const COMMIT = {
+  Hib: {label:'Hib', why:'A 2-dose primary series is only correct when both doses are PedvaxHIB. Any other product, or a mix of brands, needs a 3-dose primary series.'},
+  RV:  {label:'Rotavirus', why:'Rotarix and RotaTeq are different series lengths and are not interchangeable.'},
+  MenB:{label:'MenB', why:'Bexsero and Trumenba are not interchangeable. The whole series must be one brand.'}
+};
+
+const PRODUCTS = [
+  {g:'Hepatitis B', n:'Engerix-B',      covers:{HepB:[1,3]}},
+  {g:'Hepatitis B', n:'Recombivax HB',  covers:{HepB:[1,3]}},
+  {g:'Rotavirus',   n:'Rotarix',        covers:{RV:[1,2]}, sets:{RV:2}, oral:true},
+  {g:'Rotavirus',   n:'RotaTeq',        covers:{RV:[1,3]}, sets:{RV:3}, oral:true},
+  {g:'DTaP',        n:'Daptacel',       covers:{DTaP:[1,5]}},
+  {g:'DTaP',        n:'Infanrix',       covers:{DTaP:[1,5]}},
+  {g:'Hib',         n:'ActHIB',         covers:{Hib:[1,4]}, sets:{Hib:4}},
+  {g:'Hib',         n:'Hiberix',        covers:{Hib:[1,4]}, sets:{Hib:4}},
+  {g:'Hib',         n:'PedvaxHIB',      covers:{Hib:[1,4]}, sets:{Hib:3}},
+  {g:'Pneumococcal',n:'Prevnar 20',     covers:{PCV:[1,4]}},
+  {g:'Pneumococcal',n:'Vaxneuvance',    covers:{PCV:[1,4]}},
+  {g:'Polio',       n:'IPOL',           covers:{IPV:[1,4]}},
+  {g:'MMR',         n:'M-M-R II',       covers:{MMR:[1,2]}},
+  {g:'MMR',         n:'Priorix',        covers:{MMR:[1,2]}},
+  {g:'Varicella',   n:'Varivax',        covers:{VAR:[1,2]}},
+  {g:'Hepatitis A', n:'Havrix',         covers:{HepA:[1,2]}},
+  {g:'Hepatitis A', n:'Vaqta',          covers:{HepA:[1,2]}},
+  {g:'Tdap',        n:'Adacel',         covers:{Tdap:[1,1]}},
+  {g:'Tdap',        n:'Boostrix',       covers:{Tdap:[1,1]}},
+  {g:'HPV',         n:'Gardasil 9',     covers:{HPV:[1,2]}},
+  {g:'MenACWY',     n:'Menveo',         covers:{MenACWY:[1,2]}},
+  {g:'MenACWY',     n:'MenQuadfi',      covers:{MenACWY:[1,2]}},
+  {g:'Combination products', combo:true, n:'Pediarix',  covers:{DTaP:[1,3],HepB:[1,3],IPV:[1,3]}},
+  {g:'Combination products', combo:true, n:'Pentacel',  covers:{DTaP:[1,4],IPV:[1,4],Hib:[1,4]}, sets:{Hib:4}},
+  {g:'Combination products', combo:true, n:'Vaxelis',   covers:{DTaP:[1,3],IPV:[1,3],Hib:[1,3],HepB:[1,3]}, sets:{Hib:4}},
+  {g:'Combination products', combo:true, n:'Kinrix',    covers:{DTaP:[5,5],IPV:[4,4]}},
+  {g:'Combination products', combo:true, n:'Quadracel', covers:{DTaP:[5,5],IPV:[4,4]}},
+  {g:'Combination products', combo:true, n:'ProQuad',   covers:{MMR:[1,2],VAR:[1,2]}},
+  {g:'Shared-decision products', sdm:true, n:'Bexsero', covers:{MenB:[1,2]}, sets:{MenB:2}},
+  {g:'Shared-decision products', sdm:true, n:'Trumenba',covers:{MenB:[1,2]}, sets:{MenB:2}}
+];
+const DEFAULT_ON = ['Engerix-B','RotaTeq','Daptacel','ActHIB','Prevnar 20','IPOL','M-M-R II',
+  'Varivax','Havrix','Boostrix','Gardasil 9','Menveo'];
+
+const ABBR = {HepB:'HepB',RV:'RV',DTaP:'DTaP',Hib:'Hib',PCV:'PCV',IPV:'IPV',MMR:'MMR',
+  VAR:'VAR',HepA:'HepA',Tdap:'Tdap',HPV:'HPV',MenACWY:'MenACWY',MenB:'MenB'};
+
+let stocked = new Set(DEFAULT_ON);
+let commitTo = {};     // antigen -> chosen product name, when more than one is stocked
+
+// ─────────────────────────────────────────────────────────────────────────
+// PLANNER
+// ─────────────────────────────────────────────────────────────────────────
+const covers = (p, ant, dose) => { const r = p.covers[ant]; return !!r && dose >= r[0] && dose <= r[1]; };
+
+/** Products stocked for a committing antigen, in checklist order. */
+const stockedFor = (ant, sel) => PRODUCTS.filter(p => sel.has(p.n) && p.sets && p.sets[ant] != null);
+
+function plan(sel, commits){
+  let prods = PRODUCTS.filter(p => sel.has(p.n));
+
+  // 1. Series length. Where a brand choice sets the length, honour the commitment;
+  //    if none was made, the clinic may mix, which is the longer series.
+  const totals = {}, committed = {};
+  for (const [ant, s] of Object.entries(SERIES)){
+    const opts = stockedFor(ant, sel);
+    if (!opts.length){ totals[ant] = s.doses.length; continue; }
+    const chosen = commits[ant] && opts.find(p => p.n === commits[ant]);
+    if (chosen){ committed[ant] = chosen.n; totals[ant] = chosen.sets[ant]; }
+    else totals[ant] = Math.max(...opts.map(p => p.sets[ant]));
+  }
+  // A committed antigen uses only that product — drop its rivals from this plan.
+  for (const [ant, name] of Object.entries(committed))
+    prods = prods.filter(p => !(p.sets && p.sets[ant] != null) || p.n === name);
+
+  // 2. Every dose starts at the earliest visit it is allowed on.
+  const items = [];
+  for (const [ant, s] of Object.entries(SERIES)){
+    if (SERIES[ant].sdm && !prods.some(p => p.covers[ant])) continue;   // not offered
+    for (let d = 1; d <= totals[ant]; d++){
+      const spec = s.doses[d-1];
+      if (!spec) continue;
+      items.push({ant, dose:d, total:totals[ant], ok:spec.ok, boost:!!spec.boost,
+                  sdm:!!s.sdm, at:spec.ok[0], moved:false});
+    }
+  }
+
+  // 3. Shift a dose later, inside its own legal window, when that lets a stocked
+  //    combination product carry it. Never moves outside `ok`.
+  for (const it of items){
+    if (it.ok.length < 2) continue;
+    const best = vid => {
+      const co = new Set(items.filter(x => x.at === vid && x !== it).map(x => x.ant));
+      let n = 0;
+      for (const p of prods) if (p.combo && covers(p, it.ant, it.dose)){
+        let c = 1; for (const a of co) if (p.covers[a]) c++;
+        n = Math.max(n, c);
+      }
+      return n;
+    };
+    const now = best(it.at);
+    for (const vid of it.ok){
+      if (VI[vid] <= VI[it.at]) continue;
+      if (best(vid) > now){ it.at = vid; it.moved = true; break; }
+    }
+  }
+
+  // 4. At each visit, cover what is due with the fewest products.
+  const uncoverable = {}, visits = [];
+  for (const v of VISITS){
+    let due = items.filter(x => x.at === v.id);
+    const shots = [];
+    while (due.length){
+      let pick = null, take = [];
+      for (const p of prods){
+        const hit = due.filter(x => covers(p, x.ant, x.dose));
+        if (!hit.length) continue;
+        if (hit.length > take.length || (hit.length === take.length && p.oral && !(pick && pick.oral))){
+          pick = p; take = hit;
+        }
+      }
+      if (!pick) break;
+      shots.push({p:pick, items:take, sdm:take.every(x => x.sdm)});
+      due = due.filter(x => !take.includes(x));
+    }
+    for (const x of due) if (!x.sdm) (uncoverable[x.ant] ||= []).push(x.dose);
+    shots.sort((a,b) => (a.sdm - b.sdm) || (b.items.length - a.items.length) || a.p.n.localeCompare(b.p.n));
+    if (shots.length) visits.push({v, shots, sdmOnly: shots.every(s => s.sdm)});
+  }
+
+  const all = visits.flatMap(x => x.shots);
+  return {
+    visits, uncoverable, totals, committed,
+    sticks: all.filter(s => !s.p.oral && !s.sdm).length,
+    sdmSticks: all.filter(s => s.sdm).length,
+    used: visits.filter(x => !x.sdmOnly).length
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────────────────────────────────
+const el = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function renderRail(){
+  const groups = [];
+  for (const p of PRODUCTS){
+    let g = groups.find(x => x.t === p.g);
+    if (!g) groups.push(g = {t:p.g, combo:!!p.combo, sdm:!!p.sdm, items:[]});
+    g.items.push(p);
+  }
+  el('rail-body').innerHTML = groups.map(g => {
+    // Does this group's antigen force a commitment right now?
+    let commitHtml = '';
+    for (const [ant, meta] of Object.entries(COMMIT)){
+      const opts = stockedFor(ant, stocked);
+      if (opts.length < 2 || !g.items.some(p => p.sets && p.sets[ant] != null)) continue;
+      const cur = commitTo[ant] || '';
+      const costs = opts.map(p => {
+        const c = {...commitTo, [ant]:p.n};
+        return {n:p.n, doses:p.sets[ant], sticks:plan(stocked, c).sticks};
+      });
+      const low = Math.min(...costs.map(c => c.sticks));
+      commitHtml += `
+        <div class="commit">
+          <p>You stock ${opts.length} ${esc(meta.label)} products. Which will you use for the whole series?
+             ${esc(meta.why)}</p>
+          <select data-commit="${esc(ant)}" id="commit-${esc(ant)}">
+            <option value="">Not decided &mdash; plan for a mix</option>
+            ${costs.map(c => `<option value="${esc(c.n)}"${cur === c.n ? ' selected' : ''}>${esc(c.n)} &mdash; ${c.doses} doses</option>`).join('')}
+          </select>
+          <span class="cost">${costs.map(c =>
+            `${esc(c.n)}: ${c.sticks} injections${c.sticks === low && costs.some(o => o.sticks > low) ? ' (fewest)' : ''}`
+          ).join(' &nbsp;·&nbsp; ')}</span>
+        </div>`;
+    }
+    return `
+    <div class="grp${g.combo ? ' combo' : ''}${g.sdm ? ' sdmgrp' : ''}">
+      <div class="grp-t">${esc(g.t)}</div>
+      ${g.items.map(p => `
+        <label class="chk">
+          <input type="checkbox" id="p-${esc(p.n).replace(/\W/g,'')}" data-n="${esc(p.n)}"
+                 ${stocked.has(p.n) ? 'checked' : ''}>
+          <span><span class="nm">${esc(p.n)}</span>
+          <span class="cv">${Object.keys(p.covers).map(a => ABBR[a]).join(' + ')}${p.oral ? ' · oral' : ''}</span></span>
+        </label>`).join('')}
+      ${commitHtml}
+    </div>`;
+  }).join('');
+}
+
+function renderPlan(){
+  const r = plan(stocked, commitTo);
+  const gapCount = Object.keys(r.uncoverable).length;
+
+  el('sum').innerHTML = `
+    <div><div class="n">${r.sticks}</div><div class="l">injections, birth to 18 years</div></div>
+    <div><div class="n">${r.used}</div><div class="l">visits that need a vaccine</div></div>
+    ${gapCount
+      ? `<div class="bad"><div class="n">${gapCount}</div><div class="l">${gapCount === 1
+          ? 'antigen you cannot cover' : 'antigens you cannot cover'}</div></div>`
+      : `<div class="sd"><div class="n">${r.sdmSticks ? '+' + r.sdmSticks : 'None'}</div>
+         <div class="l">${r.sdmSticks ? 'shared-decision injections offered' : 'shared-decision products stocked'}</div></div>`}`;
+
+  el('quiet').innerHTML = `<b>No vaccines due at:</b> ${NO_VAX_VISITS.join(', ')}. These well-child
+    visits are left out of the plan below so the printed page stays short.`;
+
+  el('gaps').innerHTML = !gapCount ? '' : `
+    <div class="panel gap">
+      <h3>Nothing you stock can give these</h3>
+      <p>Tick a product that covers each one, or the child cannot complete the schedule here.</p>
+      <ul class="gaplist">${Object.entries(r.uncoverable).map(([a, ds]) =>
+        `<li><b>${esc(SERIES[a].name)}</b><span>dose${ds.length > 1 ? 's' : ''} ${ds.join(', ')} of ${r.totals[a]}</span></li>`
+      ).join('')}</ul>
+    </div>`;
+
+  el('visits').innerHTML = r.visits.map(({v, shots, sdmOnly}) => {
+    const n = shots.filter(s => !s.p.oral && !s.sdm).length;
+    const extras = [];
+    if (shots.some(s => s.p.oral)) extras.push('1 oral');
+    const sd = shots.filter(s => s.sdm).length;
+    if (sd) extras.push(`${sd} shared-decision`);
+    return `<div class="visit${sdmOnly ? ' sdmvisit' : ''}">
+      <div class="v-head"><span class="v-age">${esc(v.label)}</span>
+        <span class="v-meta">${n} injection${n === 1 ? '' : 's'}${extras.length ? ' + ' + extras.join(' + ') : ''}</span></div>
+      <div class="shots">${shots.map((s, i) => `
+        <div class="shot${s.sdm ? ' sdmshot' : ''}">
+          <div class="shot-n">${i + 1}</div>
+          <div class="shot-body">
+            <div class="shot-nm">${esc(s.p.n)}${
+              s.p.combo ? '<span class="tag combo">Combination</span>' : ''}${
+              s.p.oral ? '<span class="tag oral">Oral</span>' : ''}${
+              s.sdm ? '<span class="tag sdm">Shared decision</span>' : ''}</div>
+            <div class="ants">${s.items.map(it => `
+              <span class="ant${it.boost ? ' boost' : ''}">
+                <span class="a">${esc(ABBR[it.ant])}</span>
+                <span class="d">Dose ${it.dose} of ${it.total}${it.boost ? ' · booster' : ''}</span>
+              </span>`).join('')}</div>
+            ${s.sdm ? `<div class="sdmline">${esc(SERIES[s.items[0].ant].sdm)}</div>` : ''}
+            ${s.items.some(it => it.moved)
+              ? `<div class="moved">Moved later inside its allowed window so ${esc(s.p.n)} can carry it.</div>` : ''}
+          </div>
+        </div>`).join('')}</div>
+    </div>`;
+  }).join('');
+
+  const base = r.sticks;
+  const rows = PRODUCTS.filter(p => !stocked.has(p.n)).map(p => {
+    const t = new Set(stocked); t.add(p.n);
+    return {p, save: base - plan(t, commitTo).sticks};
+  }).sort((a, b) => b.save - a.save).slice(0, 6);
+  el('sugg').innerHTML = rows.map(({p, save}) => `
+    <div class="sugg-row">
+      <span class="s-nm">${esc(p.n)}</span>
+      <span class="s-cv">${Object.keys(p.covers).map(a => ABBR[a]).join(' + ')}</span>
+      <span class="s-win${save > 0 ? '' : ' none'}">${
+        save > 0 ? `&minus;${save} injection${save === 1 ? '' : 's'}`
+        : p.sdm ? 'shared decision' : 'no change'}</span>
+      <button type="button" data-add="${esc(p.n)}">Add</button>
+    </div>`).join('');
+}
+
+const render = () => { renderRail(); renderPlan(); };
+
+document.addEventListener('change', e => {
+  const ant = e.target.dataset.commit;
+  if (ant){ commitTo[ant] = e.target.value || undefined; render(); return; }
+  const n = e.target.dataset.n;
+  if (!n) return;
+  e.target.checked ? stocked.add(n) : stocked.delete(n);
+  // A brand that is no longer stocked cannot stay the committed choice.
+  for (const a of Object.keys(commitTo)) if (!stocked.has(commitTo[a])) delete commitTo[a];
+  render();
+});
+document.addEventListener('click', e => {
+  if (e.target.id === 'print'){ window.print(); return; }
+  if (e.target.id === 'reset'){ stocked = new Set(DEFAULT_ON); commitTo = {}; render(); return; }
+  const add = e.target.dataset.add;
+  if (add){ stocked.add(add); render(); }
+});
+render();
+</script>

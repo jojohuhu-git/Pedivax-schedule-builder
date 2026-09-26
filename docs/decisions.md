@@ -1,0 +1,188 @@
+# Decisions
+
+## Settled
+
+| Decision | Date |
+|---|---|
+| Repo name is **Pedivax-schedule-builder**, kept separate from the existing PediVax (vaxapp). | 2026-09-24 |
+| Version 1 is **healthy children only** — no asplenia, HIV, transplant or other risk conditions. | 2026-09-24 |
+| "Most efficient" means **fewest needle sticks and/or fewest office visits**, depending on which products are stocked. | 2026-09-24 |
+| Visits are **fixed to the standard well-child dates**. The app does not invent off-calendar visits. | 2026-09-24 |
+| A dose **may be shifted inside its own legal window** to catch a combination product, if the clinician stocks that combo. | 2026-09-24 |
+| The plan must **show which antigens each injection covers**, so a clinician can trace them. | 2026-09-24 |
+| Dose numbering follows MeningoVax: **"Dose 3 of 5"**, with boosters visually distinct from primary doses. | 2026-09-24 |
+| Products are chosen from a **checklist**, grouped by antigen and by combination product. | 2026-09-24 |
+| Optional / shared-decision doses (MenB) **are shown**, clearly marked, and counted separately. | 2026-09-24 |
+| Only visits where **something is due** are shown; the empty well-child visits are named in one line underneath. | 2026-09-24 |
+| Output is a **printable page / save as PDF**. | 2026-09-24 |
+| Annual vaccines (flu, COVID) sit in a **disclaimer band at the top**, not inside the plan. | 2026-09-24 |
+| The **rulebook is generated from the planner's data**, never written alongside it. | 2026-09-24 |
+| Every clinical rule carries **source, quoted sentence and a checked-on date**; a test fails when a date passes twelve months. | 2026-09-24 |
+| Products are **retired, never deleted** — `retired: '2026-03-01'`, so old plans stay explainable. | 2026-09-24 |
+| The plan speaks in **ages only** — it is a clinic protocol, not a per-child handout. No date of birth, no calendar dates. | 2026-09-25 |
+| For Hib, rotavirus and MenB the app **picks the shorter series and says why**; the clinician can override. | 2026-09-25 |
+| **HPV is a 2-dose series** — a birth-to-18 plan always starts in the 9–14 year band, where AAP gives 2 doses at 0 and 6–12 months (minimum interval 5 months; repeat if given too soon). Planned at the 11- and 12-year visits. | 2026-09-25 |
+| **vaxapp is not a port target.** The owner plans to rebuild it. Useful logic may be copied *out* of vaxapp; nothing is owed back to it. MeningoVax and PneumoVax remain live parity targets. | 2026-09-25 |
+| **Fewest injections is the score.** Visit count is a display nicety only — every visit is a Bright Futures check the child attends anyway, so an empty visit is not a trip saved. A test flags any plan where the two goals disagree. | 2026-09-25 |
+| **A package insert may fill a gap, never narrow a rule.** Where CDC/AAP say nothing brand-specific, the insert is an acceptable source — recorded with its revision date and marked on the rulebook as resting on an insert alone. It may never override an age or dose rule an organization has already made. | 2026-09-25 |
+| **"What you could add" ships** — the planner names products the clinic did *not* tick and says what stocking one would save. | 2026-09-25 |
+| **One update inbox per repo.** `docs/updates/INBOX.md` lives here; MeningoVax and PneumoVax keep their own. Each applied note names the other apps that owe the same change. | 2026-09-25 |
+
+## Found while mocking up
+
+**Some products commit the whole series.** The formulary checklist answers two different
+questions and the app must keep them apart:
+
+1. *What is in the fridge?* — plain yes/no per product.
+2. *Which one will you actually use?* — only for Hib, rotavirus and MenB, where the brand
+   choice sets the length of the entire series.
+
+Conflating those silently added an injection in the first mockup. Verified 2026-09-24:
+
+- **Hib** — PedvaxHIB start to finish is 3 doses. Any PRP-T product, or any mix of brands, is 4.
+- **Rotavirus** — Rotarix is 2 doses, RotaTeq is 3. Not interchangeable.
+- **MenB** — Bexsero and Trumenba are not interchangeable; one brand for both doses.
+
+**The two 4–6 year booster combos are licensed along manufacturer lines.** Verified
+2026-09-24 against MMWR 4 September 2015, 64(34):948-9 and immunize.org.
+
+- **Quadracel** — "approved for administration as a fifth dose in the DTaP series and as a
+  fourth or fifth dose in the IPV series in children aged 4 through 6 years who have
+  received 4 doses of DTaP-IPV-Hib (Pentacel, Sanofi Pasteur) and/or DTaP (Daptacel,
+  Sanofi Pasteur) vaccine." ACIP endorsed the licensed indications.
+- **Kinrix** — approved "in children ages 4 through 6 years who received DTaP (Infanrix)
+  and/or DTaP-HepB-IPV (Pediarix) as the first three doses and DTaP (Infanrix) as the
+  fourth dose."
+- **But the lineage is a preference, not a bar.** immunize.org: "you can give either
+  Kinrix or Quadracel as the fifth dose of DTaP and fourth dose of IPV at age 4 through 6
+  years if the previous brand is unknown or if Kinrix or Quadracel is the only product
+  stocked."
+
+This matters here more than it does in vaxapp. vaxapp meets a child whose earlier brands
+are often unknown, which is exactly the case the escape clause covers. This app *plans*
+the earlier doses, so it always knows the lineage — it can tell a clinic stocking Daptacel
+and Kinrix that Quadracel is the matched product, or reassure one that stocks only Kinrix.
+
+**Two smaller differences from vaxapp, both real:**
+- vaxapp's `COMBO_DOSE_GATES` allows Quadracel for IPV dose 4 only; the licence covers
+  dose 4 or 5.
+- vaxapp holds no lineage condition for either product at all.
+
+## Clinical authority — the edition this app is pinned to
+
+Decided 2026-09-24, after verifying the timeline live.
+
+**The app follows guidance as it stood before the federal changes that began in mid-2025,
+plus AAP, which has continued publishing its own schedule.** Where AAP and CDC disagree,
+AAP governs — the same rule the other apps already use.
+
+Verified timeline (Congressional Research Service, *Changes to CDC Vaccine
+Recommendations in 2025 and 2026*, IN12684):
+
+| Date | What happened |
+|---|---|
+| 27 May 2025 | COVID-19 for children moved from universal to shared clinical decision-making |
+| 9 June 2025 | "On June 9, 2025, the HHS Secretary removed all 17 then-sitting ACIP committee members and subsequently appointed new members." |
+| 18–19 Sept 2025 | COVID-19 for children → SCDM; MMRV changed from preferential to recommending against |
+| 4–5 Dec 2025 | Hepatitis B → SCDM for infants of HBsAg-negative or unknown mothers; CDC adopted it 17 Dec 2025 |
+| 5 Jan 2026 | New federal childhood schedule, "adopted through presidential directive rather than ACIP consultation" — hepatitis A, hepatitis B, COVID-19, rotavirus, influenza and meningococcal dropped from routine; RSV moved to high-risk |
+
+**So the cutoff is mid-2025, not 2026.** The practical line is the CDC 2025 schedule.
+
+**Useful accident:** the CDC notes page the rulebook quotes still serves *"Child Immunization
+Schedule Notes | Recommendations for Ages 18 Years or Younger, United States, 2025"*, last
+reviewed 2 July 2025. Every CDC quote in the rulebook is therefore from before the changes.
+That is luck, not a plan — the source label now names the edition and the date, and the
+quotes must be snapshotted into the data file rather than re-fetched from a live URL that
+could be replaced.
+
+**AAP is the forward source.** Its *Recommended Child and Adolescent Immunization Schedule
+for Ages 18 Years or Younger, United States, 2026* — **updated 2 September 2026**, fetched
+2026-09-24 — still carries every routine childhood vaccine, including the universal
+hepatitis B birth dose ("Birth weight ≥2000 grams: 1 dose within 24 hours of birth if
+medically stable"), identical to the CDC 2025 wording.
+
+### Two places AAP and CDC 2025 actually disagree — AAP wins in both
+
+1. **MMRV / ProQuad.** CDC 2025: separate MMR and varicella are recommended for dose 1 at
+   12–47 months. AAP: *"The AAP expresses no preference between MMR plus monovalent
+   varicella vaccine or MMRV for toddlers receiving their first immunization of this
+   kind"*, and *"For the 2nd dose at 4–6 years, MMRV generally is preferred over MMR plus
+   monovalent varicella to minimize the number of injections."* This directly serves the
+   app's goal — at the 4–6 year visit AAP actively wants the combination.
+2. **MenQuadfi's minimum age.** CDC 2025 says 2 years. AAP says **6 weeks**. Nearly two
+   years apart. (MeningoVax already shipped the 6-week floor; this app matches it.)
+
+### Brand minimum ages — the rule
+
+Each product carries **two** ages: the package-insert minimum, and the age CDC/ACIP/AAP
+say it may be used from. Where they differ, **CDC/ACIP/AAP wins** — the insert is often
+older and narrower. The insert is recorded anyway, so the difference is visible rather
+than silently resolved.
+
+## Verified 2026-09-25
+
+### Retired pneumococcal products
+
+**PCV13 / Prevnar 13 — discontinued 30 April 2024. Date NOT directly verified.**
+Pfizer's own discontinuation letter (dated January 2024, hosted by the distributor
+Medline) is titled *"Prevnar 13 Discontinuation April 30, 2024"*, and the search index
+summary states Pfizer's Return Goods Policy applied until that date. **The PDF itself
+returned HTTP 403 and could not be opened**, so this rests on the document's title and
+index summary, not on a sentence read live. It should be re-fetched before shipping.
+immunize.org Ask the Experts (Pneumococcal, reviewed 13 November 2024) confirms the
+status but gives no date: *"PCV13 (Prevnar 13, Pfizer) is FDA-licensed and may still be
+available in some clinics. It is no longer routinely recommended."*
+
+**PCV7 / Prevnar — no discontinuation date exists in any authoritative source.**
+Searched and read live. What the sources actually say:
+- MMWR 59(9), 12 March 2010: *"On February 24, 2010, a 13-valent pneumococcal conjugate
+  vaccine (PCV13 [Prevnar 13, Wyeth Pharmaceuticals Inc., a subsidiary of Pfizer Inc.])
+  was licensed by the Food and Drug Administration (FDA)"* and *"PCV13 is approved for
+  use among children aged 6 weeks--71 months and succeeds PCV7, which was licensed by
+  FDA in 2000."*
+- MMWR RR-59(11), the 2010 recommendations: read in full; **contains no sentence saying
+  PCV7 stopped being produced, distributed or available.** It says only that PCV13
+  *"replaces PCV7, which is made by the same manufacturer."*
+- immunize.org: providers were directed to *"transition from use of PCV7 to use of PCV13
+  for routine vaccination of children"* in February 2010.
+
+So the honest data-file entry is **"replaced by PCV13, February 2010"** — not
+"discontinued 2010". Writing a discontinuation date would be inventing one.
+
+### Does fewer needles ever disagree with fewer visits? Yes — and here is the mechanism
+
+Both goals are served by piling doses onto the same visit, so they agree nearly always.
+They come apart in one specific way: **combination products are licensed for particular
+dose numbers**, and that licence pins a dose to a particular visit.
+
+- Pediarix covers only DTaP doses 1–3. Kinrix and Quadracel cover only DTaP dose 5.
+  Vaxelis may not be the Hib booster.
+- Saving a needle therefore requires two doses to meet at the one visit where the combo
+  is licensed for both of their dose numbers.
+- Emptying a visit requires the opposite freedom — moving a dose anywhere in its window.
+
+Worked example. A clinic stocks Pentacel (DTaP 1–4, IPV 1–4, Hib 1–4).
+- *Needles-first:* DTaP dose 4 and Hib dose 4 both at 15 months, one Pentacel injection
+  instead of three. The 18-month visit survives, holding hepatitis A dose 2 alone.
+- *Visits-first:* push DTaP dose 4 out to 18 months to share the visit with hepatitis A
+  dose 2, and the 15-month visit may empty — but DTaP 4 and Hib 4 are now apart, so
+  Pentacel covers neither pairing and the child takes more injections.
+
+**But "fewer visits" saves the family nothing.** Every visit in this plan is a Bright
+Futures well-child check the child attends anyway; the app never invents a visit. An
+"empty" visit is a check-up with no shot, not a trip avoided. Needles are the only cost
+the child actually bears.
+
+**Proposed rule (awaiting owner confirmation):** fewest injections is the score; fewest
+visits is a display tie-break only; a test flags any plan where the two disagree, so a
+real case is reported rather than silently resolved.
+
+## Still open
+
+- **Re-fetch Pfizer's Prevnar 13 discontinuation letter** to confirm 30 April 2024 from
+  a sentence rather than a document title.
+- **Snapshotting the CDC 2025 quotes into the data file** so the app does not depend on a
+  live URL whose contents can be replaced.
+- **The 16 single-antigen brand rules still need their inserts read.** The rule for how
+  to do it is settled above; the reading has not been done.

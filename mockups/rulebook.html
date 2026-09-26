@@ -1,0 +1,714 @@
+<title>Schedule Builder Rulebook</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#f7f9fa; --surface:#ffffff; --surface-2:#eff3f5;
+  --ink:#16202b; --ink-2:#4c5a67; --ink-3:#77858f;
+  --line:#dbe2e7; --line-strong:#b9c5cd;
+  --accent:#0d5b6b; --accent-soft:#e2f0f2; --accent-line:#8fc2cb;
+  --warn:#8a5410; --warn-soft:#fbf0de; --warn-line:#e0bc84;
+  --gap:#8c2f2f; --gap-soft:#fbeaea; --gap-line:#dda2a2;
+  --oral:#3d5a2b; --oral-soft:#eaf1e4; --oral-line:#a9c295;
+  --sdm:#4a4080; --sdm-soft:#eceaf6; --sdm-line:#a9a2cf;
+  --r:5px;
+  --f-sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0e141a; --surface:#161e26; --surface-2:#1d2831;
+    --ink:#e7edf2; --ink-2:#a3b2bf; --ink-3:#77878f;
+    --line:#2a3741; --line-strong:#3c4c58;
+    --accent:#5cb4c6; --accent-soft:#132c33; --accent-line:#2d6272;
+    --warn:#dda45c; --warn-soft:#2e2414; --warn-line:#6b5227;
+    --gap:#e09393; --gap-soft:#301919; --gap-line:#6d3636;
+    --oral:#a3c78c; --oral-soft:#1b2617; --oral-line:#415633;
+    --sdm:#a8a0dc; --sdm-soft:#1e1b2e; --sdm-line:#453f6b;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0e141a; --surface:#161e26; --surface-2:#1d2831;
+  --ink:#e7edf2; --ink-2:#a3b2bf; --ink-3:#77878f;
+  --line:#2a3741; --line-strong:#3c4c58;
+  --accent:#5cb4c6; --accent-soft:#132c33; --accent-line:#2d6272;
+  --warn:#dda45c; --warn-soft:#2e2414; --warn-line:#6b5227;
+  --gap:#e09393; --gap-soft:#301919; --gap-line:#6d3636;
+  --oral:#a3c78c; --oral-soft:#1b2617; --oral-line:#415633;
+  --sdm:#a8a0dc; --sdm-soft:#1e1b2e; --sdm-line:#453f6b;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-sans);line-height:1.5;
+  padding-block:0;padding-left:20px;padding-right:20px;max-width:1240px;margin:0 auto}
+h1,h2,h3{text-wrap:balance;margin:0}
+a{color:var(--accent)}
+.eyebrow{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+
+header{padding-block:28px 18px;border-bottom:1px solid var(--line)}
+.h-top{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.h-top>div:first-child{flex:1;min-width:250px}
+h1{font-size:25px;font-weight:600;letter-spacing:-.015em}
+.sub{color:var(--ink-2);font-size:14px;margin-top:5px;max-width:64ch}
+.btns{display:flex;gap:8px}
+.btn{font:inherit;font-size:13px;font-weight:500;border:1px solid var(--line-strong);background:var(--surface);
+  color:var(--ink);border-radius:var(--r);padding:7px 15px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.banner{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.note{border:1px solid var(--line);border-left:3px solid var(--warn-line);background:var(--warn-soft);
+  padding:10px 13px;border-radius:var(--r);font-size:13px;color:var(--ink)}
+.note.draft{border-left-color:var(--gap-line);background:var(--gap-soft)}
+.note b{font-weight:600}
+
+.wrap{display:grid;grid-template-columns:232px 1fr;gap:28px;align-items:start;padding-block:22px 44px}
+@media(max-width:860px){.wrap{grid-template-columns:1fr;gap:20px}}
+
+.rail{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  position:sticky;top:12px;max-height:calc(100vh - 28px);overflow-y:auto}
+@media(max-width:860px){.rail{position:static;max-height:none}}
+.rail-head{padding:12px 15px;border-bottom:1px solid var(--line)}
+.rail-head h2{font-size:14px;font-weight:600}
+.rail-grp{border-bottom:1px solid var(--line);padding:9px 15px 11px}
+.rail-grp:last-child{border-bottom:none}
+.rail-grp .grp-t{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:6px}
+.rail a{display:block;font-size:13px;padding:2.5px 0;text-decoration:none;color:var(--ink)}
+.rail a:hover{color:var(--accent);text-decoration:underline}
+.rail a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:12px}
+@media(max-width:520px){.sum{grid-template-columns:1fr}}
+.sum div{background:var(--surface);padding:13px 15px}
+.sum .n{font-family:var(--f-mono);font-size:27px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.15}
+.sum .l{font-size:12px;color:var(--ink-2);margin-top:2px}
+.sum .ok .n{color:var(--accent)}
+.sum .bad .n{color:var(--gap)}
+.quiet{font-size:12.5px;color:var(--ink-2);margin:0 0 20px;line-height:1.5;max-width:76ch}
+.quiet b{font-weight:600;color:var(--ink)}
+
+.sec-t{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;
+  padding-bottom:6px;border-bottom:1px solid var(--line-strong);margin:26px 0 13px}
+.sec-t:first-of-type{margin-top:6px}
+
+.card{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);margin-bottom:11px;overflow:hidden;scroll-margin-top:14px}
+.c-head{display:flex;align-items:baseline;gap:10px;padding:10px 15px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.c-head h3{font-size:15px;font-weight:600}
+.c-abbr{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3)}
+.c-min{font-size:12px;color:var(--ink-2);margin-left:auto;font-family:var(--f-mono)}
+.c-body{padding:11px 15px 13px;display:flex;flex-direction:column;gap:11px}
+
+.doses{display:flex;flex-direction:column;gap:5px}
+.dgrp-t{font-size:12px;color:var(--ink-2);font-weight:500}
+.dose{display:flex;gap:11px;align-items:baseline;font-size:13.5px;padding:3px 0;flex-wrap:wrap}
+.dose .num{font-family:var(--f-mono);font-size:12px;color:var(--ink);background:var(--surface-2);
+  border:1px solid var(--line);border-radius:3px;padding:1px 7px;flex:none;font-variant-numeric:tabular-nums}
+.dose.boost .num{background:var(--warn-soft);border-color:var(--warn-line);color:var(--warn)}
+.dose .when{font-weight:500}
+.dose .kind{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.dose.boost .kind{color:var(--warn)}
+
+.fact{border-left:2px solid var(--accent-line);padding-left:11px;display:flex;flex-direction:column;gap:4px}
+.fact.unver{border-left-color:var(--gap-line)}
+.fact .claim{font-size:13px;color:var(--ink)}
+.fact blockquote{margin:0;font-family:var(--f-mono);font-size:12px;line-height:1.55;color:var(--ink-2);
+  background:var(--surface-2);border-radius:3px;padding:7px 9px;overflow-x:auto}
+.fact .src{font-size:11.5px;color:var(--ink-3);display:flex;gap:7px;flex-wrap:wrap;align-items:baseline}
+.fact .src a{text-decoration:none}
+.fact .src a:hover{text-decoration:underline}
+.chip{font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;border-radius:3px;
+  padding:1px 6px;border:1px solid var(--accent-line);background:var(--accent-soft);color:var(--accent);flex:none}
+.chip.un{border-color:var(--gap-line);background:var(--gap-soft);color:var(--gap)}
+.chip.oral{border-color:var(--oral-line);background:var(--oral-soft);color:var(--oral)}
+.chip.sdm{border-color:var(--sdm-line);background:var(--sdm-soft);color:var(--sdm)}
+.chip.ret{border-color:var(--line-strong);background:var(--surface-2);color:var(--ink-2)}
+
+.covers{display:flex;flex-wrap:wrap;gap:6px}
+.cov{border:1px solid var(--line-strong);border-radius:3px;padding:2px 8px;font-size:12px;background:var(--paper);
+  display:flex;gap:8px;align-items:baseline}
+.cov .a{font-weight:600}
+.cov .d{font-family:var(--f-mono);font-size:11px;color:var(--ink-2)}
+.card.retired{opacity:.72}
+.card.sdmcard{border-left:3px solid var(--sdm-line)}
+
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.tools input[type=search]{font:inherit;font-size:13.5px;padding:7px 11px;border:1px solid var(--line-strong);
+  border-radius:var(--r);background:var(--surface);color:var(--ink);min-width:230px;flex:1;max-width:380px}
+.tools input[type=search]:focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.tog{display:flex;gap:7px;align-items:center;font-size:13px;color:var(--ink-2);cursor:pointer}
+.tog input{accent-color:var(--accent);width:14px;height:14px}
+.tog input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#count{font-size:12px;color:var(--ink-3);font-family:var(--f-mono);margin-left:auto}
+.empty{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:16px;font-size:13px;color:var(--ink-2)}
+
+.gridwrap{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow-x:auto;margin-bottom:11px}
+table.grid{border-collapse:collapse;width:100%;font-size:12.5px}
+table.grid th,table.grid td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);
+  padding:5px 7px;text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
+table.grid thead th{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);font-weight:600;
+  background:var(--surface-2);position:sticky;top:0}
+table.grid th.rowh{text-align:left;font-weight:600;position:sticky;left:0;background:var(--surface);z-index:1;min-width:92px}
+table.grid thead th:first-child{left:0;z-index:2;background:var(--surface-2)}
+table.grid th.rowh a{text-decoration:none;color:var(--ink)}
+table.grid th.rowh a:hover{color:var(--accent);text-decoration:underline}
+table.grid tbody tr:last-child th,table.grid tbody tr:last-child td{border-bottom:none}
+td.d{font-family:var(--f-mono);font-weight:600;color:var(--accent);background:var(--accent-soft)}
+td.d.b{color:var(--warn);background:var(--warn-soft)}
+td.d.s{color:var(--sdm);background:var(--sdm-soft)}
+td.d.o{color:var(--oral);background:var(--oral-soft)}
+.gridkey{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-2);margin:0 0 20px}
+.gridkey span{display:flex;gap:5px;align-items:center}
+.gridkey i{width:11px;height:11px;border-radius:2px;display:inline-block;font-style:normal}
+.k1{background:var(--accent-soft);border:1px solid var(--accent-line)}
+.k2{background:var(--warn-soft);border:1px solid var(--warn-line)}
+.k3{background:var(--sdm-soft);border:1px solid var(--sdm-line)}
+.k4{background:var(--oral-soft);border:1px solid var(--oral-line)}
+
+.psub{font-size:12.5px;font-weight:600;color:var(--ink-2);margin:18px 0 9px}
+.psub:first-child{margin-top:0}
+h3 a.anch{text-decoration:none;color:inherit}
+h3 a.anch:hover{color:var(--accent)}
+.hidden{display:none}
+
+footer{border-top:1px solid var(--line);padding-block:18px 40px;font-size:12.5px;color:var(--ink-2);line-height:1.55}
+footer h2{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px}
+footer ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+
+@media print{
+  .rail,.btns,.sum,.tools{display:none}
+  .wrap{grid-template-columns:1fr;padding-block:10px}
+  .card{break-inside:avoid;page-break-inside:avoid}
+  body{max-width:none;padding:0}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header>
+  <div class="h-top">
+    <div>
+      <p class="eyebrow">PediVax Schedule Builder</p>
+      <h1>Rulebook</h1>
+      <p class="sub">Every schedule rule and every product rule the planner uses, with the sentence
+        it came from, the page it came from, and the date somebody last checked it.</p>
+    </div>
+    <div class="btns">
+      <button class="btn" id="print" type="button">Print or save as PDF</button>
+    </div>
+  </div>
+  <div class="banner">
+    <div class="note"><b>This page is generated from the planner's own data.</b> Nothing here is
+      typed a second time. If the planner schedules MMR dose 2 at 4 years, this page says 4 years,
+      because both read the same line. Editing one without the other is not possible.</div>
+    <div class="note"><b>Which authority this app follows, and why the edition matters.</b>
+      Federal vaccine policy changed repeatedly from mid-2025 onwards. This app is pinned to
+      guidance as it stood <b>before those changes</b>: the CDC 2025 schedule, alongside AAP, which
+      has gone on publishing its own schedule and keeps every routine childhood vaccine routine.
+      <b>Where AAP and CDC disagree, AAP governs</b> &mdash; two such disagreements are marked below.
+      Every quote names its edition and its date, so you can always see which vintage a rule is.</div>
+    <div class="note draft"><b>Mockup.</b> This shows what the reference side looks like and how a
+      rule carries its source. The rules below marked <b>needs checking</b> were copied from vaxapp
+      and have not been re-read against CDC yet — that is the point of showing the status.</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="rail" aria-label="Rulebook contents">
+    <div class="rail-head"><h2>On this page</h2></div>
+    <div class="rail-grp"><p class="grp-t">By vaccine</p><div id="nav-vax"></div></div>
+    <div class="rail-grp"><p class="grp-t">By product</p><div id="nav-prod"></div></div>
+  </nav>
+
+  <main>
+    <div class="sum" id="sum"></div>
+    <p class="quiet" id="lede"></p>
+
+    <h2 class="sec-t">The whole routine schedule on one screen</h2>
+    <div class="gridwrap"><table class="grid" id="grid"></table></div>
+    <p class="gridkey">
+      <span><i class="k1"></i>Primary dose</span>
+      <span><i class="k2"></i>Booster</span>
+      <span><i class="k4"></i>Oral, not an injection</span>
+      <span><i class="k3"></i>Shared decision, not routine</span>
+      <span>&dagger; the brand you choose changes how many doses there are</span>
+    </p>
+
+    <div class="tools">
+      <input type="search" id="q" placeholder="Search a vaccine, a brand or a rule" aria-label="Search the rulebook">
+      <label class="tog" for="onlyun"><input type="checkbox" id="onlyun"> Only rules that still need checking</label>
+      <span id="count"></span>
+    </div>
+
+    <h2 class="sec-t" id="sec-vax">By vaccine — what the routine schedule requires</h2>
+    <div id="vaccines"></div>
+
+    <h2 class="sec-t" id="sec-prod">By product — what each brand can cover</h2>
+    <div id="products"></div>
+    <p class="empty hidden" id="noresults">Nothing matches that. Clear the search box to see everything again.</p>
+  </main>
+</div>
+
+<footer>
+  <h2>What this rulebook does not cover yet</h2>
+  <ul>
+    <li>Healthy children only. No asplenia, HIV, complement deficiency, transplant or other risk conditions.</li>
+    <li>No catch-up rules. Every rule here assumes the child starts from nothing and stays on time.</li>
+    <li>Influenza, COVID-19 and RSV are annual or season-dependent and sit outside the birth-to-18 plan.</li>
+    <li>Minimum intervals between doses are only listed where the source states one. Full interval tables come with the real data file.</li>
+  </ul>
+</footer>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// ONE DATA FILE. The planner reads the scheduling fields; this page prints the
+// documentation fields beside them. In the real app this block becomes
+// src/data/rules.js and both screens import it.
+//
+// verified: the date the quoted sentence was fetched live from the source URL.
+//           null = carried over from vaxapp, not yet re-read. A test will fail
+//           when any date here is more than 12 months old.
+// ─────────────────────────────────────────────────────────────────────────────
+const TODAY = '2026-09-24';
+
+const SRC = {
+  cdc:      {label:'CDC child & adolescent schedule 2025, notes \u2014 last reviewed 2 July 2025', url:'https://www.cdc.gov/vaccines/hcp/imz-schedules/child-adolescent-notes.html'},
+  aap:      {label:'AAP Recommended Child & Adolescent Immunization Schedule 2026 \u2014 updated 2 September 2026', url:'https://downloads.aap.org/AAP/PDF/AAP-Immunization-Schedule.pdf'},
+  izHib:    {label:'immunize.org Ask the Experts, Hib',      url:'https://www.immunize.org/ask-experts/topic/hib/'},
+  izPent:   {label:'immunize.org Ask the Experts, DTaP-IPV/Hib', url:'https://www.immunize.org/ask-experts/topic/combo-vaccines/dtap-ipv-hib/'},
+  izPed:    {label:'immunize.org Ask the Experts, DTaP-IPV-HepB', url:'https://www.immunize.org/ask-experts/topic/combo-vaccines/dtap-ipv-hepb/'},
+  izDtIpv:  {label:'immunize.org Ask the Experts, DTaP-IPV',  url:'https://www.immunize.org/ask-experts/topic/combo-vaccines/dtap-ipv/'},
+  mmwr15:   {label:'MMWR, 4 September 2015, 64(34):948-9 \u2014 ACIP guidance for Quadracel', url:'https://www.cdc.gov/mmwr/pdf/wk/mm6434.pdf'},
+  vaxapp:   {label:'Copied from vaxapp src/logic/brandRules.js', url:null}
+};
+
+const VACCINES = [
+  {key:'HepB', name:'Hepatitis B', abbr:'HepB', min:'Birth',
+   doses:[{n:1,of:3,when:'Birth, within 24 hours'},{n:2,of:3,when:'1–2 months'},{n:3,of:3,when:'6–18 months'}],
+   facts:[
+     {claim:'Three doses, the first on the day of birth.', src:'cdc', verified:TODAY,
+      quote:'3-dose series at age 0, 1–2, 6–18 months (use monovalent HepB vaccine for doses administered before age 6 weeks)'},
+     {claim:'The birth dose for a healthy baby of an HBsAg-negative mother.', src:'cdc', verified:TODAY,
+      quote:'Birth weight ≥2,000 grams: 1 dose within 24 hours of birth if medically stable'}
+   ]},
+
+  {key:'RV', name:'Rotavirus', abbr:'RV', min:'6 weeks', oral:true, commit:'Rotarix and RotaTeq are different lengths and are not interchangeable. Pick one brand for the whole series.',
+   groups:[
+     {t:'Rotarix', doses:[{n:1,of:2,when:'2 months'},{n:2,of:2,when:'4 months'}]},
+     {t:'RotaTeq', doses:[{n:1,of:3,when:'2 months'},{n:2,of:3,when:'4 months'},{n:3,of:3,when:'6 months'}]}
+   ],
+   facts:[
+     {claim:'The brand sets the number of doses.', src:'cdc', verified:TODAY,
+      quote:'Rotarix: 2-dose series at age 2 and 4 months — RotaTeq: 3-dose series at age 2, 4, and 6 months'},
+     {claim:'Hard age limits at both ends. Miss them and the series cannot be given at all.', src:'cdc', verified:TODAY,
+      quote:'Do not start the series on or after age 15 weeks, 0 days. The maximum age for the final dose is 8 months, 0 days.'}
+   ]},
+
+  {key:'DTaP', name:'Diphtheria, tetanus, pertussis', abbr:'DTaP', min:'6 weeks (4 years for Kinrix or Quadracel)',
+   doses:[{n:1,of:5,when:'2 months'},{n:2,of:5,when:'4 months'},{n:3,of:5,when:'6 months'},
+          {n:4,of:5,when:'15–18 months',boost:1},{n:5,of:5,when:'4–6 years',boost:1}],
+   facts:[
+     {claim:'Three in infancy, then two boosters.', src:'cdc', verified:TODAY,
+      quote:'5-dose series (3-dose primary series at age 2, 4, and 6 months, followed by booster doses at ages 15–18 months and 4–6 years)'},
+     {claim:'Two products are booster-only and cannot be used before 4 years.', src:'cdc', verified:TODAY,
+      quote:'(minimum age: 6 weeks [4 years for Kinrix or Quadracel])'},
+     {claim:'The two booster products are licensed along manufacturer lines \u2014 Kinrix after the GSK products, Quadracel after the Sanofi ones \u2014 but either may be used when the earlier brand is unknown or is the only one stocked.', src:'izDtIpv', verified:TODAY,
+      quote:'Although it is preferable to use the same manufacturer\u2019s DTaP vaccine for all of the doses in the series, you can give either Kinrix or Quadracel as the fifth dose of DTaP and fourth dose of IPV at age 4 through 6 years if the previous brand is unknown or if Kinrix or Quadracel is the only product stocked.'}
+   ]},
+
+  {key:'Hib', name:'Haemophilus influenzae type b', abbr:'Hib', min:'6 weeks',
+   commit:'The brand sets the length of the whole series, and mixing brands adds a dose. The clinician has to commit before the plan can be counted.',
+   groups:[
+     {t:'PedvaxHIB start to finish', doses:[{n:1,of:3,when:'2 months'},{n:2,of:3,when:'4 months'},{n:3,of:3,when:'12–15 months',boost:1}]},
+     {t:'ActHIB, Hiberix, Pentacel or Vaxelis — or any mix of brands', doses:[{n:1,of:4,when:'2 months'},{n:2,of:4,when:'4 months'},{n:3,of:4,when:'6 months'},{n:4,of:4,when:'12–15 months',boost:1}]}
+   ],
+   facts:[
+     {claim:'Four doses for every product except PedvaxHIB.', src:'cdc', verified:TODAY,
+      quote:'ActHIB, Hiberix, Pentacel, or Vaxelis: 4-dose series (3-dose primary series at age 2, 4, and 6 months, followed by a booster dose at age 12–15 months)'},
+     {claim:'PedvaxHIB is three doses — one fewer needle.', src:'cdc', verified:TODAY,
+      quote:'PedvaxHIB: 3-dose series (2-dose primary series at age 2 and 4 months, followed by a booster dose at age 12–15 months)'},
+     {claim:'The short series only holds if both early doses are PedvaxHIB. Mixing costs a dose.', src:'izHib', verified:TODAY,
+      quote:'A 2-dose primary schedule (that is, doses at age 2 and 4 months) is only appropriate when both doses are PedvaxHIB. — If different brands of Hib vaccine are given at 2 and 4 months of age then the child should receive a third primary dose of either vaccine at 6 months of age.'},
+     {claim:'Vaxelis cannot be the 12–15 month booster, whatever else it covers.', src:'cdc', verified:TODAY,
+      quote:'Vaxelis is not recommended for use as a booster dose. A different Hib-containing vaccine should be used for the booster dose.'}
+   ]},
+
+  {key:'PCV', name:'Pneumococcal conjugate', abbr:'PCV', min:'6 weeks',
+   doses:[{n:1,of:4,when:'2 months'},{n:2,of:4,when:'4 months'},{n:3,of:4,when:'6 months'},{n:4,of:4,when:'12–15 months'}],
+   facts:[
+     {claim:'Four doses, the last in the second year.', src:'cdc', verified:TODAY,
+      quote:'4-dose series at 2, 4, 6, 12–15 months'}
+   ]},
+
+  {key:'IPV', name:'Polio', abbr:'IPV', min:'6 weeks',
+   doses:[{n:1,of:4,when:'2 months'},{n:2,of:4,when:'4 months'},{n:3,of:4,when:'6–18 months'},{n:4,of:4,when:'4–6 years',boost:1}],
+   facts:[
+     {claim:'Four doses, and the last one has two conditions on it, not one.', src:'cdc', verified:TODAY,
+      quote:'4-dose series at ages 2, 4, 6–18 months, 4–6 years; administer the final dose on or after age 4 years and at least 6 months after the previous dose.'}
+   ]},
+
+  {key:'MMR', name:'Measles, mumps, rubella', abbr:'MMR', min:'12 months',
+   doses:[{n:1,of:2,when:'12–15 months'},{n:2,of:2,when:'4–6 years'}],
+   facts:[
+     {claim:'Two doses, four years apart in practice.', src:'cdc', verified:TODAY,
+      quote:'2-dose series at age 12–15 months, age 4–6 years'},
+     {claim:'AAP has no preference at the first dose, and positively prefers the MMR-varicella combination at 4\u20136 years to save an injection. AAP governs where the two schedules differ.', src:'aap', verified:TODAY,
+      quote:'The AAP expresses no preference between MMR plus monovalent varicella vaccine or MMRV for toddlers receiving their first immunization of this kind. Parents should be counseled about the rare possibility of their child developing a febrile seizure 1 to 2 weeks after immunization with MMRV for the 1st immunizing dose. For the 2nd dose at 4\u20136 years, MMRV generally is preferred over MMR plus monovalent varicella to minimize the number of injections.'},
+     {claim:'CDC\u2019s 2025 schedule takes a firmer line on the first dose. This is a genuine disagreement, and the app follows AAP.', src:'cdc', verified:TODAY,
+      quote:'For dose 1 in children age 12\u201347 months, it is recommended to administer MMR and varicella vaccines separately. MMRV may be used if parents or caregivers express a preference.'}
+   ]},
+
+  {key:'VAR', name:'Varicella', abbr:'VAR', min:'12 months',
+   doses:[{n:1,of:2,when:'12–15 months'},{n:2,of:2,when:'4–6 years'}],
+   facts:[
+     {claim:'Two doses, on the same visits as MMR.', src:'cdc', verified:TODAY,
+      quote:'2-dose series at age 12–15 months, 4–6 years'}
+   ]},
+
+  {key:'HepA', name:'Hepatitis A', abbr:'HepA', min:'12 months',
+   doses:[{n:1,of:2,when:'12–23 months'},{n:2,of:2,when:'6 months after dose 1'}],
+   facts:[
+     {claim:'Two doses at least six months apart, both started in the second year.', src:'cdc', verified:TODAY,
+      quote:'2-dose series (minimum interval: 6 months) at age 12–23 months'}
+   ]},
+
+  {key:'Tdap', name:'Tetanus, diphtheria, pertussis booster', abbr:'Tdap', min:'11 years (routine)',
+   doses:[{n:1,of:1,when:'11–12 years',boost:1}],
+   facts:[
+     {claim:'One adolescent booster.', src:'cdc', verified:TODAY,
+      quote:'Age 11–12 years: 1 dose Tdap (adolescent booster)'}
+   ]},
+
+  {key:'HPV', name:'Human papillomavirus', abbr:'HPV', min:'9 years',
+   doses:[{n:1,of:2,when:'11–12 years (may start at 9)'},{n:2,of:2,when:'6–12 months after dose 1'}],
+   facts:[
+     {claim:'Starting on time means two doses, not three. Starting at 15 or later means three.', src:'cdc', verified:TODAY,
+      quote:'Age 9–14 years at initial vaccination: 2-dose series at 0, 6–12 months (minimum interval: 5 months) — Age 15 years or older at initial vaccination: 3-dose series at 0, 1–2 months, 6 months'},
+     {claim:'Routine age, with an earlier start allowed.', src:'cdc', verified:TODAY,
+      quote:'HPV vaccination routinely recommended at age 11–12 years (can start at age 9 years)'}
+   ]},
+
+  {key:'MenACWY', name:'Meningococcal ACWY', abbr:'MenACWY', min:'6 weeks (MenQuadfi) or 2 months (Menveo)',
+   doses:[{n:1,of:2,when:'11–12 years'},{n:2,of:2,when:'16 years',boost:1}],
+   facts:[
+     {claim:'Two doses five years apart for a healthy adolescent.', src:'cdc', verified:TODAY,
+      quote:'2-dose series at age 11–12 years; 16 years'},
+     {claim:'AAP puts MenQuadfi\u2019s floor at 6 weeks. AAP governs where the two schedules differ.', src:'aap', verified:TODAY,
+      quote:'Meningococcal serogroup A, C, W, Y (MenACWY) vaccination (minimum age: 6 weeks [MenACWY-TT, MenQuadfi], 2 months [MenACWY-CRM, Menveo])'},
+     {claim:'CDC\u2019s 2025 schedule puts MenQuadfi\u2019s floor at 2 years \u2014 nearly two years later. A real disagreement; the app follows AAP.', src:'cdc', verified:TODAY,
+      quote:'minimum age: 2 months [MenACWY-CRM, Menveo], 2 years [MenACWY-TT, MenQuadfi]'}
+   ]},
+
+  {key:'MenB', name:'Meningococcal B', abbr:'MenB', min:'10 years', sdm:true,
+   commit:'Bexsero and Trumenba are not interchangeable. One brand for both doses.',
+   doses:[{n:1,of:2,when:'16–18 years (preferred)'},{n:2,of:2,when:'at least 6 months later'}],
+   facts:[
+     {claim:'Not a routine dose. It happens only if the family and clinician decide together.', src:'cdc', verified:TODAY,
+      quote:'Adolescents not at increased risk age 16–23 years (preferred age 16–18 years) based on shared clinical decision-making'},
+     {claim:'Two doses, same brand, six months apart.', src:'cdc', verified:TODAY,
+      quote:'Bexsero or Trumenba (use same brand for all doses): 2–dose series at least 6 months apart'}
+   ]}
+];
+
+const PRODUCTS = [
+  // ── single-antigen products ────────────────────────────────────────────────
+  {n:'Engerix-B', g:'Single antigen', covers:[['HepB','doses 1–3']], ages:'Birth onwards',
+   facts:[{claim:'Dose range and age limits carried over from vaxapp. Not re-read against CDC yet.', src:'vaxapp', verified:null}]},
+  {n:'Recombivax HB', g:'Single antigen', covers:[['HepB','doses 1–3']], ages:'Birth onwards',
+   facts:[{claim:'Dose range and age limits carried over from vaxapp. Not re-read against CDC yet.', src:'vaxapp', verified:null}]},
+  {n:'Rotarix', g:'Single antigen', oral:true, covers:[['RV','doses 1–2']], ages:'6 weeks to 8 months, 0 days',
+   facts:[{claim:'Two doses, and choosing it commits the whole series.', src:'cdc', verified:TODAY,
+           quote:'Rotarix: 2-dose series at age 2 and 4 months'}]},
+  {n:'RotaTeq', g:'Single antigen', oral:true, covers:[['RV','doses 1–3']], ages:'6 weeks to 8 months, 0 days',
+   facts:[{claim:'Three doses, and choosing it commits the whole series.', src:'cdc', verified:TODAY,
+           quote:'RotaTeq: 3-dose series at age 2, 4, and 6 months'}]},
+  {n:'Daptacel', g:'Single antigen', covers:[['DTaP','doses 1–5']], ages:'6 weeks to 6 years',
+   facts:[{claim:'Dose range and age limits carried over from vaxapp. Not re-read against CDC yet.', src:'vaxapp', verified:null}]},
+  {n:'Infanrix', g:'Single antigen', covers:[['DTaP','doses 1–5']], ages:'6 weeks to 6 years',
+   facts:[{claim:'Dose range and age limits carried over from vaxapp. Not re-read against CDC yet.', src:'vaxapp', verified:null}]},
+  {n:'ActHIB', g:'Single antigen', covers:[['Hib','doses 1–4']], ages:'6 weeks onwards',
+   facts:[{claim:'A PRP-T product: using it anywhere in the primary series means a 3-dose primary series, so 4 in total.', src:'izHib', verified:TODAY,
+           quote:'If either ActHIB (PRP-T), Hiberix (PRP-T), Vaxelis (DTaP-IPV-Hib-HepB), or Pentacel (DTaP-IPV/Hib) is used for a routine primary series dose, a complete routine primary series consists of three doses.'}]},
+  {n:'Hiberix', g:'Single antigen', covers:[['Hib','doses 1–4']], ages:'6 weeks onwards',
+   facts:[{claim:'A PRP-T product: same 4-dose total as ActHIB.', src:'izHib', verified:TODAY,
+           quote:'If either ActHIB (PRP-T), Hiberix (PRP-T), Vaxelis (DTaP-IPV-Hib-HepB), or Pentacel (DTaP-IPV/Hib) is used for a routine primary series dose, a complete routine primary series consists of three doses.'}]},
+  {n:'PedvaxHIB', g:'Single antigen', covers:[['Hib','doses 1–3']], ages:'6 weeks onwards',
+   facts:[{claim:'The only Hib product that gives a 3-dose total — and only if it is used for every dose.', src:'izHib', verified:TODAY,
+           quote:'A 2-dose primary schedule (that is, doses at age 2 and 4 months) is only appropriate when both doses are PedvaxHIB.'}]},
+  {n:'Prevnar 20', g:'Single antigen', covers:[['PCV','doses 1–4']], ages:'6 weeks onwards',
+   facts:[{claim:'Dose range and age limits carried over from vaxapp. Not re-read against CDC yet.', src:'vaxapp', verified:null}]},
+  {n:'Vaxneuvance', g:'Single antigen', covers:[['PCV','doses 1–4']], ages:'6 weeks onwards',
+   facts:[{claim:'Dose range and age limits carried over from vaxapp. Not re-read against CDC yet.', src:'vaxapp', verified:null}]},
+  {n:'IPOL', g:'Single antigen', covers:[['IPV','doses 1–4']], ages:'6 weeks onwards',
+   facts:[{claim:'Dose range and age limits carried over from vaxapp. Not re-read against CDC yet.', src:'vaxapp', verified:null}]},
+  {n:'M-M-R II', g:'Single antigen', covers:[['MMR','doses 1–2']], ages:'12 months onwards',
+   facts:[{claim:'Dose range and age limits carried over from vaxapp. Not re-read against CDC yet.', src:'vaxapp', verified:null}]},
+  {n:'Priorix', g:'Single antigen', covers:[['MMR','doses 1–2']], ages:'12 months onwards',
+   facts:[{claim:'Dose range and age limits carried over from vaxapp. Not re-read against CDC yet.', src:'vaxapp', verified:null}]},
+  {n:'Varivax', g:'Single antigen', covers:[['VAR','doses 1–2']], ages:'12 months onwards',
+   facts:[{claim:'Dose range and age limits carried over from vaxapp. Not re-read against CDC yet.', src:'vaxapp', verified:null}]},
+  {n:'Havrix', g:'Single antigen', covers:[['HepA','doses 1–2']], ages:'12 months onwards',
+   facts:[{claim:'Dose range and age limits carried over from vaxapp. Not re-read against CDC yet.', src:'vaxapp', verified:null}]},
+  {n:'Vaqta', g:'Single antigen', covers:[['HepA','doses 1–2']], ages:'12 months onwards',
+   facts:[{claim:'Dose range and age limits carried over from vaxapp. Not re-read against CDC yet.', src:'vaxapp', verified:null}]},
+  {n:'Adacel', g:'Single antigen', covers:[['Tdap','1 dose']], ages:'10 years onwards',
+   facts:[{claim:'Dose range and age limits carried over from vaxapp. Not re-read against CDC yet.', src:'vaxapp', verified:null}]},
+  {n:'Boostrix', g:'Single antigen', covers:[['Tdap','1 dose']], ages:'10 years onwards',
+   facts:[{claim:'Dose range and age limits carried over from vaxapp. Not re-read against CDC yet.', src:'vaxapp', verified:null}]},
+  {n:'Gardasil 9', g:'Single antigen', covers:[['HPV','doses 1–3']], ages:'9 years onwards',
+   facts:[{claim:'Dose range and age limits carried over from vaxapp. Not re-read against CDC yet.', src:'vaxapp', verified:null}]},
+  {n:'Menveo', g:'Single antigen', covers:[['MenACWY','doses 1–2']], ages:'2 months onwards',
+   facts:[{claim:'Licensed from 2 months, which is far earlier than the routine 11-year dose needs.', src:'cdc', verified:TODAY,
+           quote:'minimum age: 2 months [MenACWY-CRM, Menveo], 2 years [MenACWY-TT, MenQuadfi]'}]},
+  {n:'MenQuadfi', g:'Single antigen', covers:[['MenACWY','doses 1\u20132']], ages:'6 weeks onwards, per AAP',
+   facts:[{claim:'AAP puts the floor at 6 weeks; CDC\u2019s 2025 schedule says 2 years. AAP governs.', src:'aap', verified:TODAY,
+           quote:'Meningococcal serogroup A, C, W, Y (MenACWY) vaccination (minimum age: 6 weeks [MenACWY-TT, MenQuadfi], 2 months [MenACWY-CRM, Menveo])'}]},
+
+  // ── combination products ───────────────────────────────────────────────────
+  {n:'Pediarix', g:'Combination', combo:true, covers:[['DTaP','doses 1–3'],['HepB','doses 1–3'],['IPV','doses 1–3']],
+   ages:'6 weeks to under 7 years — never the birth dose',
+   facts:[{claim:'The first three DTaP doses only.', src:'izPed', verified:TODAY,
+           quote:'Pediarix is licensed by the Food and Drug Administration (FDA) for only the first 3 doses of the DTaP series.'},
+          {claim:'Hard age limits at both ends.', src:'izPed', verified:TODAY,
+           quote:'It should not be given to infants younger than 6 weeks of age or to children 7 years or older.'}]},
+  {n:'Pentacel', g:'Combination', combo:true, covers:[['DTaP','doses 1–4'],['IPV','doses 1–4'],['Hib','doses 1–4']],
+   ages:'2 through 18 months',
+   facts:[{claim:'A 4-dose product, ending at the 15–18 month visit.', src:'izPent', verified:TODAY,
+           quote:'FDA licensed Pentacel in 2008 as a 4-dose series in infants and children at ages 2, 4, 6, and 15–18 months.'},
+          {claim:'It cannot be the 4–6 year booster.', src:'izPent', verified:TODAY,
+           quote:'It should not be used for any dose in the primary series for children age 5 years or older or as the booster dose for children ages 4 through 6 years.'}]},
+  {n:'Vaxelis', g:'Combination', combo:true, covers:[['DTaP','doses 1–3'],['IPV','doses 1–3'],['Hib','doses 1–3'],['HepB','doses 1–3']],
+   ages:'6 weeks to 4 years, primary series only',
+   facts:[{claim:'Four antigens in one injection, but only for the primary series.', src:'izHib', verified:TODAY,
+           quote:'Vaxelis (DTaP-IPV-Hib-HepB, MSP Company) is FDA-approved and recommended by CDC as a 3-dose primary series of Hib for infants at age 2, 4, and 6 months. Vaxelis is not approved for use as a Hib booster (4th) dose.'},
+          {claim:'Using it means the Hib series is 4 doses, not 3.', src:'cdc', verified:TODAY,
+           quote:'ActHIB, Hiberix, Pentacel, or Vaxelis: 4-dose series (3-dose primary series at age 2, 4, and 6 months, followed by a booster dose at age 12–15 months)'}]},
+  {n:'Kinrix', g:'Combination', combo:true, covers:[['DTaP','dose 5'],['IPV','dose 4']], ages:'4 through 6 years',
+   lineage:'Licensed for children whose earlier doses were the GSK products \u2014 Infanrix and/or Pediarix.',
+   facts:[{claim:'A booster-visit product. It covers the last DTaP and the last polio dose in one injection \u2014 but the licence names which earlier brands the child should have had.', src:'izDtIpv', verified:TODAY,
+           quote:'It is approved for use as the fifth dose of DTaP and the fourth dose of IPV in children ages 4 through 6 years who received DTaP (Infanrix) and/or DTaP-HepB-IPV (Pediarix) as the first three doses and DTaP (Infanrix) as the fourth dose.'},
+          {claim:'If the clinic stocked a different manufacturer earlier, Kinrix is still allowed \u2014 matching brands is preferred, not required.', src:'izDtIpv', verified:TODAY,
+           quote:'Although it is preferable to use the same manufacturer\u2019s DTaP vaccine for all of the doses in the series, you can give either Kinrix or Quadracel as the fifth dose of DTaP and fourth dose of IPV at age 4 through 6 years if the previous brand is unknown or if Kinrix or Quadracel is the only product stocked.'}]},
+  {n:'Quadracel', g:'Combination', combo:true, covers:[['DTaP','dose 5'],['IPV','doses 4–5']], ages:'4 through 6 years, never under 4 or 7 and over',
+   lineage:'Licensed for children whose earlier four doses were the Sanofi products \u2014 Pentacel and/or Daptacel.',
+   facts:[{claim:'Same booster job as Kinrix, a wider polio licence, and the opposite brand lineage. ACIP endorsed these indications.', src:'mmwr15', verified:TODAY,
+           quote:'Quadracel is approved for administration as a fifth dose in the DTaP series and as a fourth or fifth dose in the IPV series in children aged 4 through 6 years who have received 4 doses of DTaP-IPV-Hib (Pentacel, Sanofi Pasteur) and/or DTaP (Daptacel, Sanofi Pasteur) vaccine'},
+          {claim:'Hard age limits at both ends.', src:'mmwr15', verified:TODAY,
+           quote:'This vaccine should not be administered to children aged <4 years or \u22657 years.'},
+          {claim:'Given too early by mistake, the dose still counts for DTaP \u2014 but it cannot be the final polio dose, which must be on or after the fourth birthday.', src:'mmwr15', verified:TODAY,
+           quote:'Note that the final dose in the IPV series must be administered at age \u22654 years regardless of the number of previous doses, and with a minimum interval of 6 months from the previous dose. Therefore, a dose of Quadracel vaccine administered before the fourth birthday cannot be counted as a valid final dose of IPV.'},
+          {claim:'If the clinic stocked a different manufacturer earlier, Quadracel is still allowed \u2014 matching brands is preferred, not required.', src:'izDtIpv', verified:TODAY,
+           quote:'Although it is preferable to use the same manufacturer\u2019s DTaP vaccine for all of the doses in the series, you can give either Kinrix or Quadracel as the fifth dose of DTaP and fourth dose of IPV at age 4 through 6 years if the previous brand is unknown or if Kinrix or Quadracel is the only product stocked.'}]},
+  {n:'ProQuad', g:'Combination', combo:true, covers:[['MMR','doses 1–2'],['VAR','doses 1–2']], ages:'12 months to 12 years',
+   facts:[{claim:'AAP prefers it at the 4\u20136 year visit precisely because it saves a needle \u2014 which is what this app optimizes for.', src:'aap', verified:TODAY,
+           quote:'For the 2nd dose at 4\u20136 years, MMRV generally is preferred over MMR plus monovalent varicella to minimize the number of injections.'},
+          {claim:'At the first dose AAP has no preference either way; the family should be counselled about febrile seizure.', src:'aap', verified:TODAY,
+           quote:'The AAP expresses no preference between MMR plus monovalent varicella vaccine or MMRV for toddlers receiving their first immunization of this kind. Parents should be counseled about the rare possibility of their child developing a febrile seizure 1 to 2 weeks after immunization with MMRV for the 1st immunizing dose.'},
+          {claim:'Hard maximum age.', src:'aap', verified:TODAY,
+           quote:'The maximum age for use of MMRV is 12 years.'},
+          {claim:'Dose range carried over from vaxapp, not re-read yet.', src:'vaxapp', verified:null}]},
+
+  // ── shared decision making ─────────────────────────────────────────────────
+  {n:'Bexsero', g:'Shared decision', sdm:true, covers:[['MenB','doses 1–2']], ages:'10 years onwards',
+   facts:[{claim:'Two doses, and the series cannot be finished with the other brand.', src:'cdc', verified:TODAY,
+           quote:'Bexsero or Trumenba (use same brand for all doses): 2–dose series at least 6 months apart'}]},
+  {n:'Trumenba', g:'Shared decision', sdm:true, covers:[['MenB','doses 1–2']], ages:'10 years onwards',
+   facts:[{claim:'Two doses, and the series cannot be finished with the other brand.', src:'cdc', verified:TODAY,
+           quote:'Bexsero or Trumenba (use same brand for all doses): 2–dose series at least 6 months apart'}]},
+
+  // ── retired: kept, never deleted ───────────────────────────────────────────
+  {n:'Prevnar 13', g:'Off the list', retired:true, covers:[['PCV','doses 1–4']], ages:'6 weeks onwards',
+   facts:[{claim:'No longer the pneumococcal product for routine childhood use. Kept here, not deleted, so an old saved plan can still be explained. The date it came off the list still needs checking.', src:'vaxapp', verified:null}]}
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDERING — everything below only reads the two arrays above.
+// ─────────────────────────────────────────────────────────────────────────────
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const slug = s => 'r-' + s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+
+// The visits the routine plan actually uses, in order.
+const VISIT_COLS = [['b','Birth'],['m2','2 mo'],['m4','4 mo'],['m6','6 mo'],['m12','12 mo'],
+  ['m15','15 mo'],['m18','18 mo'],['y4','4 y'],['y11','11 y'],['y12','12 y'],['y16','16 y'],['y17','17 y']];
+
+// Until the real data file carries a visit id on every dose, the grid maps the
+// written age window onto the visit it lands on. One lookup, in one place.
+const WHEN_COL = {
+  'Birth, within 24 hours':'b', '1–2 months':'m2', '2 months':'m2', '4 months':'m4',
+  '6 months':'m6', '6–18 months':'m6', '12–15 months':'m12', '12–23 months':'m12',
+  '15–18 months':'m15', '6 months after dose 1':'m18', '4–6 years':'y4',
+  '11–12 years':'y11', '11–12 years (may start at 9)':'y11', '6–12 months after dose 1':'y12',
+  '16 years':'y16', '16–18 years (preferred)':'y16', 'at least 6 months later':'y17'
+};
+
+function factHTML(f){
+  const s = SRC[f.src];
+  const ver = f.verified
+    ? '<span class="chip">Checked ' + esc(f.verified) + '</span>'
+    : '<span class="chip un">Needs checking</span>';
+  const link = s.url
+    ? '<a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.label) + '</a>'
+    : esc(s.label);
+  return '<div class="fact' + (f.verified ? '' : ' unver') + '">' +
+    '<p class="claim">' + esc(f.claim) + '</p>' +
+    (f.quote ? '<blockquote>&ldquo;' + esc(f.quote) + '&rdquo;</blockquote>' : '') +
+    '<p class="src">' + ver + link + '</p></div>';
+}
+
+function doseListHTML(doses){
+  return '<div class="doses">' + doses.map(d =>
+    '<div class="dose' + (d.boost ? ' boost' : '') + '">' +
+      '<span class="num">Dose ' + d.n + ' of ' + d.of + '</span>' +
+      '<span class="when">' + esc(d.when) + '</span>' +
+      '<span class="kind">' + (d.boost ? 'booster' : 'primary') + '</span>' +
+    '</div>').join('') + '</div>';
+}
+
+/** Everything the search box should be able to match on. */
+const vaxText = v => [v.name, v.abbr, v.key, v.min, v.commit || '',
+  ...(v.doses || []).map(d => d.when),
+  ...(v.groups || []).flatMap(g => [g.t, ...g.doses.map(d => d.when)]),
+  ...v.facts.flatMap(f => [f.claim, f.quote || '', SRC[f.src].label])].join(' ').toLowerCase();
+const prodText = p => [p.n, p.g, p.ages, p.lineage || '', ...p.covers.flat(),
+  ...p.facts.flatMap(f => [f.claim, f.quote || '', SRC[f.src].label])].join(' ').toLowerCase();
+const hasUnchecked = o => o.facts.some(f => !f.verified);
+
+const head3 = name => '<h3><a class="anch" href="#' + slug(name) + '">' + esc(name) + '</a></h3>';
+
+function vaccineHTML(v){
+  let body = '';
+  if (v.groups){
+    body += v.groups.map(g =>
+      '<div><p class="dgrp-t">' + esc(g.t) + '</p>' + doseListHTML(g.doses) + '</div>').join('');
+  } else {
+    body += doseListHTML(v.doses);
+  }
+  if (v.commit) body += '<div class="note"><b>Brand choice changes the plan.</b> ' + esc(v.commit) + '</div>';
+  body += v.facts.map(factHTML).join('');
+  return '<section class="card' + (v.sdm ? ' sdmcard' : '') + '" id="' + slug(v.key) + '"' +
+      ' data-t="' + esc(vaxText(v)) + '" data-un="' + (hasUnchecked(v) ? '1' : '0') + '">' +
+    '<div class="c-head">' + head3(v.name) + '<span class="c-abbr">' + esc(v.abbr) + '</span>' +
+      (v.oral ? '<span class="chip oral">Oral</span>' : '') +
+      (v.sdm ? '<span class="chip sdm">Shared decision</span>' : '') +
+      '<span class="c-min">Minimum age: ' + esc(v.min) + '</span></div>' +
+    '<div class="c-body">' + body + '</div></section>';
+}
+
+function productHTML(p){
+  const covers = '<div class="covers">' + p.covers.map(c =>
+    '<span class="cov"><span class="a">' + esc(c[0]) + '</span><span class="d">' + esc(c[1]) + '</span></span>').join('') + '</div>';
+  const lin = p.lineage ? '<div class="note"><b>Which earlier brands it follows.</b> ' + esc(p.lineage) + '</div>' : '';
+  return '<section class="card' + (p.retired ? ' retired' : '') + (p.sdm ? ' sdmcard' : '') + '" id="' + slug(p.n) + '"' +
+      ' data-t="' + esc(prodText(p)) + '" data-un="' + (hasUnchecked(p) ? '1' : '0') + '">' +
+    '<div class="c-head">' + head3(p.n) +
+      (p.combo ? '<span class="chip">Combination</span>' : '') +
+      (p.oral ? '<span class="chip oral">Oral</span>' : '') +
+      (p.sdm ? '<span class="chip sdm">Shared decision</span>' : '') +
+      (p.retired ? '<span class="chip ret">Off the list</span>' : '') +
+      '<span class="c-min">' + esc(p.ages) + '</span></div>' +
+    '<div class="c-body">' + covers + lin + p.facts.map(factHTML).join('') + '</div></section>';
+}
+
+// ── the schedule grid ────────────────────────────────────────────────────────
+// Where the brand changes the dose count, the grid draws the longer series and
+// marks the row, because that is the plan a clinic gets if it does not commit.
+function gridHTML(){
+  let h = '<thead><tr><th>Vaccine</th>' +
+    VISIT_COLS.map(c => '<th>' + esc(c[1]) + '</th>').join('') + '</tr></thead><tbody>';
+  for (const v of VACCINES){
+    const doses = v.groups ? v.groups[v.groups.length - 1].doses : v.doses;
+    const cells = Object.create(null);
+    for (const d of doses){
+      const col = WHEN_COL[d.when];
+      if (col) cells[col] = d;
+    }
+    h += '<tr><th class="rowh"><a href="#' + slug(v.key) + '">' + esc(v.abbr) +
+         (v.groups ? ' &dagger;' : '') + '</a></th>';
+    for (const [id] of VISIT_COLS){
+      const d = cells[id];
+      if (!d){ h += '<td></td>'; continue; }
+      const cls = 'd' + (d.boost ? ' b' : '') + (v.sdm ? ' s' : '') + (v.oral ? ' o' : '');
+      h += '<td class="' + cls + '" title="Dose ' + d.n + ' of ' + d.of + ', ' + esc(d.when) + '">' + d.n + '</td>';
+    }
+    h += '</tr>';
+  }
+  return h + '</tbody>';
+}
+
+// ── draw ─────────────────────────────────────────────────────────────────────
+const PGROUPS = ['Single antigen','Combination','Shared decision','Off the list'];
+
+document.getElementById('grid').innerHTML = gridHTML();
+document.getElementById('vaccines').innerHTML = VACCINES.map(vaccineHTML).join('');
+document.getElementById('products').innerHTML = PGROUPS.map(g => {
+  const inGroup = PRODUCTS.filter(p => p.g === g);
+  if (!inGroup.length) return '';
+  return '<p class="psub">' + esc(g) + '</p>' + inGroup.map(productHTML).join('');
+}).join('');
+
+document.getElementById('nav-vax').innerHTML = VACCINES.map(v =>
+  '<a href="#' + slug(v.key) + '">' + esc(v.abbr) + '</a>').join('');
+document.getElementById('nav-prod').innerHTML = PGROUPS.map((g, i) => {
+  const inGroup = PRODUCTS.filter(p => p.g === g);
+  if (!inGroup.length) return '';
+  return '<p class="grp-t"' + (i ? ' style="margin-top:9px"' : '') + '>' + esc(g) + '</p>' +
+    inGroup.map(p => '<a href="#' + slug(p.n) + '">' + esc(p.n) + '</a>').join('');
+}).join('');
+
+// The verification tripwire, made visible.
+const allFacts = [...VACCINES.flatMap(v => v.facts), ...PRODUCTS.flatMap(p => p.facts)];
+const checked = allFacts.filter(f => f.verified).length;
+const stale = allFacts.length - checked;
+document.getElementById('sum').innerHTML =
+  '<div><div class="n">' + allFacts.length + '</div><div class="l">Rules on this page</div></div>' +
+  '<div class="ok"><div class="n">' + checked + '</div><div class="l">Read from the source today</div></div>' +
+  '<div class="' + (stale ? 'bad' : 'ok') + '"><div class="n">' + stale + '</div><div class="l">Still to check</div></div>';
+
+document.getElementById('lede').innerHTML =
+  'Each rule below shows the sentence it came from. <b>' + checked + '</b> of them were read live from CDC, ' +
+  'MMWR, AAP and immunize.org on ' + esc(TODAY) + '. The other <b>' + stale + '</b> were copied across from vaxapp and are ' +
+  'marked <b>needs checking</b> — the app will not pretend a copied rule is a verified one. Tick the box above to ' +
+  'see only those. In the real app a test fails the build when any date here passes twelve months old, so this page ' +
+  'cannot quietly go out of date.';
+
+// ── search and filter ────────────────────────────────────────────────────────
+const cards = [...document.querySelectorAll('.card')];
+const subs  = [...document.querySelectorAll('.psub')];
+const navLinks = [...document.querySelectorAll('.rail a')];
+const qBox = document.getElementById('q');
+const unBox = document.getElementById('onlyun');
+const countEl = document.getElementById('count');
+const noRes = document.getElementById('noresults');
+const vaxIds = new Set(VACCINES.map(v => slug(v.key)));
+
+function applyFilter(){
+  const q = qBox.value.trim().toLowerCase();
+  const onlyUn = unBox.checked;
+  const visible = new Set();
+  for (const c of cards){
+    const ok = (!q || c.dataset.t.includes(q)) && (!onlyUn || c.dataset.un === '1');
+    c.classList.toggle('hidden', !ok);
+    if (ok) visible.add(c.id);
+  }
+  // A group heading disappears with the last card under it.
+  for (const sub of subs){
+    let n = sub.nextElementSibling, any = false;
+    while (n && n.classList.contains('card')){
+      if (!n.classList.contains('hidden')){ any = true; break; }
+      n = n.nextElementSibling;
+    }
+    sub.classList.toggle('hidden', !any);
+  }
+  for (const a of navLinks)
+    a.classList.toggle('hidden', !visible.has(a.getAttribute('href').slice(1)));
+  let nVax = 0;
+  for (const id of visible) if (vaxIds.has(id)) nVax++;
+  document.getElementById('sec-vax').classList.toggle('hidden', nVax === 0);
+  document.getElementById('sec-prod').classList.toggle('hidden', visible.size - nVax === 0);
+  countEl.textContent = (q || onlyUn)
+    ? 'Showing ' + visible.size + ' of ' + cards.length
+    : cards.length + ' entries';
+  noRes.classList.toggle('hidden', visible.size > 0);
+}
+qBox.addEventListener('input', applyFilter);
+unBox.addEventListener('change', applyFilter);
+applyFilter();
+
+document.getElementById('print').addEventListener('click', () => window.print());
+</script>
