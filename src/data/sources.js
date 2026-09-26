@@ -44,4 +44,32 @@ export const SOURCES = {
     snapshot: '2026-09-25-hepb-inserts.md',
     tier: 'insert',
   },
+  cdc2025RvNotes: {
+    label: 'CDC Child Immunization Schedule Notes, 2025 — Rotavirus',
+    edition: 'last reviewed July 2, 2025',
+    url: 'https://www.cdc.gov/vaccines/hcp/imz-schedules/child-adolescent-notes.html',
+    snapshot: '2026-09-25-rotavirus.md',
+    tier: 'organization',
+  },
+  cdc2025RvIntervals: {
+    label: 'CDC child/adolescent catch-up table — Rotavirus minimum/maximum ages',
+    edition: '2025 schedule cycle',
+    url: 'https://www.cdc.gov/vaccines/schedules/wcms-inc/child-schedule-table-catchup_TP4.html',
+    snapshot: '2026-09-25-rotavirus.md',
+    tier: 'organization',
+  },
+  insertRotarix: {
+    label: 'Rotarix package insert (DailyMed)',
+    edition: 'label revision 1/2024',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=f3182470-1965-4e20-dbaf-e3506f893ea5&type=display',
+    snapshot: '2026-09-25-rotavirus.md',
+    tier: 'insert',
+  },
+  insertRotaTeq: {
+    label: 'RotaTeq package insert (DailyMed)',
+    edition: 'label revision 5/2026',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=aaf3b24e-85fd-43ee-b657-2ee4df312ec3&type=display',
+    snapshot: '2026-09-25-rotavirus.md',
+    tier: 'insert',
+  },
 };
