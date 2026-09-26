@@ -579,6 +579,56 @@ export const PRODUCTS = [
     ],
   },
   {
+    name: 'Adacel',
+    group: 'Tdap',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'Tdap', doses: [1, 1] }],
+    minAgeDays: 3653,
+    maxAgeDays: null,
+    insertMinAgeDays: 3653,
+    lineage: null,
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed 10 through 64 years — a year wider than CDC/ACIP\'s 11-year ' +
+          'routine age, not narrower, so no gap.',
+        source: 'insertAdacel',
+        verified: '2026-09-25',
+        quote: 'Adacel is approved for use in persons 10 through 64 years of age.',
+      },
+    ],
+  },
+  {
+    name: 'Boostrix',
+    group: 'Tdap',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'Tdap', doses: [1, 1] }],
+    minAgeDays: 3653,
+    maxAgeDays: null,
+    insertMinAgeDays: 3653,
+    lineage: null,
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          "Licensed from 10 years of age — a year wider than CDC/ACIP's 11-year " +
+          'routine age, not narrower, so no gap.',
+        source: 'insertBoostrix',
+        verified: '2026-09-25',
+        quote:
+          'Active booster immunization against tetanus, diphtheria, and pertussis ' +
+          'in individuals aged 10 years and older.',
+      },
+    ],
+  },
+  {
     name: 'Pediarix',
     group: 'Combination products',
     kind: 'combination',

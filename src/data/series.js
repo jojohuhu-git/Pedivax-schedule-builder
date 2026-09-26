@@ -618,4 +618,32 @@ export const SERIES = {
       },
     ],
   },
+
+  // Tdap is a single adolescent booster dose, unlike every series so far —
+  // no primary series, no interval to check.
+  Tdap: {
+    key: 'Tdap',
+    name: 'Tetanus, diphtheria, pertussis (adolescent booster)',
+    abbr: 'Tdap',
+    route: 'injection',
+    doses: [{ n: 1, at: ['y11', 'y12'], booster: true, minAgeDays: 4018 }],
+    facts: [
+      {
+        claim: 'One dose, routinely at 11-12 years.',
+        source: 'cdc2025TdapNotes',
+        verified: '2026-09-25',
+        quote: 'Age 11–12 years: 1 dose Tdap (adolescent booster)',
+      },
+      {
+        claim:
+          'An early dose at age 10 satisfies the requirement and the 11-12-year ' +
+          "dose is then skipped — a catch-up allowance, out of scope for this app's " +
+          'v1 (no catch-up logic), since an on-time child simply takes the one ' +
+          'routine dose.',
+        source: 'cdc2025TdapNotes',
+        verified: '2026-09-25',
+        quote: 'Age 10 years who receive Tdap do not need the adolescent Tdap booster dose at age 11–12 years.',
+      },
+    ],
+  },
 };

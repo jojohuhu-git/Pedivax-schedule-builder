@@ -331,4 +331,32 @@ export const SOURCES = {
     snapshot: '2026-09-25-hepa.md',
     tier: 'insert',
   },
+  cdc2025TdapNotes: {
+    label: 'CDC Child Immunization Schedule Notes, 2025 — Tdap',
+    edition: 'last reviewed July 2, 2025',
+    url: 'https://www.cdc.gov/vaccines/hcp/imz-schedules/child-adolescent-notes.html',
+    snapshot: '2026-09-25-tdap.md',
+    tier: 'organization',
+  },
+  cdc2025TdapCatchupAge: {
+    label: 'CDC child/adolescent catch-up table — Tdap minimum age',
+    edition: '2025 schedule cycle',
+    url: 'https://www.cdc.gov/vaccines/schedules/wcms-inc/child-schedule-table-catchup_TP4.html',
+    snapshot: '2026-09-25-tdap.md',
+    tier: 'organization',
+  },
+  insertAdacel: {
+    label: 'Adacel package insert (DailyMed)',
+    edition: 'label revision 8/2026',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=a41b7601-34f2-4a88-a406-f53011fb7de1&type=display',
+    snapshot: '2026-09-25-tdap.md',
+    tier: 'insert',
+  },
+  insertBoostrix: {
+    label: 'Boostrix package insert (DailyMed)',
+    edition: 'label revision 3/2025',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=c3c03458-942c-4565-8a9c-1901bb0d2db0&type=display',
+    snapshot: '2026-09-25-tdap.md',
+    tier: 'insert',
+  },
 };
