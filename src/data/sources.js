@@ -359,4 +359,18 @@ export const SOURCES = {
     snapshot: '2026-09-25-tdap.md',
     tier: 'insert',
   },
+  cdc2025HpvNotes: {
+    label: 'CDC Child Immunization Schedule Notes, 2025 — HPV',
+    edition: 'last reviewed July 2, 2025',
+    url: 'https://www.cdc.gov/vaccines/hcp/imz-schedules/child-adolescent-notes.html',
+    snapshot: '2026-09-25-hpv.md',
+    tier: 'organization',
+  },
+  insertGardasil9: {
+    label: 'Gardasil 9 package insert (DailyMed)',
+    edition: 'label revision 3/2025',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=a21f4f4b-b891-4f25-b747-cb9ec7d865d6&type=display',
+    snapshot: '2026-09-25-hpv.md',
+    tier: 'insert',
+  },
 };

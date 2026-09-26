@@ -629,6 +629,35 @@ export const PRODUCTS = [
     ],
   },
   {
+    name: 'Gardasil 9',
+    group: 'HPV',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'HPV', doses: [1, 2] }],
+    minAgeDays: 3287,
+    maxAgeDays: null,
+    insertMinAgeDays: 3287,
+    lineage: null,
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed 9 through 45 years, both sexes; 2-dose schedule at 0, 6-12 ' +
+          'months for the 9-14-year band — matches CDC/ACIP exactly, no gap. The ' +
+          'only currently-marketed HPV product (Gardasil-quadrivalent and Cervarix ' +
+          'are both discontinued in the US).',
+        source: 'insertGardasil9',
+        verified: '2026-09-25',
+        quote:
+          '0, 6 to 12 months. If the second dose is administered earlier than 5 ' +
+          'months after the first dose, administer a third dose at least 4 months ' +
+          'after the second dose.',
+      },
+    ],
+  },
+  {
     name: 'Pediarix',
     group: 'Combination products',
     kind: 'combination',

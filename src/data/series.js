@@ -646,4 +646,53 @@ export const SERIES = {
       },
     ],
   },
+
+  // HPV can start as early as 9 (CDC/AAP agree), but decisions.md settles
+  // this app's plan to always use the 2-dose 9-14-year schedule, placed at
+  // the 11- and 12-year visits specifically (not a window) — an owner
+  // decision, not a clinical minimum.
+  HPV: {
+    key: 'HPV',
+    name: 'Human papillomavirus',
+    abbr: 'HPV',
+    route: 'injection',
+    doses: [
+      { n: 1, at: ['y11'], minAgeDays: 3287 },
+      { n: 2, at: ['y12'], minIntervalFromPrevDays: 152 },
+    ],
+    facts: [
+      {
+        claim:
+          'Routinely recommended at 11-12 years (can start at 9). For anyone whose ' +
+          'first dose is at 9-14 years, a 2-dose series at 0, 6-12 months. This app ' +
+          "always starts in that band (decisions.md), so the 15+/3-dose branch " +
+          'never applies to an on-time plan.',
+        source: 'cdc2025HpvNotes',
+        verified: '2026-09-25',
+        quote:
+          'HPV vaccination routinely recommended at age 11–12 years (can start at ' +
+          'age 9 years). Age 9–14 years at initial vaccination: 2-dose series at 0, ' +
+          '6–12 months (minimum interval: 5 months; repeat dose if administered ' +
+          'too soon).',
+      },
+      {
+        claim:
+          "Placed at the 11- and 12-year visits specifically — an owner decision " +
+          '(docs/decisions.md, 2026-09-25), not a clinical minimum; CDC/AAP allow ' +
+          'anywhere in the 9-14 window with a 6-12 month gap.',
+        source: 'cdc2025HpvNotes',
+        verified: '2026-09-25',
+        quote: 'HPV vaccination routinely recommended at age 11–12 years (can start at age 9 years)',
+      },
+      {
+        claim:
+          "No AAP/CDC disagreement here — CDC's 2-dose-at-0/6-12-months rule for " +
+          'the 9-14 band matches what AAP recommends for the same population; ' +
+          "cited from CDC directly (this session's live read), no decision needed.",
+        source: 'cdc2025HpvNotes',
+        verified: '2026-09-25',
+        quote: 'Age 9–14 years at initial vaccination: 2-dose series at 0, 6–12 months',
+      },
+    ],
+  },
 };
