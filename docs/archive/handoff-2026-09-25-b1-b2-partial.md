@@ -1,3 +1,8 @@
+> **Superseded** by
+> [handoff-2026-09-25-b2-complete.md](handoff-2026-09-25-b2-complete.md) —
+> B2 is now fully done (all 14 vaccine groups + all 6 combo products).
+> Read that file, not this one, for current state.
+
 # Pedivax Schedule Builder — Handoff after B1 + B2 partial (2026-09-25)
 
 Branch: `main`, no base (first branch — see "Push policy" below). **NOT pushed** — the
