@@ -362,6 +362,33 @@ export const PRODUCTS = [
     ],
   },
   {
+    name: 'IPOL',
+    group: 'IPV',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'IPV', doses: [1, 4] }],
+    minAgeDays: 42,
+    maxAgeDays: null,
+    insertMinAgeDays: 42,
+    lineage: null,
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed from 6 weeks of age; 4-dose series at 2, 4, 6-18 months, 4-6 ' +
+          'years — matches CDC/ACIP exactly, no gap.',
+        source: 'insertIPOL',
+        verified: '2026-09-25',
+        quote:
+          'The primary series of IPOL vaccine consists of three 0.5 mL doses ' +
+          'administered intramuscularly or subcutaneously, preferably eight or more ' +
+          'weeks apart and usually at ages 2, 4, and 6 to 18 months.',
+      },
+    ],
+  },
+  {
     name: 'Prevnar 13',
     group: 'Pneumococcal',
     kind: 'single',

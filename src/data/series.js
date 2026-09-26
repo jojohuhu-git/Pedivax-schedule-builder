@@ -422,4 +422,60 @@ export const SERIES = {
       },
     ],
   },
+
+  // IPV is another plain series, like HepB/PCV/DTaP — IPOL is the only
+  // single-antigen product, no brand choice, no variants. Unlike the other
+  // boosters in this app, dose 4 has a real absolute-age floor (4 years)
+  // that binds on-time, not just a minimum interval — it's placed at the
+  // y4 visit rather than the earlier m18/y3 visits the interval alone would
+  // allow.
+  IPV: {
+    key: 'IPV',
+    name: 'Inactivated poliovirus',
+    abbr: 'IPV',
+    route: 'injection',
+    doses: [
+      { n: 1, at: ['m2'], minAgeDays: 42 },
+      { n: 2, at: ['m4'], minIntervalFromPrevDays: 28 },
+      { n: 3, at: ['m6', 'm12', 'm15', 'm18'], minIntervalFromPrevDays: 28 },
+      {
+        n: 4,
+        at: ['y4', 'y5', 'y6'],
+        booster: true,
+        minAgeDays: 1461,
+        minIntervalFromPrevDays: 183,
+      },
+    ],
+    facts: [
+      {
+        claim:
+          '4-dose series: 2, 4, 6-18 months, 4-6 years. The final dose must be on or ' +
+          'after age 4 and at least 6 months after the previous dose — an absolute ' +
+          'floor, not just an interval, so it always lands at the 4-6 year visits ' +
+          'even for a child whose earlier doses ran early.',
+        source: 'cdc2025IpvNotes',
+        verified: '2026-09-25',
+        quote:
+          '4-dose series at ages 2, 4, 6–18 months, 4–6 years; administer the final ' +
+          'dose on or after age 4 years and at least 6 months after the previous dose.',
+      },
+      {
+        claim: 'The routine minimum age for dose 1 is 6 weeks.',
+        source: 'cdc2025IpvIntervals',
+        verified: '2026-09-25',
+        quote: 'Minimum age for dose 1: 6 weeks',
+      },
+      {
+        claim:
+          'A 4th dose is not needed if dose 3 was given at age 4 or older and at ' +
+          "least 6 months after dose 2 — this cannot occur in an on-time plan, since " +
+          'dose 3 always lands at 6-18 months.',
+        source: 'cdc2025IpvIntervals',
+        verified: '2026-09-25',
+        quote:
+          'A fourth dose is not necessary if the third dose was administered at age ' +
+          '4 years or older and at least 6 months after the previous dose.',
+      },
+    ],
+  },
 };

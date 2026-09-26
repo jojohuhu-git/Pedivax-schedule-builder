@@ -184,4 +184,25 @@ export const SOURCES = {
     snapshot: '2026-09-25-dtap.md',
     tier: 'insert',
   },
+  cdc2025IpvNotes: {
+    label: 'CDC Child Immunization Schedule Notes, 2025 — IPV',
+    edition: 'last reviewed July 2, 2025',
+    url: 'https://www.cdc.gov/vaccines/hcp/imz-schedules/child-adolescent-notes.html',
+    snapshot: '2026-09-25-ipv.md',
+    tier: 'organization',
+  },
+  cdc2025IpvIntervals: {
+    label: 'CDC child/adolescent catch-up table — IPV minimum intervals',
+    edition: '2025 schedule cycle',
+    url: 'https://www.cdc.gov/vaccines/schedules/wcms-inc/child-schedule-table-catchup_TP4.html',
+    snapshot: '2026-09-25-ipv.md',
+    tier: 'organization',
+  },
+  insertIPOL: {
+    label: 'IPOL package insert (DailyMed)',
+    edition: 'label revision 6/2026',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=34a647f5-8728-451b-b918-94c8acd15974&type=display',
+    snapshot: '2026-09-25-ipv.md',
+    tier: 'insert',
+  },
 };
