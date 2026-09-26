@@ -128,4 +128,32 @@ export const SOURCES = {
     snapshot: '2026-09-25-menb.md',
     tier: 'insert',
   },
+  cdc2025PcvNotes: {
+    label: 'CDC Child Immunization Schedule Notes, 2025 — Pneumococcal',
+    edition: 'last reviewed July 2, 2025',
+    url: 'https://www.cdc.gov/vaccines/hcp/imz-schedules/child-adolescent-notes.html',
+    snapshot: '2026-09-25-pcv.md',
+    tier: 'organization',
+  },
+  cdc2025PcvIntervals: {
+    label: 'CDC child/adolescent catch-up table — Pneumococcal minimum intervals',
+    edition: '2025 schedule cycle',
+    url: 'https://www.cdc.gov/vaccines/schedules/wcms-inc/child-schedule-table-catchup_TP4.html',
+    snapshot: '2026-09-25-pcv.md',
+    tier: 'organization',
+  },
+  insertPrevnar20: {
+    label: 'Prevnar 20 package insert (DailyMed)',
+    edition: 'label revision 4/2023',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=d4e2cf51-e6a8-4103-bb1d-6120c6474ff8&type=display',
+    snapshot: '2026-09-25-pcv.md',
+    tier: 'insert',
+  },
+  insertVaxneuvance: {
+    label: 'Vaxneuvance package insert (DailyMed)',
+    edition: 'label revision 6/2026',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=1158fa93-ef41-4a29-8252-9251f94c53c8&type=display',
+    snapshot: '2026-09-25-pcv.md',
+    tier: 'insert',
+  },
 };

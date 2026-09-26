@@ -254,4 +254,86 @@ export const PRODUCTS = [
       },
     ],
   },
+  {
+    name: 'Prevnar 20',
+    group: 'Pneumococcal',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'PCV', doses: [1, 4] }],
+    minAgeDays: 42,
+    maxAgeDays: null,
+    insertMinAgeDays: 42,
+    lineage: null,
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed 6 weeks through 17 years; 4-dose series at 2, 4, 6, 12-15 months — ' +
+          'matches CDC/ACIP exactly, no gap.',
+        source: 'insertPrevnar20',
+        verified: '2026-09-25',
+        quote:
+          'Administer Prevnar 20 as a 4-dose series at 2, 4, 6, and 12 through 15 ' +
+          'months of age (and at least 2 months after the third dose). The first dose ' +
+          'may be given as early as 6 weeks of age.',
+      },
+    ],
+  },
+  {
+    name: 'Vaxneuvance',
+    group: 'Pneumococcal',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'PCV', doses: [1, 4] }],
+    minAgeDays: 42,
+    maxAgeDays: null,
+    insertMinAgeDays: 42,
+    lineage: null,
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed from 6 weeks of age; 4-dose series at 2, 4, 6, 12-15 months — ' +
+          'matches CDC/ACIP exactly, no gap.',
+        source: 'insertVaxneuvance',
+        verified: '2026-09-25',
+        quote:
+          'Administer VAXNEUVANCE as a 4-dose series at 2, 4, 6 and 12 through 15 ' +
+          'months of age.',
+      },
+    ],
+  },
+  {
+    name: 'Prevnar 13',
+    group: 'Pneumococcal',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'PCV', doses: [1, 4] }],
+    minAgeDays: 42,
+    maxAgeDays: null,
+    insertMinAgeDays: 42,
+    lineage: null,
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: '2024-04-30',
+    facts: [
+      {
+        claim:
+          'No longer the routinely-used pneumococcal product — replaced by PCV15/PCV20. ' +
+          'Kept here, not deleted, so an old saved plan can still be explained. Its own ' +
+          'retirement date (30 April 2024) is commonly cited but rests on a document ' +
+          "title and search summaries of a PDF that returns HTTP 403 both this session " +
+          'and last — not a sentence read live. Recorded with a caveat rather than as a ' +
+          'plain verified fact; re-fetch the letter directly before treating the date ' +
+          'as settled.',
+        source: 'cdc2025PcvNotes',
+        verified: '2026-09-25',
+        quote: 'minimum age: 6 weeks [PCV15], [PCV 20]; 2 years [PPSV23]',
+      },
+    ],
+  },
 ];

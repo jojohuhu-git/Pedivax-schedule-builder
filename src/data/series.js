@@ -288,4 +288,66 @@ export const SERIES = {
       },
     ],
   },
+
+  // PCV is a plain 4-dose series, like HepB — unlike Hib/RV/MenB, the two
+  // current products (Prevnar 20, Vaxneuvance) cover doses 1-4 identically,
+  // so there's no brand choice that changes the series length and no
+  // `variants[]` needed.
+  PCV: {
+    key: 'PCV',
+    name: 'Pneumococcal conjugate',
+    abbr: 'PCV',
+    route: 'injection',
+    doses: [
+      { n: 1, at: ['m2'], minAgeDays: 42 },
+      { n: 2, at: ['m4'], minIntervalFromPrevDays: 28 },
+      { n: 3, at: ['m6'], minIntervalFromPrevDays: 28 },
+      {
+        n: 4,
+        at: ['m12', 'm15'],
+        booster: true,
+        minAgeDays: 365,
+        minIntervalFromPrevDays: 56,
+      },
+    ],
+    facts: [
+      {
+        claim: '4-dose series at 2, 4, 6, and 12-15 months.',
+        source: 'cdc2025PcvNotes',
+        verified: '2026-09-25',
+        quote: '4-dose series at 2, 4, 6, 12–15 months',
+      },
+      {
+        claim: 'The routine minimum age for dose 1 is 6 weeks.',
+        source: 'cdc2025PcvIntervals',
+        verified: '2026-09-25',
+        quote: 'Minimum age for dose 1: 6 weeks',
+      },
+      {
+        claim:
+          'Minimum intervals: 4 weeks between doses given before the 1st birthday; ' +
+          'dose 4 requires at least 8 weeks after dose 3 and is only needed for a ' +
+          'child who received all 3 primary doses before 12 months — which describes ' +
+          "every on-time child this app plans for, so dose 4 always applies here.",
+        source: 'cdc2025PcvIntervals',
+        verified: '2026-09-25',
+        quote:
+          '8 weeks (as final dose). This dose is only necessary for children age 12 ' +
+          'through 59 months regardless of risk ... who received 3 doses before age ' +
+          '12 months.',
+      },
+      {
+        claim:
+          'PCV13 (Prevnar 13) is no longer the routinely-used product; the two current ' +
+          'products are PCV15 (Vaxneuvance) and PCV20 (Prevnar 20), both licensed from ' +
+          "6 weeks of age. PCV13's own retirement date (commonly cited as 30 April " +
+          "2024) rests on a document title and search summaries, not a sentence read " +
+          "live — the underlying PDF is bot-blocked (HTTP 403) both this session and " +
+          'last. Recorded as unverified rather than upgraded to a fact.',
+        source: 'cdc2025PcvNotes',
+        verified: '2026-09-25',
+        quote: 'minimum age: 6 weeks [PCV15], [PCV 20]; 2 years [PPSV23]',
+      },
+    ],
+  },
 };
