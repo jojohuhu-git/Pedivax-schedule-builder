@@ -25,11 +25,12 @@ Pedivax-schedule-builder/
 │   │   ├── score.js       counts injections and visits
 │   │   └── suggest.js     "what you could add"
 │   ├── ui/          the three screens
-│   │   ├── App.jsx      the app shell
+│   │   ├── App.jsx      the app shell — owns the ticked formulary, syncs ?s= + localStorage
 │   │   ├── Formulary.jsx  tick the products you stock
 │   │   ├── Plan.jsx     the schedule
-│   │   └── Rulebook.jsx  every rule, generated from src/data
-│   └── test/        the six required tests live here
+│   │   ├── Rulebook.jsx  every rule, generated from src/data (not built yet)
+│   │   └── theme.css    design tokens + component styles, from the frozen mockups
+│   └── test/        the six required tests, plus UI rendering tests for each screen
 ├── mockups/         clickable HTML mockups — frozen, reference only, not the real app
 │   ├── formulary-planner.html   tick the products you stock, see the schedule
 │   └── rulebook.html            the rules, each with its source and check date
@@ -41,12 +42,12 @@ Pedivax-schedule-builder/
     │   ├── sources/  saved copies of pages and PDFs, so a quote stays traceable
     │   └── applied/  one dated note per link, saying what changed and what did not
     └── archive/       finished plans and end-of-session handoffs go here
-        └── handoff-2026-09-26-b3-plan-js.md   ← start here (supersedes the
-            two 2026-09-25 handoffs — B1/B2 are done, plan.js is done,
-            score.js/suggest.js are next)
+        └── handoff-2026-09-26-b3-plan-js.md   ← superseded by this file's own
+            summary below (B3 fully done; Formulary.jsx/Plan.jsx now built too) —
+            see git log for a fresher handoff once one is written
 ```
 
 `src/data/` (B2) and `src/logic/` (B3 — `cover.js`, `seriesLength.js`, `plan.js`,
-`score.js`) are built and tested. `suggest.js` and the three UI screens
-(`Formulary.jsx`, `Plan.jsx`, `Rulebook.jsx`) are not built yet (queue items
-B3's remainder + B4). `App.jsx` is currently a placeholder shell.
+`score.js`, `suggest.js`) are all built and tested — B3 is done. `App.jsx`,
+`Formulary.jsx`, and `Plan.jsx` (B4) are built, live-verified, and tested.
+`Rulebook.jsx` and `src/ui/print.css` are not built yet.
