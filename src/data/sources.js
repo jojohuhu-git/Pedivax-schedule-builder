@@ -156,4 +156,32 @@ export const SOURCES = {
     snapshot: '2026-09-25-pcv.md',
     tier: 'insert',
   },
+  cdc2025DtapNotes: {
+    label: 'CDC Child Immunization Schedule Notes, 2025 — DTaP',
+    edition: 'last reviewed July 2, 2025',
+    url: 'https://www.cdc.gov/vaccines/hcp/imz-schedules/child-adolescent-notes.html',
+    snapshot: '2026-09-25-dtap.md',
+    tier: 'organization',
+  },
+  cdc2025DtapIntervals: {
+    label: 'CDC child/adolescent catch-up table — DTaP minimum intervals',
+    edition: '2025 schedule cycle',
+    url: 'https://www.cdc.gov/vaccines/schedules/wcms-inc/child-schedule-table-catchup_TP4.html',
+    snapshot: '2026-09-25-dtap.md',
+    tier: 'organization',
+  },
+  insertDaptacel: {
+    label: 'Daptacel package insert (DailyMed)',
+    edition: 'label revision 8/2026',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=06f34d0f-4e72-41d3-967f-8abf3f2005c1',
+    snapshot: '2026-09-25-dtap.md',
+    tier: 'insert',
+  },
+  insertInfanrix: {
+    label: 'Infanrix package insert (DailyMed)',
+    edition: 'label revision 5/2026',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=de16dd6a-859b-4180-c6af-f930be14f26a&type=display',
+    snapshot: '2026-09-25-dtap.md',
+    tier: 'insert',
+  },
 };

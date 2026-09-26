@@ -308,6 +308,60 @@ export const PRODUCTS = [
     ],
   },
   {
+    name: 'Daptacel',
+    group: 'DTaP',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'DTaP', doses: [1, 5] }],
+    minAgeDays: 42,
+    maxAgeDays: null,
+    insertMinAgeDays: 42,
+    lineage: null,
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed 6 weeks through 6 years (prior to 7th birthday); 5-dose series at ' +
+          '2, 4, 6, 15-20 months, 4-6 years — insert window is a month wider than ' +
+          'CDC/ACIP at dose 4, not narrower, so no gap.',
+        source: 'insertDaptacel',
+        verified: '2026-09-25',
+        quote:
+          'The five dose immunization series consists of a 0.5 mL dose administered ' +
+          'intramuscularly at 2, 4, 6 and 15-20 months of age, and at 4-6 years of age.',
+      },
+    ],
+  },
+  {
+    name: 'Infanrix',
+    group: 'DTaP',
+    kind: 'single',
+    route: 'injection',
+    covers: [{ series: 'DTaP', doses: [1, 5] }],
+    minAgeDays: 42,
+    maxAgeDays: null,
+    insertMinAgeDays: 42,
+    lineage: null,
+    setsSeriesLength: null,
+    cannotBeBooster: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'Licensed 6 weeks through 6 years (prior to 7th birthday); 5-dose series at ' +
+          '2, 4, 6, 15-20 months, 4-6 years — insert window is a month wider than ' +
+          'CDC/ACIP at dose 4, not narrower, so no gap.',
+        source: 'insertInfanrix',
+        verified: '2026-09-25',
+        quote:
+          'One dose each at 2, 4, and 6 months of age. One booster dose at 15 to 20 ' +
+          'months of age and another booster dose at 4 to 6 years of age.',
+      },
+    ],
+  },
+  {
     name: 'Prevnar 13',
     group: 'Pneumococcal',
     kind: 'single',
