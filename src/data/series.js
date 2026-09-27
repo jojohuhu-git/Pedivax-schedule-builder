@@ -213,6 +213,79 @@ export const SERIES = {
     ],
   },
 
+  // DTaP is another plain series, like HepB — Daptacel and Infanrix both
+  // cover doses 1-5 identically, no brand choice that changes series length.
+  // The two 4-6-year booster combo products (Kinrix, Quadracel) are DTaP+IPV
+  // and are added once IPV is verified, per the B2 queue.
+  DTaP: {
+    key: 'DTaP',
+    name: 'Diphtheria, tetanus, pertussis',
+    abbr: 'DTaP',
+    route: 'injection',
+    ageBlock: 'infant',
+    doses: [
+      { n: 1, at: ['m2'], minAgeDays: 42 },
+      { n: 2, at: ['m4'], minIntervalFromPrevDays: 28 },
+      { n: 3, at: ['m6'], minIntervalFromPrevDays: 28 },
+      {
+        n: 4,
+        at: ['m15', 'm18'],
+        booster: true,
+        minAgeDays: 365,
+        minIntervalFromPrevDays: 183,
+      },
+      {
+        n: 5,
+        at: ['y4', 'y5', 'y6'],
+        booster: true,
+        minAgeDays: 1461,
+        minIntervalFromPrevDays: 183,
+      },
+    ],
+    facts: [
+      {
+        claim:
+          '5-dose series: 3-dose primary at 2, 4, 6 months, boosters at 15-18 months ' +
+          'and 4-6 years.',
+        source: 'cdc2025DtapNotes',
+        verified: '2026-09-25',
+        quote:
+          '5-dose series (3-dose primary series at age 2, 4, and 6 months, followed ' +
+          'by booster doses at ages 15–18 months and 4–6 years)',
+      },
+      {
+        claim: 'The routine minimum age for dose 1 is 6 weeks.',
+        source: 'cdc2025DtapIntervals',
+        verified: '2026-09-25',
+        quote: 'Minimum age for dose 1: 6 weeks',
+      },
+      {
+        claim:
+          'Minimum intervals: 4 weeks between doses 1-2 and 2-3; 6 months between ' +
+          'doses 3-4 and doses 4-5. A 5th dose is not needed if dose 4 was given at ' +
+          'age 4 or older and at least 6 months after dose 3 — this cannot occur in ' +
+          "an on-time plan, since dose 4 always lands at 15-18 months.",
+        source: 'cdc2025DtapIntervals',
+        verified: '2026-09-25',
+        quote:
+          'Dose 3 to dose 4: 6 months / Dose 4 to dose 5: 6 months / A fifth dose is ' +
+          'not necessary if the fourth dose was administered at age 4 years or older ' +
+          'and at least 6 months after dose 3',
+      },
+      {
+        claim:
+          "Both current products' inserts allow dose 4 at 15-20 months, one month " +
+          "wider than CDC/ACIP's 15-18-month routine window — a wider insert, not a " +
+          'narrower one, so no gap to flag. CDC/ACIP governs the on-time schedule.',
+        source: 'insertDaptacel',
+        verified: '2026-09-25',
+        quote:
+          'The five dose immunization series consists of a 0.5 mL dose administered ' +
+          'intramuscularly at 2, 4, 6 and 15-20 months of age, and at 4-6 years of age.',
+      },
+    ],
+  },
+
   // Hib is the third series (with Rotavirus and MenB) whose brand choice sets
   // the length of the whole series — decisions.md: "PedvaxHIB start to
   // finish is 3 doses. Any PRP-T product, or any mix of brands, is 4."
@@ -360,79 +433,6 @@ export const SERIES = {
         source: 'cdc2025PcvNotes',
         verified: '2026-09-25',
         quote: 'minimum age: 6 weeks [PCV15], [PCV 20]; 2 years [PPSV23]',
-      },
-    ],
-  },
-
-  // DTaP is another plain series, like HepB/PCV — Daptacel and Infanrix both
-  // cover doses 1-5 identically, no brand choice that changes series length.
-  // The two 4-6-year booster combo products (Kinrix, Quadracel) are DTaP+IPV
-  // and are added once IPV is verified, per the B2 queue.
-  DTaP: {
-    key: 'DTaP',
-    name: 'Diphtheria, tetanus, pertussis',
-    abbr: 'DTaP',
-    route: 'injection',
-    ageBlock: 'infant',
-    doses: [
-      { n: 1, at: ['m2'], minAgeDays: 42 },
-      { n: 2, at: ['m4'], minIntervalFromPrevDays: 28 },
-      { n: 3, at: ['m6'], minIntervalFromPrevDays: 28 },
-      {
-        n: 4,
-        at: ['m15', 'm18'],
-        booster: true,
-        minAgeDays: 365,
-        minIntervalFromPrevDays: 183,
-      },
-      {
-        n: 5,
-        at: ['y4', 'y5', 'y6'],
-        booster: true,
-        minAgeDays: 1461,
-        minIntervalFromPrevDays: 183,
-      },
-    ],
-    facts: [
-      {
-        claim:
-          '5-dose series: 3-dose primary at 2, 4, 6 months, boosters at 15-18 months ' +
-          'and 4-6 years.',
-        source: 'cdc2025DtapNotes',
-        verified: '2026-09-25',
-        quote:
-          '5-dose series (3-dose primary series at age 2, 4, and 6 months, followed ' +
-          'by booster doses at ages 15–18 months and 4–6 years)',
-      },
-      {
-        claim: 'The routine minimum age for dose 1 is 6 weeks.',
-        source: 'cdc2025DtapIntervals',
-        verified: '2026-09-25',
-        quote: 'Minimum age for dose 1: 6 weeks',
-      },
-      {
-        claim:
-          'Minimum intervals: 4 weeks between doses 1-2 and 2-3; 6 months between ' +
-          'doses 3-4 and doses 4-5. A 5th dose is not needed if dose 4 was given at ' +
-          'age 4 or older and at least 6 months after dose 3 — this cannot occur in ' +
-          "an on-time plan, since dose 4 always lands at 15-18 months.",
-        source: 'cdc2025DtapIntervals',
-        verified: '2026-09-25',
-        quote:
-          'Dose 3 to dose 4: 6 months / Dose 4 to dose 5: 6 months / A fifth dose is ' +
-          'not necessary if the fourth dose was administered at age 4 years or older ' +
-          'and at least 6 months after dose 3',
-      },
-      {
-        claim:
-          "Both current products' inserts allow dose 4 at 15-20 months, one month " +
-          "wider than CDC/ACIP's 15-18-month routine window — a wider insert, not a " +
-          'narrower one, so no gap to flag. CDC/ACIP governs the on-time schedule.',
-        source: 'insertDaptacel',
-        verified: '2026-09-25',
-        quote:
-          'The five dose immunization series consists of a 0.5 mL dose administered ' +
-          'intramuscularly at 2, 4, 6 and 15-20 months of age, and at 4-6 years of age.',
       },
     ],
   },

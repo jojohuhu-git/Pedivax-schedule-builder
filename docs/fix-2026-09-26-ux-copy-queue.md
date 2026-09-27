@@ -5,8 +5,10 @@
 (https://claude.ai/artifact/RJ9jXrVGVjaK2fjwTetR17).
 
 **Status:** OPEN. Batch A is DONE (A1–A6, merged as PR #1). Batch B is DONE (B1–B4,
-PR opened 2026-09-26) — see its own STOP line below for the baseline the next session
-(Batch C) should verify against. Batches C–F are still open.
+merged as PR #2). Batch C is DONE (C1–C5, PR opened 2026-09-26; C2's source fetch is
+in `docs/updates/sources/2026-09-26-cdc2025-schedule-table-row-order.md`) — see its own
+STOP line below for the baseline the next session (Batch D) should verify against.
+Batches D–F are still open.
 
 Run this with the `fix-queue` skill, one batch at a time. **Each batch is a whole
 conversation.** Every batch ends at a STOP line: finish the batch, open its pull request,
@@ -277,12 +279,12 @@ by a policy instead of by what it protects against. Row 10 holds six products wh
 shared trait is more than one antigen in the syringe, and sits tenth only because ProQuad
 is typed first in the file.
 
-### C1 — Two sections · P1
+### C1 — Two sections · P1 · **DONE**
 `src/data/products.js` + `src/ui/Formulary.jsx`. Add whatever field the data needs so the
 UI can render **Single vaccines** (grouped by antigen) and **Combination vaccines**
 separately, without `Formulary.jsx` deciding anything clinical for itself.
 
-### C2 — Singles in schedule-table order · P1 · **fetch the table first**
+### C2 — Singles in schedule-table order · P1 · **DONE**
 Settled 2026-09-26: **copy the AAP/CDC schedule table's row order**; do not derive an
 order of our own. That makes the fetch below the first action of Batch C — the table is
 now the specification, so it has to be read before any reordering.
@@ -302,7 +304,7 @@ the commit message, and use what it says. "Shared-decision products" stops being
 **Meningococcal B** at the end, with the shared-decision note as a line of text under the
 group rather than a tint over the whole section.
 
-### C3 — Combinations sub-grouped by visit · P1
+### C3 — Combinations sub-grouped by visit · P1 · **DONE**
 
 > **For the 2, 4 and 6 month visits**
 > Vaxelis — DTaP + polio + Hib + hep B (doses 1–3)
@@ -321,7 +323,7 @@ what the app scores on, so the list reads best-first. Pentacel sits above Pediar
 both being three antigens because Pentacel covers DTaP doses 1–4 and Pediarix only 1–3 —
 show that difference in the sub-label. Every sub-label says what the product **replaces**.
 
-### C4 — Consistent headings · P2
+### C4 — Consistent headings · P2 · **DONE**
 Today the headings mix plain English ("Hepatitis B", "Varicella") with bare abbreviations
 ("Hib", "IPV", "MenACWY"), then repeat the abbreviation under every product — so
 "HEPATITIS B → Engerix-B → HepB" says the same thing three times.
@@ -331,15 +333,23 @@ Use disease names with the abbreviation in parentheses where it helps: "Hepatiti
 "Pneumococcal", "Measles, mumps, rubella (MMR)", "Chickenpox (varicella)", "Hepatitis A",
 "Tdap booster", "HPV", "Meningococcal ACWY", "Meningococcal B".
 
-### C5 — Drop the redundant sub-line on singles · P2
+### C5 — Drop the redundant sub-line on singles · P2 · **DONE**
 The per-product abbreviation line earns its place on a combination ("DTaP + polio + Hib")
 and on products where the valence matters (PCV20 / PCV15) and on the two oral products.
 On a single vaccine under a heading that already names the disease, it is noise. Keep the
 dose-count difference, which is genuinely useful: "PedvaxHIB · 3 doses" against
 "ActHIB · 4 doses".
 
-> ## STOP — Batch C ends here
-> Suite green, live-verified at desktop and 375 px, screenshots in the PR, handoff written.
+> ## STOP — Batch C ends here · **DONE 2026-09-26**
+> C2's live fetch confirmed the reviewer's recalled order exactly (matches today's
+> `docs/updates/sources/2026-09-26-cdc2025-schedule-table-row-order.md`) — only the
+> Hib/DTaP swap and MenB's move (already done by A3) were needed in `series.js`.
+> 483 → **489 passing** (`npx vitest run`), `npm run build` green, live-verified at
+> desktop and at 375 × 812 px (dev server on port 5187) — no console errors, no
+> horizontal overflow, both sections and all three combo sub-groups render with the
+> right order and copy. Rulebook jump bar picked up the DTaP/Hib reorder automatically
+> (single source of truth via `series.js` declaration order) with no Rulebook.jsx
+> changes needed.
 
 ---
 

@@ -21,7 +21,7 @@
 export const PRODUCTS = [
   {
     name: 'Engerix-B',
-    group: 'Hepatitis B',
+    group: 'HepB',
     kind: 'single',
     route: 'injection',
     covers: [{ series: 'HepB', doses: [1, 3] }],
@@ -46,7 +46,7 @@ export const PRODUCTS = [
   },
   {
     name: 'Recombivax HB',
-    group: 'Hepatitis B',
+    group: 'HepB',
     kind: 'single',
     route: 'injection',
     covers: [{ series: 'HepB', doses: [1, 3] }],
@@ -68,7 +68,7 @@ export const PRODUCTS = [
   },
   {
     name: 'Rotarix',
-    group: 'Rotavirus',
+    group: 'RV',
     kind: 'single',
     route: 'oral',
     covers: [{ series: 'RV', doses: [1, 2] }],
@@ -96,7 +96,7 @@ export const PRODUCTS = [
   },
   {
     name: 'RotaTeq',
-    group: 'Rotavirus',
+    group: 'RV',
     kind: 'single',
     route: 'oral',
     covers: [{ series: 'RV', doses: [1, 3] }],
@@ -204,8 +204,7 @@ export const PRODUCTS = [
   },
   {
     name: 'Bexsero',
-    group: 'Shared-decision products',
-    sdm: true,
+    group: 'MenB',
     kind: 'single',
     route: 'injection',
     covers: [{ series: 'MenB', doses: [1, 2] }],
@@ -230,8 +229,7 @@ export const PRODUCTS = [
   },
   {
     name: 'Trumenba',
-    group: 'Shared-decision products',
-    sdm: true,
+    group: 'MenB',
     kind: 'single',
     route: 'injection',
     covers: [{ series: 'MenB', doses: [1, 2] }],
@@ -257,7 +255,7 @@ export const PRODUCTS = [
   {
     name: 'Prevnar 20',
     commonName: 'PCV20',
-    group: 'Pneumococcal',
+    group: 'PCV',
     kind: 'single',
     route: 'injection',
     covers: [{ series: 'PCV', doses: [1, 4] }],
@@ -285,7 +283,7 @@ export const PRODUCTS = [
   {
     name: 'Vaxneuvance',
     commonName: 'PCV15',
-    group: 'Pneumococcal',
+    group: 'PCV',
     kind: 'single',
     route: 'injection',
     covers: [{ series: 'PCV', doses: [1, 4] }],
@@ -442,7 +440,7 @@ export const PRODUCTS = [
   },
   {
     name: 'Varivax',
-    group: 'Varicella',
+    group: 'VAR',
     kind: 'single',
     route: 'injection',
     covers: [{ series: 'VAR', doses: [1, 2] }],
@@ -472,6 +470,14 @@ export const PRODUCTS = [
     group: 'Combination products',
     kind: 'combination',
     route: 'injection',
+    // Checklist sub-grouping (Batch C / C3, queue's own copy) — which visits
+    // this product serves, and its rank within that visit's list (most
+    // antigens first; a manual field rather than a UI-derived sort, since
+    // the tie-break between Pentacel and Pediarix below isn't "more
+    // antigens," it's "more DTaP doses covered").
+    comboVisitGroup: 'toddler',
+    comboRank: 1,
+    comboLabel: 'MMR + chickenpox',
     covers: [
       { series: 'MMR', doses: [1, 2] },
       { series: 'VAR', doses: [1, 2] },
@@ -527,7 +533,7 @@ export const PRODUCTS = [
   },
   {
     name: 'Havrix',
-    group: 'Hepatitis A',
+    group: 'HepA',
     kind: 'single',
     route: 'injection',
     covers: [{ series: 'HepA', doses: [1, 2] }],
@@ -555,7 +561,7 @@ export const PRODUCTS = [
   },
   {
     name: 'Vaqta',
-    group: 'Hepatitis A',
+    group: 'HepA',
     kind: 'single',
     route: 'injection',
     covers: [{ series: 'HepA', doses: [1, 2] }],
@@ -724,6 +730,9 @@ export const PRODUCTS = [
     // birth dose (dose 1, monovalent, within 24 hours per ACIP). Given after
     // a separate birth dose, its three administrations are HepB doses 2, 3,
     // and 4 of a 4-dose series — see the correction fact below.
+    comboVisitGroup: 'infant',
+    comboRank: 3,
+    comboLabel: 'DTaP + hep B + polio (doses 1–3)',
     covers: [
       { series: 'DTaP', doses: [1, 3] },
       { series: 'HepB', doses: [2, 4] },
@@ -779,6 +788,9 @@ export const PRODUCTS = [
     group: 'Combination products',
     kind: 'combination',
     route: 'injection',
+    comboVisitGroup: 'infant',
+    comboRank: 2,
+    comboLabel: 'DTaP + polio + Hib (DTaP doses 1–4)',
     covers: [
       { series: 'DTaP', doses: [1, 4] },
       { series: 'IPV', doses: [1, 4] },
@@ -826,6 +838,9 @@ export const PRODUCTS = [
     // (2026-09-26): Vaxelis starts at 6 weeks, so it can never be the HepB
     // birth dose; given after a separate birth dose its 3 administrations
     // are HepB doses 2, 3, and 4. See the correction fact below.
+    comboVisitGroup: 'infant',
+    comboRank: 1,
+    comboLabel: 'DTaP + polio + Hib + hep B (doses 1–3)',
     covers: [
       { series: 'DTaP', doses: [1, 3] },
       { series: 'IPV', doses: [1, 3] },
@@ -883,6 +898,9 @@ export const PRODUCTS = [
     group: 'Combination products',
     kind: 'combination',
     route: 'injection',
+    comboVisitGroup: 'booster',
+    comboRank: 1,
+    comboLabel: 'final DTaP + polio',
     covers: [
       { series: 'DTaP', doses: [5, 5] },
       { series: 'IPV', doses: [4, 4] },
@@ -932,6 +950,9 @@ export const PRODUCTS = [
     group: 'Combination products',
     kind: 'combination',
     route: 'injection',
+    comboVisitGroup: 'booster',
+    comboRank: 2,
+    comboLabel: 'final DTaP + polio',
     covers: [
       { series: 'DTaP', doses: [5, 5] },
       { series: 'IPV', doses: [4, 5] },
@@ -978,7 +999,7 @@ export const PRODUCTS = [
   {
     name: 'Prevnar 13',
     commonName: 'PCV13',
-    group: 'Pneumococcal',
+    group: 'PCV',
     kind: 'single',
     route: 'injection',
     covers: [{ series: 'PCV', doses: [1, 4] }],
