@@ -122,9 +122,18 @@ describe('Formulary', () => {
     expect(screen.queryByText('DTaP', { selector: '.cv' })).not.toBeInTheDocument();
   });
 
-  it('keeps the abbreviation sub-line on the two oral products', () => {
+  // Found live 2026-09-27: the two oral products (both Rotavirus) had lost
+  // their dose count entirely — the sub-line showed only "RV · oral" for
+  // both, even though Rotarix is a genuinely shorter 2-dose series than
+  // RotaTeq's 3. Rotavirus was the one series where this was invisible: it's
+  // the only series where every product is oral, so there was no non-oral
+  // sibling still showing a dose count to notice the gap against.
+  it('shows the dose count on the two oral products too, since it differs by brand (Rotarix 2 vs RotaTeq 3)', () => {
     render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} />);
-    expect(screen.getAllByText('RV · oral')).toHaveLength(2); // Rotarix, RotaTeq
+    const rotarix = screen.getByText('Rotarix').closest('.chk');
+    const rotateq = screen.getByText('RotaTeq').closest('.chk');
+    expect(within(rotarix).getByText('2 doses · oral')).toBeInTheDocument();
+    expect(within(rotateq).getByText('3 doses · oral')).toBeInTheDocument();
   });
 
   // D1 — a one-line phone summary that opens/closes the checklist. The

@@ -77,29 +77,26 @@ const COMBO_VISIT_GROUPS = [
   { id: 'booster', label: 'For the 4-to-6 year booster' },
 ];
 
-function abbrsFor(product) {
-  // A product's commonName (e.g. Vaxneuvance = "PCV15", Prevnar 20 = "PCV20")
-  // says more than the shared series abbreviation ("PCV") — those two
-  // products protect against different sets of pneumococcal strains and are
-  // not the same vaccine, even though this app schedules them identically.
-  if (product.commonName) return product.commonName;
-  return product.covers.map((c) => SERIES[c.series]?.abbr ?? c.series).join(' + ');
-}
-
 // C5: the per-product sub-line is noise on a single vaccine sitting under a
 // heading that already names the disease — drop it there in favor of the
 // dose count, which genuinely varies by brand (PedvaxHIB · 3 doses vs.
 // ActHIB · 4 doses). Keep it where it earns its place: combinations (their
-// own C3 copy), valence-matters products (PCV20/PCV15), and the two oral
-// products (the route is the thing worth flagging).
+// own C3 copy), valence-matters products (PCV20/PCV15, whose dose count
+// doesn't vary by brand — the valence is the whole story), and the two oral
+// products (the route is worth flagging, same as PCV's valence — but unlike
+// PCV, the oral products' dose count DOES vary by brand: Rotarix is 2 doses,
+// RotaTeq is 3. Found live 2026-09-27: the original version of this function
+// grouped "commonName or oral" into one branch and always returned just the
+// abbreviation/valence, which silently dropped the dose count on both oral
+// products — Rotavirus was the one series where every product lost its
+// dose count, because both its products are oral.
 function subLine(product) {
   if (product.kind === 'combination') return product.comboLabel;
-  if (product.commonName || product.route === 'oral') {
-    return abbrsFor(product) + (product.route === 'oral' ? ' · oral' : '');
-  }
+  if (product.commonName) return product.commonName;
   const [lo, hi] = product.covers[0].doses;
   const n = hi - lo + 1;
-  return `${n} dose${n === 1 ? '' : 's'}`;
+  const doseText = `${n} dose${n === 1 ? '' : 's'}`;
+  return product.route === 'oral' ? `${doseText} · oral` : doseText;
 }
 
 function ProductCheck({ product, ticked, onToggle }) {
