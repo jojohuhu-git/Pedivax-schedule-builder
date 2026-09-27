@@ -8,7 +8,7 @@
 merged as PR #2). Batch C is DONE (C1–C5, PR opened 2026-09-26; C2's source fetch is
 in `docs/updates/sources/2026-09-26-cdc2025-schedule-table-row-order.md`) — see its own
 STOP line below for the baseline the next session (Batch D) should verify against.
-Batches D–F are still open.
+Batch D is DONE (D1–D2, merged as PR #4). Batches E–F are still open.
 
 Run this with the `fix-queue` skill, one batch at a time. **Each batch is a whole
 conversation.** Every batch ends at a STOP line: finish the batch, open its pull request,
@@ -369,6 +369,17 @@ Below the existing 860 px breakpoint, the checklist starts closed as one line �
 Re-measure with the dev server running at 375 px and record the number in the PR. Target:
 the first visit card visible without scrolling. Also confirm the panel opens and closes by
 tap and by keyboard, and that `print.css` still hides the rail.
+
+**DONE 2026-09-26, PR #4.** Live-measured at 375px with a 12-product formulary: first
+visit card moved from 2,525px to 1,230px. Did not reach the "no scrolling" target — the
+remaining 1,230px is the summary tiles, legend, and brand-dependent-dose-count prose
+above the checklist, none of which is the checklist itself, so it's out of D1's scope
+(a Batch F candidate, if it's worth its own item). Tap open/close and print.css
+verified live; keyboard open/close verified only by an automated test
+(`userEvent.keyboard('{Enter}')` passes) — the live preview tool used this session could
+not trigger keyboard activation on any button, including the pre-existing Reset button,
+so that's a tooling limitation, not a checked-and-passed live result. Worth a real
+keyboard spot check before considering D2 fully closed.
 
 > ## STOP — Batch D ends here
 
