@@ -126,4 +126,68 @@ describe('Formulary', () => {
     render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} />);
     expect(screen.getAllByText('RV · oral')).toHaveLength(2); // Rotarix, RotaTeq
   });
+
+  // D1 — a one-line phone summary that opens/closes the checklist. The
+  // media query that hides the full list below 860px lives in theme.css and
+  // isn't exercised by happy-dom, so this test covers the structural/JS half
+  // (the toggle button, its label, its state) that CSS alone can't.
+  describe('the phone-summary toggle (D1)', () => {
+    it('states how many products are stocked, singular and plural', () => {
+      const { rerender } = render(
+        <Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} />
+      );
+      expect(screen.getByText('0 products stocked')).toBeInTheDocument();
+
+      rerender(<Formulary ticked={new Set(['Engerix-B'])} onToggle={() => {}} onReset={() => {}} />);
+      expect(screen.getByText('1 product stocked')).toBeInTheDocument();
+
+      rerender(
+        <Formulary
+          ticked={new Set(['Engerix-B', 'Recombivax HB'])}
+          onToggle={() => {}}
+          onReset={() => {}}
+        />
+      );
+      expect(screen.getByText('2 products stocked')).toBeInTheDocument();
+    });
+
+    it('starts closed and opens on tap, exposing aria-expanded and an .open class for the mobile CSS to key off', async () => {
+      const { container } = render(
+        <Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} />
+      );
+      const toggle = screen.getByRole('button', { name: /products stocked/i });
+      const rail = container.querySelector('.rail');
+      expect(toggle).toHaveAttribute('aria-expanded', 'false');
+      expect(within(toggle).getByText('Change')).toBeInTheDocument();
+      expect(rail.className).not.toMatch(/\bopen\b/);
+
+      await userEvent.click(toggle);
+      expect(toggle).toHaveAttribute('aria-expanded', 'true');
+      expect(within(toggle).getByText('Done')).toBeInTheDocument();
+      expect(rail.className).toMatch(/\bopen\b/);
+    });
+
+    it('closes again on a second tap (and by keyboard, since it is a real button)', async () => {
+      const { container } = render(
+        <Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} />
+      );
+      const toggle = screen.getByRole('button', { name: /products stocked/i });
+      const rail = container.querySelector('.rail');
+
+      await userEvent.click(toggle);
+      expect(toggle).toHaveAttribute('aria-expanded', 'true');
+
+      toggle.focus();
+      await userEvent.keyboard('{Enter}');
+      expect(toggle).toHaveAttribute('aria-expanded', 'false');
+      expect(rail.className).not.toMatch(/\bopen\b/);
+    });
+
+    it('the full checklist (Your formulary, Reset, every product) is always present in the DOM — CSS alone decides whether it shows, so desktop never loses it', () => {
+      render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} />);
+      expect(screen.getByText('Your formulary')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument();
+      expect(screen.getByText('Single vaccines')).toBeInTheDocument();
+    });
+  });
 });

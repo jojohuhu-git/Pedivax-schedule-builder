@@ -9,9 +9,16 @@
 // sub-grouped by the visit they serve (C3), and the per-product sub-line
 // dropped wherever it would just repeat the heading (C5).
 //
+// Batch D / D1: below the 860px breakpoint the full checklist is what pushed
+// the schedule 2,525px down the page, so it starts collapsed to one line
+// ("N products stocked · Change") and opens on tap. The full list is always
+// rendered — only theme.css's media query hides it on a phone — so desktop,
+// which ignores that media query, is unaffected by this state at all.
+//
 // Retired products (Prevnar 13) are never offered here — a clinic building a
 // plan today cannot newly stock a discontinued product. They still exist in
 // products.js so an old saved plan stays explainable, just not in this list.
+import { useState } from 'react';
 import { PRODUCTS } from '../data/products.js';
 import { SERIES } from '../data/series.js';
 
@@ -112,6 +119,7 @@ function ProductCheck({ product, ticked, onToggle }) {
 }
 
 export default function Formulary({ ticked, onToggle, onReset }) {
+  const [open, setOpen] = useState(false);
   const active = PRODUCTS.filter((p) => !p.retired);
   const singles = active.filter((p) => p.kind !== 'combination');
   const combos = active.filter((p) => p.kind === 'combination');
@@ -130,39 +138,55 @@ export default function Formulary({ ticked, onToggle, onReset }) {
       .sort((a, b) => a.comboRank - b.comboRank),
   })).filter((g) => g.items.length > 0);
 
+  const n = ticked.size;
+
   return (
-    <aside className="rail">
-      <div className="rail-head">
-        <h2>Your formulary</h2>
-        <button className="linkbtn" type="button" onClick={onReset}>
-          Reset
-        </button>
-      </div>
-      <div className="fml-section">
-        <div className="fml-section-t">Single vaccines</div>
-        {singleGroups.map((g) => (
-          <div key={g.key} className="grp">
-            <div className="grp-t">{g.heading}</div>
-            {g.sdm && <p className="sdmline">{g.sdm}</p>}
-            {g.items.map((p) => (
-              <ProductCheck product={p} ticked={ticked} onToggle={onToggle} key={p.name} />
-            ))}
-          </div>
-        ))}
-      </div>
-      {comboGroups.length > 0 && (
+    <aside className={open ? 'rail open' : 'rail'}>
+      <button
+        type="button"
+        className="rail-summary"
+        aria-expanded={open}
+        aria-controls="rail-body"
+        onClick={() => setOpen((o) => !o)}
+      >
+        <span>
+          {n} product{n === 1 ? '' : 's'} stocked
+        </span>
+        <span className="rail-summary-action">{open ? 'Done' : 'Change'}</span>
+      </button>
+      <div className="rail-body" id="rail-body">
+        <div className="rail-head">
+          <h2>Your formulary</h2>
+          <button className="linkbtn" type="button" onClick={onReset}>
+            Reset
+          </button>
+        </div>
         <div className="fml-section">
-          <div className="fml-section-t">Combination vaccines</div>
-          {comboGroups.map((g) => (
-            <div key={g.id} className="grp combo">
-              <div className="grp-t">{g.label}</div>
+          <div className="fml-section-t">Single vaccines</div>
+          {singleGroups.map((g) => (
+            <div key={g.key} className="grp">
+              <div className="grp-t">{g.heading}</div>
+              {g.sdm && <p className="sdmline">{g.sdm}</p>}
               {g.items.map((p) => (
                 <ProductCheck product={p} ticked={ticked} onToggle={onToggle} key={p.name} />
               ))}
             </div>
           ))}
         </div>
-      )}
+        {comboGroups.length > 0 && (
+          <div className="fml-section">
+            <div className="fml-section-t">Combination vaccines</div>
+            {comboGroups.map((g) => (
+              <div key={g.id} className="grp combo">
+                <div className="grp-t">{g.label}</div>
+                {g.items.map((p) => (
+                  <ProductCheck product={p} ticked={ticked} onToggle={onToggle} key={p.name} />
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </aside>
   );
 }
