@@ -1,3 +1,7 @@
+> **Superseded by `docs/archive/handoff-2026-09-26-ux-queue-batch-c.md`** — Batch C
+> (this handoff's own "Resuming" step 3) is now done and its PR is open. Read the newer
+> file for the current state.
+
 # Pedivax Schedule Builder — Handoff after UX copy queue Batch A + Batch B (2026-09-26)
 
 > Supersedes `docs/archive/handoff-2026-09-27-ux-queue-batch-a.md` — that handoff's
