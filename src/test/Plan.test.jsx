@@ -85,8 +85,14 @@ describe('Plan — a clinic with no combination products, and PedvaxHIB unstocke
     expect(onAddProduct).toHaveBeenCalledWith('Vaxelis');
   });
 
-  it('explains why Hib stays 4-dose (no shorter-path product stocked)', () => {
+  it('explains why Hib stays 4-dose (no shorter-path product stocked), without leading with the absence', () => {
     render(<Plan ticked={ticked} onAddProduct={() => {}} />);
-    expect(screen.getByText(/None of the shorter-series products are stocked/)).toBeInTheDocument();
+    expect(screen.getByText(/Hib — 4 doses at 2, 4, 6 and 12–15 months\./)).toBeInTheDocument();
+    expect(screen.queryByText(/None of the shorter-series products are stocked/)).not.toBeInTheDocument();
+  });
+
+  it('renames the series-length panel to say what it actually explains (B4)', () => {
+    render(<Plan ticked={ticked} onAddProduct={() => {}} />);
+    expect(screen.getByText('Dose counts set by the brands you stock')).toBeInTheDocument();
   });
 });

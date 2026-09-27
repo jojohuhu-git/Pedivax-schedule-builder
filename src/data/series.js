@@ -38,6 +38,13 @@ export const SERIES = {
         label: 'Engerix-B and/or Recombivax HB (standalone hepatitis B)',
         doseCount: 3,
         requiresAllDosesFrom: ['Engerix-B', 'Recombivax HB'],
+        // Written for seriesLength.js (docs UX queue, Batch B/B2) — a
+        // human-authored sentence, not assembled from `label`, which stays
+        // reserved for the rulebook table heading above.
+        chosenNote:
+          'Hepatitis B — 3 doses at birth, 1–2 months and 6 months, because you stock ' +
+          'standalone hepatitis B vaccine. Giving doses 2–4 as Pediarix or Vaxelis is ' +
+          'equally correct, but makes it a 4-dose series — one more injection.',
         doses: [
           { n: 1, at: ['birth'], minAgeDays: 0 },
           { n: 2, at: ['m1', 'm2'], minIntervalFromPrevDays: 28 },
@@ -58,6 +65,10 @@ export const SERIES = {
         label: 'Pediarix or Vaxelis for doses 2 through 4',
         doseCount: 4,
         fallback: true,
+        chosenNote:
+          'Hepatitis B — 4 doses at birth, 1–2 months, 4 months and 6 months, because ' +
+          'Pediarix or Vaxelis is carrying doses 2 through 4. An all-Engerix-B or ' +
+          'Recombivax HB series is 3 doses instead (birth, 1–2 months and 6 months).',
         doses: [
           { n: 1, at: ['birth'], minAgeDays: 0 },
           { n: 2, at: ['m1', 'm2'], minIntervalFromPrevDays: 28 },
@@ -145,6 +156,10 @@ export const SERIES = {
         label: 'Rotarix',
         doseCount: 2,
         requiresAllDosesFrom: ['Rotarix'],
+        chosenNote:
+          'Rotavirus — 2 doses at 2 and 4 months, because you stock Rotarix. Any series ' +
+          'containing a RotaTeq dose, or mixing the two brands, is a 3-dose series ' +
+          'instead (adds a 6-month dose).',
         doses: [
           { n: 1, at: ['m2'], minAgeDays: 42, maxAgeDays: 104 },
           { n: 2, at: ['m4'], minIntervalFromPrevDays: 28, maxAgeDays: 244 },
@@ -156,6 +171,10 @@ export const SERIES = {
         label: 'Any RotaTeq dose, or any mix of brands',
         doseCount: 3,
         fallback: true,
+        chosenNote:
+          'Rotavirus — 3 doses at 2, 4 and 6 months. Any series containing a RotaTeq ' +
+          'dose — or mixing the two brands — is a 3-dose series. An all-Rotarix series ' +
+          'is 2 doses, at 2 and 4 months.',
         doses: [
           { n: 1, at: ['m2'], minAgeDays: 42, maxAgeDays: 104 },
           { n: 2, at: ['m4'], minIntervalFromPrevDays: 28 },
@@ -209,6 +228,10 @@ export const SERIES = {
         label: 'PedvaxHIB for every dose',
         doseCount: 3,
         requiresAllDosesFrom: ['PedvaxHIB'],
+        chosenNote:
+          'Hib — 3 doses at 2, 4 and 12–15 months, because you stock PedvaxHIB for ' +
+          'every dose. Any series with an ActHIB or Hiberix dose, or mixing brands, is ' +
+          'a 4-dose series instead (adds a 6-month dose).',
         doses: [
           { n: 1, at: ['m2'], minAgeDays: 42 },
           { n: 2, at: ['m4'], minIntervalFromPrevDays: 28 },
@@ -226,6 +249,10 @@ export const SERIES = {
         label: 'Any PRP-T product (ActHIB, Hiberix), or any mix of brands',
         doseCount: 4,
         fallback: true,
+        chosenNote:
+          'Hib — 4 doses at 2, 4, 6 and 12–15 months. ActHIB and Hiberix are 4-dose ' +
+          'series, and so is any series that mixes brands. Only an all-PedvaxHIB ' +
+          'series is 3 doses (2, 4 and 12–15 months).',
         doses: [
           { n: 1, at: ['m2'], minAgeDays: 42 },
           { n: 2, at: ['m4'], minIntervalFromPrevDays: 28 },
@@ -758,6 +785,10 @@ export const SERIES = {
       {
         id: 'bexsero',
         label: 'Bexsero for both doses',
+        // For seriesLength.js's prose when both brands are stocked — kept
+        // separate from `label` so that sentence never has to strip a
+        // trailing phrase back off (Batch B, B1).
+        noun: 'Bexsero',
         doseCount: 2,
         requiresAllDosesFrom: ['Bexsero'],
         doses: [
@@ -768,6 +799,7 @@ export const SERIES = {
       {
         id: 'trumenba',
         label: 'Trumenba for both doses',
+        noun: 'Trumenba',
         doseCount: 2,
         requiresAllDosesFrom: ['Trumenba'],
         doses: [

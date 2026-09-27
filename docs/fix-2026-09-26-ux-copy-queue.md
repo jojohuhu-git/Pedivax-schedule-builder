@@ -4,9 +4,9 @@
 375 × 812 px (iPhone size). Findings artifact: *Formulary Rail Rethink*
 (https://claude.ai/artifact/RJ9jXrVGVjaK2fjwTetR17).
 
-**Status:** OPEN. Batch A is DONE (A1–A6, PR opened 2026-09-27) — see its own STOP line
-below for the baseline the next session (Batch B) should verify against. Batches B–F are
-still open.
+**Status:** OPEN. Batch A is DONE (A1–A6, merged as PR #1). Batch B is DONE (B1–B4,
+PR opened 2026-09-26) — see its own STOP line below for the baseline the next session
+(Batch C) should verify against. Batches C–F are still open.
 
 Run this with the `fix-queue` skill, one batch at a time. **Each batch is a whole
 conversation.** Every batch ends at a STOP line: finish the batch, open its pull request,
@@ -195,7 +195,7 @@ Bexsero and Trumenba:
 sentence template. `label` is written to head a rulebook table ("Any PRP-T product
 (ActHIB, Hiberix), or any mix of brands") and cannot also serve as a sentence fragment.
 
-### B1 — The MenB note must not invite a mid-series brand change · **P0**
+### B1 — The MenB note must not invite a mid-series brand change · **P0** · **DONE**
 The only item in this queue where the current wording could mislead. "The clinician can
 switch to the other brand instead" means *switch which brand the whole plan uses*; read
 quickly at a desk it says *switch brands mid-series*. The verified quote already in
@@ -206,7 +206,7 @@ Also fixes the visible seam — a `.replace(' for both doses', '')` strips the t
 phrase from one mention of the label and not the other, producing "Bexsero for both doses
 was picked."
 
-### B2 — Split `label` from the plan's prose · P1
+### B2 — Split `label` from the plan's prose · P1 · **DONE**
 Add a written-out string to each variant in `series.js` — one for when that variant is
 chosen as the shorter path, one for when it is the fallback. `seriesLength.js` then
 *selects* prose instead of *assembling* it. `label` keeps its rulebook job unchanged.
@@ -214,7 +214,7 @@ chosen as the shorter path, one for when it is the fallback. `seriesLength.js` t
 This keeps the one-source-of-truth rule: the prose still lives in `src/data/`, a human
 just gets to write it. `one-source-of-truth.test.js` must still pass untouched.
 
-### B3 — Write the four replacements · P1
+### B3 — Write the four replacements · P1 · **DONE**
 Each answers the three things a clinician actually wants — how many doses, at what ages,
 and what would change it. Ages come from the variant's own `doses[]`, not retyped.
 
@@ -244,14 +244,17 @@ and then offers to undo it.
 Check the Pediarix-only case while here: the note opens "None of the shorter-series
 products are stocked" and then names Pediarix, which that clinic *does* stock.
 
-### B4 — Rename the panel · P2
+### B4 — Rename the panel · P2 · **DONE**
 "Why some series are longer or shorter than expected" → **"Dose counts set by the brands
 you stock."** Expected by whom? The panel only ever appears for the four brand-dependent
 series, so say so.
 
-> ## STOP — Batch B ends here
-> Suite green, notes checked live against at least three different formularies
-> (combination-heavy, shorter-series, and one with a gap), one PR, handoff written.
+> ## STOP — Batch B ends here — DONE 2026-09-26
+> 483 passing (up from 479), 0 failing. `npm run build` green. Notes checked live
+> against three formularies: nothing stocked (gap), Vaxelis+Pentacel (combination-heavy,
+> exercises plan.js's own override note — unchanged and still correct), and
+> Engerix-B+PedvaxHIB+Rotarix+Bexsero+Trumenba (shorter-series, exercises all four new
+> `chosenNote` strings plus the rewritten MenB note). PR opened, handoff written.
 
 ---
 
