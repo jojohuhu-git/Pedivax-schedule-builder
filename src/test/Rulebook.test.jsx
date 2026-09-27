@@ -40,4 +40,25 @@ describe('Rulebook', () => {
     expect(quotes.some((q) => q.includes(someFact.quote))).toBe(true);
     expect(screen.getAllByText(`checked ${someFact.verified}`, { exact: false }).length).toBeGreaterThan(0);
   });
+
+  it('groups the jump bar into the same three age blocks as the checklist, with MenB filed under Adolescent (A3)', () => {
+    render(<Rulebook />);
+    expect(screen.getByText('Birth & infant')).toBeInTheDocument();
+    expect(screen.getByText('Toddler & preschool')).toBeInTheDocument();
+    expect(screen.getByText('Adolescent')).toBeInTheDocument();
+
+    const jump = screen.getByLabelText('Jump to an antigen');
+    const links = [...jump.querySelectorAll('a')].map((a) => a.textContent);
+    // Every series still gets a link, and MenB now sits after its own age
+    // block's other members (Tdap, HPV, MenACWY) rather than between Hib and
+    // pneumococcal.
+    expect(links).toContain('MenB');
+    expect(links.indexOf('MenB')).toBeGreaterThan(links.indexOf('MenACWY'));
+  });
+
+  it('runs the series bodies themselves in the same age order as the jump bar', () => {
+    const { container } = render(<Rulebook />);
+    const headings = [...container.querySelectorAll('.rule-series h2')].map((h) => h.textContent);
+    expect(headings[headings.length - 1]).toContain('Meningococcal B');
+  });
 });

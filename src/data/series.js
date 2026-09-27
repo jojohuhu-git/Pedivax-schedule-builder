@@ -31,6 +31,7 @@ export const SERIES = {
     name: 'Hepatitis B',
     abbr: 'HepB',
     route: 'injection',
+    ageBlock: 'infant',
     variants: [
       {
         id: 'monovalent',
@@ -137,6 +138,7 @@ export const SERIES = {
     name: 'Rotavirus',
     abbr: 'RV',
     route: 'oral',
+    ageBlock: 'infant',
     variants: [
       {
         id: 'rotarix',
@@ -200,6 +202,7 @@ export const SERIES = {
     name: 'Haemophilus influenzae type b',
     abbr: 'Hib',
     route: 'injection',
+    ageBlock: 'infant',
     variants: [
       {
         id: 'pedvax',
@@ -271,83 +274,6 @@ export const SERIES = {
     ],
   },
 
-  // MenB is the last of the three brand-length-setting series, but unlike
-  // Hib/RV it is not a shorter-vs-longer choice: Bexsero and Trumenba are
-  // BOTH 2-dose series when spaced correctly. What decisions.md's "not
-  // interchangeable" actually requires here is a same-brand commitment, not
-  // a dose-count trade-off — so both variants below have doseCount 2 and
-  // neither is a `fallback`.
-  MenB: {
-    key: 'MenB',
-    name: 'Meningococcal B',
-    abbr: 'MenB',
-    route: 'injection',
-    sdm: 'Not a routine dose. CDC recommends MenB for adolescents not at increased ' +
-      'risk age 16–23 years (preferred 16–18) by shared clinical decision-making ' +
-      'with the family, not as a universal recommendation.',
-    variants: [
-      {
-        id: 'bexsero',
-        label: 'Bexsero for both doses',
-        doseCount: 2,
-        requiresAllDosesFrom: ['Bexsero'],
-        doses: [
-          { n: 1, at: ['y16', 'y17', 'y18'] },
-          { n: 2, at: ['y16', 'y17', 'y18'], minIntervalFromPrevDays: 183 },
-        ],
-      },
-      {
-        id: 'trumenba',
-        label: 'Trumenba for both doses',
-        doseCount: 2,
-        requiresAllDosesFrom: ['Trumenba'],
-        doses: [
-          { n: 1, at: ['y16', 'y17', 'y18'] },
-          { n: 2, at: ['y16', 'y17', 'y18'], minIntervalFromPrevDays: 183 },
-        ],
-      },
-    ],
-    facts: [
-      {
-        claim:
-          'Shared clinical decision-making for adolescents not at increased risk, age ' +
-          '16-23 (preferred 16-18) — not a universal recommendation.',
-        source: 'cdc2025MenBNotes',
-        verified: '2026-09-25',
-        quote:
-          'Adolescents not at increased risk age 16–23 years (preferred age 16–18 ' +
-          'years) based on shared clinical decision-making.',
-      },
-      {
-        claim:
-          'Bexsero and Trumenba are each a 2-dose series at least 6 months apart; the ' +
-          'same brand must be used for both doses.',
-        source: 'cdc2025MenBNotes',
-        verified: '2026-09-25',
-        quote: 'Bexsero or Trumenba (use same brand for all doses): 2-dose series at least 6 months apart',
-      },
-      {
-        claim:
-          'If dose 2 is given earlier than 6 months after dose 1, a 3rd dose is needed ' +
-          'at least 4 months after dose 2. Not modeled as a schedule branch here: this ' +
-          "app's fixed birth-to-18 visits are always ≥6 months apart at this age range, " +
-          'so an early dose 2 cannot occur in an on-time plan.',
-        source: 'cdc2025MenBNotes',
-        verified: '2026-09-25',
-        quote: 'if dose 2 is administered earlier than 6 months, administer dose 3 at least 4 months after dose 2',
-      },
-      {
-        claim:
-          "This is an October 2024 ACIP dosing change (from 0-and-≥1-month to " +
-          '0-and-6-months) — before this app\'s mid-2025 authority cutoff, so it is ' +
-          'adopted, not one of the excluded later changes.',
-        source: 'cdc2025MenBNotes',
-        verified: '2026-09-25',
-        quote: 'Bexsero or Trumenba (use same brand for all doses): 2-dose series at least 6 months apart',
-      },
-    ],
-  },
-
   // PCV is a plain 4-dose series, like HepB — unlike Hib/RV/MenB, the two
   // current products (Prevnar 20, Vaxneuvance) cover doses 1-4 identically,
   // so there's no brand choice that changes the series length and no
@@ -357,6 +283,7 @@ export const SERIES = {
     name: 'Pneumococcal conjugate',
     abbr: 'PCV',
     route: 'injection',
+    ageBlock: 'infant',
     doses: [
       { n: 1, at: ['m2'], minAgeDays: 42 },
       { n: 2, at: ['m4'], minIntervalFromPrevDays: 28 },
@@ -419,6 +346,7 @@ export const SERIES = {
     name: 'Diphtheria, tetanus, pertussis',
     abbr: 'DTaP',
     route: 'injection',
+    ageBlock: 'infant',
     doses: [
       { n: 1, at: ['m2'], minAgeDays: 42 },
       { n: 2, at: ['m4'], minIntervalFromPrevDays: 28 },
@@ -493,6 +421,7 @@ export const SERIES = {
     name: 'Inactivated poliovirus',
     abbr: 'IPV',
     route: 'injection',
+    ageBlock: 'infant',
     doses: [
       { n: 1, at: ['m2'], minAgeDays: 42 },
       { n: 2, at: ['m4'], minIntervalFromPrevDays: 28 },
@@ -548,6 +477,7 @@ export const SERIES = {
     name: 'Measles, mumps, rubella',
     abbr: 'MMR',
     route: 'injection',
+    ageBlock: 'toddler',
     doses: [
       { n: 1, at: ['m12', 'm15'], minAgeDays: 365 },
       {
@@ -598,6 +528,7 @@ export const SERIES = {
     name: 'Varicella',
     abbr: 'VAR',
     route: 'injection',
+    ageBlock: 'toddler',
     doses: [
       { n: 1, at: ['m12', 'm15'], minAgeDays: 365 },
       {
@@ -650,6 +581,7 @@ export const SERIES = {
     name: 'Hepatitis A',
     abbr: 'HepA',
     route: 'injection',
+    ageBlock: 'toddler',
     doses: [
       { n: 1, at: ['m12', 'm15'], minAgeDays: 365 },
       { n: 2, at: ['m18', 'm24'], minIntervalFromPrevDays: 183 },
@@ -685,6 +617,7 @@ export const SERIES = {
     name: 'Tetanus, diphtheria, pertussis (adolescent booster)',
     abbr: 'Tdap',
     route: 'injection',
+    ageBlock: 'adolescent',
     doses: [{ n: 1, at: ['y11', 'y12'], booster: true, minAgeDays: 4018 }],
     facts: [
       {
@@ -715,6 +648,7 @@ export const SERIES = {
     name: 'Human papillomavirus',
     abbr: 'HPV',
     route: 'injection',
+    ageBlock: 'adolescent',
     doses: [
       { n: 1, at: ['y11'], minAgeDays: 3287 },
       { n: 2, at: ['y12'], minIntervalFromPrevDays: 152 },
@@ -763,6 +697,7 @@ export const SERIES = {
     name: 'Meningococcal ACWY',
     abbr: 'MenACWY',
     route: 'injection',
+    ageBlock: 'adolescent',
     doses: [
       { n: 1, at: ['y11', 'y12'], minAgeDays: 4018 },
       { n: 2, at: ['y16'], booster: true, minIntervalFromPrevDays: 56 },
@@ -794,6 +729,90 @@ export const SERIES = {
           'Updated MenACWY recommendations to align with the American Academy of ' +
           'Pediatrics. The minimum age for the first MenQuadfi dose is now 6 weeks, ' +
           'instead of 2 years for children who meet the recommendation.',
+      },
+    ],
+  },
+
+  // MenB is the last of the three brand-length-setting series, but unlike
+  // Hib/RV it is not a shorter-vs-longer choice: Bexsero and Trumenba are
+  // BOTH 2-dose series when spaced correctly. What decisions.md's "not
+  // interchangeable" actually requires here is a same-brand commitment, not
+  // a dose-count trade-off — so both variants below have doseCount 2 and
+  // neither is a `fallback`.
+  //
+  // Filed last (moved from 4th, 2026-09-26 UX review, item A3): its "shared
+  // decision" property isn't an age, and every other series here runs in
+  // age order, so a policy-based placement between two infant series read
+  // as arbitrary. MenB's own first dose is at 16 years — later than every
+  // other series — so last is where age order actually puts it.
+  MenB: {
+    key: 'MenB',
+    name: 'Meningococcal B',
+    abbr: 'MenB',
+    route: 'injection',
+    ageBlock: 'adolescent',
+    sdm: 'Not a routine dose. CDC recommends MenB for adolescents not at increased ' +
+      'risk age 16–23 years (preferred 16–18) by shared clinical decision-making ' +
+      'with the family, not as a universal recommendation.',
+    variants: [
+      {
+        id: 'bexsero',
+        label: 'Bexsero for both doses',
+        doseCount: 2,
+        requiresAllDosesFrom: ['Bexsero'],
+        doses: [
+          { n: 1, at: ['y16', 'y17', 'y18'] },
+          { n: 2, at: ['y16', 'y17', 'y18'], minIntervalFromPrevDays: 183 },
+        ],
+      },
+      {
+        id: 'trumenba',
+        label: 'Trumenba for both doses',
+        doseCount: 2,
+        requiresAllDosesFrom: ['Trumenba'],
+        doses: [
+          { n: 1, at: ['y16', 'y17', 'y18'] },
+          { n: 2, at: ['y16', 'y17', 'y18'], minIntervalFromPrevDays: 183 },
+        ],
+      },
+    ],
+    facts: [
+      {
+        claim:
+          'Shared clinical decision-making for adolescents not at increased risk, age ' +
+          '16-23 (preferred 16-18) — not a universal recommendation.',
+        source: 'cdc2025MenBNotes',
+        verified: '2026-09-25',
+        quote:
+          'Adolescents not at increased risk age 16–23 years (preferred age 16–18 ' +
+          'years) based on shared clinical decision-making.',
+      },
+      {
+        claim:
+          'Bexsero and Trumenba are each a 2-dose series at least 6 months apart; the ' +
+          'same brand must be used for both doses.',
+        source: 'cdc2025MenBNotes',
+        verified: '2026-09-25',
+        quote: 'Bexsero or Trumenba (use same brand for all doses): 2-dose series at least 6 months apart',
+      },
+      {
+        claim:
+          'If dose 2 is given earlier than 6 months after dose 1, a 3rd dose is needed ' +
+          'at least 4 months after dose 2. Not modeled as a schedule branch here: this ' +
+          "app's fixed birth-to-18 visits are always ≥6 months apart at this age range, " +
+          'so an early dose 2 cannot occur in an on-time plan.',
+        source: 'cdc2025MenBNotes',
+        verified: '2026-09-25',
+        quote: 'if dose 2 is administered earlier than 6 months, administer dose 3 at least 4 months after dose 2',
+      },
+      {
+        claim:
+          "This is an October 2024 ACIP dosing change (from 0-and-≥1-month to " +
+          '0-and-6-months) — before this app\'s mid-2025 authority cutoff, so it is ' +
+          'adopted, not one of the excluded later changes.',
+        source: 'cdc2025MenBNotes',
+        verified: '2026-09-25',
+        quote: 'Bexsero or Trumenba (use same brand for all doses): 2-dose series at least 6 months apart',
       },
     ],
   },

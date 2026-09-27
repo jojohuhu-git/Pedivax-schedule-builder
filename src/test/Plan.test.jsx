@@ -16,7 +16,7 @@ const ALL_PRODUCTS = new Set(PRODUCTS.filter((p) => !p.retired).map((p) => p.nam
 describe('Plan — nothing stocked', () => {
   it('shows a gap for every routine antigen and never renders an actual shot', () => {
     const { container } = render(<Plan ticked={new Set()} onAddProduct={() => {}} />);
-    expect(screen.getByText('Nothing you stock can give these')).toBeInTheDocument();
+    expect(screen.getByText('Nothing in your formulary covers these doses.')).toBeInTheDocument();
     expect(screen.getByText('Diphtheria, tetanus, pertussis')).toBeInTheDocument();
     expect(container.querySelectorAll('.shot')).toHaveLength(0);
   });
@@ -29,7 +29,7 @@ describe('Plan — every current product stocked', () => {
     render(<Plan ticked={ALL_PRODUCTS} onAddProduct={() => {}} />);
     expect(screen.getByText(String(score.injections))).toBeInTheDocument();
     expect(screen.getByText(String(score.visits))).toBeInTheDocument();
-    expect(screen.queryByText('Nothing you stock can give these')).not.toBeInTheDocument();
+    expect(screen.queryByText('Nothing in your formulary covers these doses.')).not.toBeInTheDocument();
   });
 
   it('has nothing left to suggest', () => {
@@ -41,6 +41,34 @@ describe('Plan — every current product stocked', () => {
     render(<Plan ticked={ALL_PRODUCTS} onAddProduct={() => {}} />);
     const pentacel = screen.getByText('Pentacel');
     expect(pentacel.parentElement.querySelector('.tag.combo')).toHaveTextContent('Combination');
+  });
+});
+
+describe('Plan — every current product stocked, including Bexsero (A5)', () => {
+  it('states a shared-decision product is included, without contradicting the schedule below it', () => {
+    render(<Plan ticked={ALL_PRODUCTS} onAddProduct={() => {}} />);
+    expect(screen.getByText('Included')).toBeInTheDocument();
+    expect(screen.getByText('shared-decision product in this plan')).toBeInTheDocument();
+    expect(screen.queryByText('None')).not.toBeInTheDocument();
+  });
+});
+
+describe('Plan — the empty-visit line (A4)', () => {
+  it('collapses consecutive same-unit ages into a range, below the schedule, in one sentence', () => {
+    const { container } = render(<Plan ticked={new Set()} onAddProduct={() => {}} />);
+    const line = screen.getByText('No vaccine is due at the other well-child visits:');
+    expect(line.parentElement.textContent).toMatch(/5 to 10 years/);
+    // It must come after the last visit card, not above the schedule.
+    const visits = [...container.querySelectorAll('.visit')];
+    const lastVisit = visits[visits.length - 1];
+    expect(lastVisit.compareDocumentPosition(line.parentElement) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});
+
+describe('Plan — a combination shot spells out the antigen count (A6)', () => {
+  it('says "covering three vaccines" instead of "3 vaccines — covers"', () => {
+    render(<Plan ticked={new Set(['Pentacel', 'Prevnar 20', 'Rotarix', 'Engerix-B'])} onAddProduct={() => {}} />);
+    expect(screen.getAllByText('One injection covering three vaccines:').length).toBeGreaterThan(0);
   });
 });
 

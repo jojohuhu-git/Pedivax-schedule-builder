@@ -42,7 +42,6 @@ function Fact({ fact }) {
         ) : (
           fact.source
         )}
-        {source && <span className="tag valence">{source.tier}</span>}
         <span className="quiet"> · checked {fact.verified}</span>
         {stale && <span className="stalewarn"> — over a year old, due for a re-check</span>}
       </p>
@@ -103,6 +102,16 @@ function seriesAnchor(key) {
   return `series-${key}`;
 }
 
+// Same three age blocks the 2026-09-26 UX review settled on for the
+// checklist (docs/decisions.md, docs/fix-2026-09-26-ux-copy-queue.md A3) —
+// `ageBlock` on each series is the one source of truth for which block it's
+// in; this just orders and labels the three blocks themselves.
+const AGE_BLOCKS = [
+  { id: 'infant', label: 'Birth & infant' },
+  { id: 'toddler', label: 'Toddler & preschool' },
+  { id: 'adolescent', label: 'Adolescent' },
+];
+
 function SeriesRule({ series }) {
   const products = PRODUCTS.filter((p) => p.covers.some((c) => c.series === series.key));
   return (
@@ -145,10 +154,18 @@ export default function Rulebook() {
     <main className="rulebook">
       <nav className="rule-jump" aria-label="Jump to an antigen">
         <span className="quiet">Jump to:</span>
-        {Object.values(SERIES).map((series) => (
-          <a href={`#${seriesAnchor(series.key)}`} key={series.key}>
-            {series.abbr}
-          </a>
+        {AGE_BLOCKS.map((block, i) => (
+          <span className="jump-block" key={block.id}>
+            {i > 0 && <span className="jump-sep" aria-hidden="true" />}
+            <span className="jump-block-label">{block.label}</span>
+            {Object.values(SERIES)
+              .filter((series) => series.ageBlock === block.id)
+              .map((series) => (
+                <a href={`#${seriesAnchor(series.key)}`} key={series.key}>
+                  {series.abbr}
+                </a>
+              ))}
+          </span>
         ))}
       </nav>
       <p className="note">

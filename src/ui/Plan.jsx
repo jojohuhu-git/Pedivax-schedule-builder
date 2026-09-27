@@ -8,6 +8,11 @@ import { VISITS } from '../data/visits.js';
 import { buildPlan } from '../logic/plan.js';
 import { scorePlan } from '../logic/score.js';
 import { suggest } from '../logic/suggest.js';
+import { describeEmptyVisits } from '../logic/emptyVisits.js';
+
+// A combination product's antigen count is always small (2-4) — spelled out
+// reads as a clinician's sentence rather than a template filling in a number.
+const NUMBER_WORDS = { 2: 'two', 3: 'three', 4: 'four' };
 
 function isSdmSeries(seriesKey) {
   return !!SERIES[seriesKey]?.sdm;
@@ -49,7 +54,7 @@ function Shot({ shot, visitId, index, placements }) {
         </div>
         {shot.covers.length > 1 && (
           <p className="quiet combo-lede">
-            One injection, {shot.covers.length} vaccines — covers:
+            One injection covering {NUMBER_WORDS[shot.covers.length] ?? shot.covers.length} vaccines:
           </p>
         )}
         <div className="ants">
@@ -106,16 +111,15 @@ export default function Plan({ ticked, onAddProduct }) {
           </div>
         ) : (
           <div className="sd">
-            <div className="n">{plan.unresolved.length === 0 ? 'None' : 'Optional'}</div>
-            <div className="l">shared-decision products {plan.unresolved.length === 0 ? 'stocked' : 'not yet decided'}</div>
+            <div className="n">{plan.unresolved.length === 0 ? 'Included' : 'Optional'}</div>
+            <div className="l">
+              {plan.unresolved.length === 0
+                ? 'shared-decision product in this plan'
+                : 'shared-decision products not yet decided'}
+            </div>
           </div>
         )}
       </div>
-
-      <p className="quiet">
-        <b>No vaccines due at:</b> {emptyVisits.map((v) => v.label).join(', ') || 'none — every well-child visit needs something'}.
-        These well-child visits are left out of the plan below so the printed page stays short.
-      </p>
 
       <div className="legend">
         <span>
@@ -128,7 +132,7 @@ export default function Plan({ ticked, onAddProduct }) {
         </span>
         <span>
           <span className="sw o" />
-          Oral — not an injection
+          Oral
         </span>
         <span>
           <span className="sw s" />
@@ -138,8 +142,8 @@ export default function Plan({ ticked, onAddProduct }) {
 
       {allGaps.length > 0 && (
         <div className="panel gap">
-          <h3>Nothing you stock can give these</h3>
-          <p>Tick a product that covers each one, or the child cannot complete the schedule here.</p>
+          <h3>Nothing in your formulary covers these doses.</h3>
+          <p>Add a product for each, or the series can't be finished with what you stock.</p>
           <ul className="gaplist">
             {Object.entries(gapsBySeries).map(([key, doses]) => (
               <li key={key}>
@@ -198,8 +202,14 @@ export default function Plan({ ticked, onAddProduct }) {
         })}
       </div>
 
+      {emptyVisits.length > 0 && (
+        <p className="quiet">
+          <b>No vaccine is due at the other well-child visits:</b> {describeEmptyVisits(emptyVisits)}.
+        </p>
+      )}
+
       <div className="panel">
-        <h3>What you could add</h3>
+        <h3>Products that would save injections</h3>
         <p>Products you don't stock, and how many injections each would save across the whole birth-to-18 plan.</p>
         <div className="sugg">
           {suggestions.length === 0 && <p>Nothing left to add would save an injection.</p>}
