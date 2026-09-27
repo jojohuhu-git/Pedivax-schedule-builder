@@ -118,7 +118,7 @@ function ProductCheck({ product, ticked, onToggle }) {
   );
 }
 
-export default function Formulary({ ticked, onToggle, onReset, justCleared, onUndoReset }) {
+export default function Formulary({ ticked, onToggle, onReset, justCleared, onUndoReset, tickDelta }) {
   const [open, setOpen] = useState(false);
   const active = PRODUCTS.filter((p) => !p.retired);
   const singles = active.filter((p) => p.kind !== 'combination');
@@ -156,9 +156,19 @@ export default function Formulary({ ticked, onToggle, onReset, justCleared, onUn
       </button>
       <div className="rail-body" id="rail-body">
         <div className="rail-head">
-          <h2>
-            Your formulary <span className="quiet">· {n} of {active.length} stocked</span>
-          </h2>
+          <div>
+            <h2>
+              Your formulary <span className="quiet">· {n} of {active.length} stocked</span>
+            </h2>
+            {/* F4: shown right where a clinician's eyes already are after a
+                tick, since the injection count itself lives below the
+                schedule and can be off-screen entirely on a phone. */}
+            {tickDelta && (
+              <p className="tick-delta">
+                {tickDelta.from} → {tickDelta.to} injection{tickDelta.to === 1 ? '' : 's'}
+              </p>
+            )}
+          </div>
           {justCleared ? (
             <button className="linkbtn" type="button" onClick={onUndoReset}>
               Undo reset

@@ -44,3 +44,21 @@ describe('App — F6 Reset is undoable', () => {
     expect(screen.queryByRole('button', { name: 'Undo reset' })).not.toBeInTheDocument();
   });
 });
+
+describe('App — F4 shows the effect of a tick', () => {
+  it('shows the before/after injection count next to the checklist right after a tick', async () => {
+    render(<App />);
+    expect(screen.queryByText(/^\d+ → \d+ injections?$/)).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('checkbox', { name: /Engerix-B/ }));
+    expect(screen.getByText('0 → 3 injections')).toBeInTheDocument();
+  });
+
+  it('shows nothing when the tick makes no difference to the total (nothing to report)', async () => {
+    render(<App />);
+    await userEvent.click(screen.getByRole('checkbox', { name: /Engerix-B/ }));
+    // A second, redundant hepatitis B brand doesn't change the total —
+    // plan.js already prefers the first one it found.
+    await userEvent.click(screen.getByRole('checkbox', { name: /Recombivax HB/ }));
+    expect(screen.queryByText(/→/)).not.toBeInTheDocument();
+  });
+});
