@@ -2,7 +2,7 @@
 // App.jsx — owns the ticked formulary and the F6 undo-reset wiring. Beyond
 // this, App holds no logic of its own; Formulary/Plan/Rulebook render what
 // it passes them (already covered by their own test files).
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../ui/App.jsx';
@@ -11,6 +11,16 @@ beforeEach(() => {
   window.history.replaceState(null, '', '/');
   localStorage.clear();
 });
+
+// A near-empty formulary gaps most of the 13 series at once, and each gap
+// row now runs fixesForSeries' own candidate search (F2) on every render —
+// real work, not a hang, but enough of it that a full App render plus two
+// userEvent clicks measured 5.8s on CI's slower runner against vitest's
+// 5000ms default (this file's own tests ran 3.3s-5.5s even when they
+// stayed under the default locally). Raised per-file rather than patching
+// just the one that tipped over, since several others in this file were
+// already close to that same edge.
+vi.setConfig({ testTimeout: 15000 });
 
 describe('App — F6 Reset is undoable', () => {
   it('offers Undo reset in place of Reset right after clearing a non-empty formulary', async () => {
