@@ -200,6 +200,47 @@ h1 {
     max-height: none;
   }
 }
+
+/* D1 (2026-09-26 UX queue): below 860px the full checklist is what pushed
+   the schedule 2,525px down the page, so it starts collapsed to this one
+   line and opens on tap. `.rail-summary` stays hidden above 860px so
+   desktop is unchanged; `.rail-body` stays visible above 860px for the
+   same reason — only the media query below ever hides it. */
+.rail-summary {
+  display: none;
+}
+@media (max-width: 860px) {
+  .rail-summary {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    padding: 13px 15px;
+    background: none;
+    border: none;
+    font: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    cursor: pointer;
+    text-align: left;
+  }
+  .rail.open .rail-summary {
+    border-bottom: 1px solid var(--line);
+  }
+  .rail-summary-action {
+    color: var(--accent);
+    font-size: 12px;
+    text-decoration: underline;
+    flex: none;
+  }
+  .rail-body {
+    display: none;
+  }
+  .rail.open .rail-body {
+    display: block;
+  }
+}
 .rail-head {
   padding: 13px 15px;
   border-bottom: 1px solid var(--line);
