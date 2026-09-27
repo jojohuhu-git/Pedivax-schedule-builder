@@ -159,7 +159,7 @@ export default function Plan({ ticked, onAddProduct }) {
 
       {seriesNoteEntries.length > 0 && (
         <div className="panel">
-          <h3>Why some series are longer or shorter than expected</h3>
+          <h3>Dose counts set by the brands you stock</h3>
           {seriesNoteEntries.map(([key, note]) => (
             <p key={key}>
               <b>{abbr(key)}:</b> {note}

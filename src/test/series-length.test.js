@@ -11,7 +11,8 @@ describe('seriesLength.js — Hib', () => {
     const result = resolveSeriesLength(SERIES.Hib, new Set(['PedvaxHIB']));
     expect(result.doseCount).toBe(3);
     expect(result.variant.id).toBe('pedvax');
-    expect(result.note).toMatch(/shorter/i);
+    expect(result.note).toMatch(/2, 4 and 12–15 months/);
+    expect(result.note).not.toMatch(/switch/i);
   });
 
   it('falls back to the 4-dose path when only a PRP-T product is stocked', () => {
@@ -55,6 +56,22 @@ describe('seriesLength.js — Rotavirus', () => {
     expect(result.doseCount).toBe(2);
     expect(result.variant.id).toBe('rotarix');
   });
+
+  it('Rotarix chosen: states the current path, never invites switching to the longer one (B3)', () => {
+    const result = resolveSeriesLength(SERIES.RV, new Set(['Rotarix']));
+    expect(result.note).toMatch(/2 and 4 months/);
+    expect(result.note).not.toMatch(/switch/i);
+  });
+
+  it('RotaTeq-only clinic: the note leads with the current dose count, not with what is missing (B3)', () => {
+    const result = resolveSeriesLength(SERIES.RV, new Set(['RotaTeq']));
+    expect(result.note).toBe(
+      'Rotavirus — 3 doses at 2, 4 and 6 months. Any series containing a RotaTeq dose ' +
+        '— or mixing the two brands — is a 3-dose series. An all-Rotarix series is 2 ' +
+        'doses, at 2 and 4 months.'
+    );
+    expect(result.note).not.toMatch(/none of the/i);
+  });
 });
 
 describe('seriesLength.js — MenB', () => {
@@ -83,7 +100,16 @@ describe('seriesLength.js — MenB', () => {
     const result = resolveSeriesLength(SERIES.MenB, new Set(['Bexsero', 'Trumenba']));
     expect(result.doseCount).toBe(2);
     expect(['bexsero', 'trumenba']).toContain(result.variant.id);
-    expect(result.note).toMatch(/no length difference/i);
+    expect(result.note).toBe(
+      'Meningococcal B — 2 doses either way. You stock both Bexsero and Trumenba; the ' +
+        'plan uses Bexsero. The same brand must be used for both doses — the two are ' +
+        'not interchangeable within a series.'
+    );
+    // B1: must state the same-brand rule, never invite a mid-series switch,
+    // and never repeat the seam bug where only one mention of the brand
+    // dropped its trailing phrase ("Bexsero for both doses was picked").
+    expect(result.note).not.toMatch(/switch/i);
+    expect(result.note).not.toMatch(/for both doses was picked/i);
   });
 
   it('reports no usable variant when neither brand is stocked — MenB has no fallback', () => {
@@ -115,6 +141,13 @@ describe('seriesLength.js — Hepatitis B (added 2026-09-26, same pattern as Hib
     const result = resolveSeriesLength(SERIES.HepB, new Set(['Engerix-B', 'Pediarix']));
     expect(result.doseCount).toBe(3);
     expect(result.variant.id).toBe('monovalent');
+  });
+
+  it('Pediarix-only clinic: the note names what is actually stocked, never opens with what is absent (B3)', () => {
+    const result = resolveSeriesLength(SERIES.HepB, new Set(['Pediarix']));
+    expect(result.note).toMatch(/^Hepatitis B — 4 doses/);
+    expect(result.note).not.toMatch(/none of the/i);
+    expect(result.note).toMatch(/Pediarix or Vaxelis/);
   });
 });
 

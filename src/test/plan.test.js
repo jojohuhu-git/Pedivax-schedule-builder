@@ -157,7 +157,7 @@ describe('buildPlan — PedvaxHIB stocked with no DTaP/IPV combination product',
       .flatMap((v) => v.injections.flatMap((i) => i.covers))
       .filter((c) => c.seriesKey === 'Hib');
     expect(hibDoses).toHaveLength(3);
-    expect(plan.seriesNotes.Hib).toMatch(/shorter path/i);
+    expect(plan.seriesNotes.Hib).toMatch(/2, 4 and 12–15 months/);
   });
 });
 
