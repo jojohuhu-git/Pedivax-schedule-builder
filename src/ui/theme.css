@@ -186,19 +186,22 @@ h1 {
   }
 }
 
+/* F7 (2026-09-26 UX queue, Batch F): no independent scroll box. The rail
+   used to cap its own height and scroll internally, so the mouse wheel did
+   different things depending on which side of the page the pointer sat on.
+   `position: sticky` alone still keeps the checklist in view while it fits,
+   then scrolls with the page like everything else once the page scrolls
+   past it — one scrollbar for the whole app. */
 .rail {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--r);
   position: sticky;
   top: 12px;
-  max-height: calc(100vh - 28px);
-  overflow-y: auto;
 }
 @media (max-width: 860px) {
   .rail {
     position: static;
-    max-height: none;
   }
 }
 
@@ -254,6 +257,19 @@ h1 {
   font-size: 14px;
   font-weight: 600;
 }
+.rail-head h2 .quiet {
+  display: inline;
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 400;
+}
+.tick-delta {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  margin: 4px 0 0;
+}
 .linkbtn {
   background: none;
   border: none;
@@ -282,6 +298,73 @@ h1 {
 }
 .grp.combo {
   background: var(--surface-2);
+}
+/* F5: search box for the checklist. */
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--line-strong);
+}
+.search-input {
+  flex: 1;
+  font: inherit;
+  font-size: 13px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r);
+  padding: 6px 10px;
+  background: var(--surface);
+  color: var(--ink);
+}
+.search-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.search-empty {
+  font-size: 13px;
+  color: var(--ink-2);
+  padding: 12px 15px;
+  margin: 0;
+}
+/* F1: one-tap starting formularies, offered only before anything is ticked. */
+.presets {
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--line-strong);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.presets-lede {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  margin: 0;
+}
+.preset-row {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r);
+  padding: 8px 11px;
+  cursor: pointer;
+}
+.preset-row:hover {
+  border-color: var(--accent);
+}
+.preset-nm {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.preset-desc {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-2);
+  margin-top: 2px;
 }
 .fml-section-t {
   font-size: 13px;
@@ -592,16 +675,34 @@ label.chk input:focus-visible {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 10px;
 }
-.gaplist li {
+.gaplist > li {
   font-size: 13px;
-  display: flex;
-  gap: 9px;
 }
 .gaplist b {
   font-weight: 600;
-  min-width: 74px;
+}
+/* F2: one row per gapped dose, each with its own "Add <product>" fix —
+   fixGap.js works out which unstocked product actually closes that dose. */
+.gapdoses {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.gapdose {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink-2);
+}
+.gapdose .linkbtn {
+  flex: none;
+  white-space: nowrap;
 }
 .sugg {
   display: flex;

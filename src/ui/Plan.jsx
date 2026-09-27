@@ -9,6 +9,7 @@ import { buildPlan } from '../logic/plan.js';
 import { scorePlan } from '../logic/score.js';
 import { suggest } from '../logic/suggest.js';
 import { describeEmptyVisits } from '../logic/emptyVisits.js';
+import { fixesForSeries } from '../logic/fixGap.js';
 
 // A combination product's antigen count is always small (2-4) — spelled out
 // reads as a clinician's sentence rather than a template filling in a number.
@@ -120,6 +121,34 @@ export default function Plan({ ticked, onAddProduct }) {
         )}
       </div>
 
+      {/* F3: moved up beside the injection count it explains — this used to
+          sit at the very bottom of the page, past the whole schedule, where
+          almost nobody scrolls. */}
+      <div className="panel">
+        <h3>Products that would save injections</h3>
+        <p>Products you don't stock, and how many injections each would save across the whole birth-to-18 plan.</p>
+        <div className="sugg">
+          {suggestions.length === 0 && <p>Nothing left to add would save an injection.</p>}
+          {suggestions.map(({ product, saves }) => {
+            const commonName = PRODUCTS.find((p) => p.name === product)?.commonName;
+            return (
+              <div className="sugg-row" key={product}>
+                <span className="s-nm">
+                  {product}
+                  {commonName && <span className="tag valence">{commonName}</span>}
+                </span>
+                <span className="s-win">
+                  −{saves} injection{saves === 1 ? '' : 's'}
+                </span>
+                <button type="button" onClick={() => onAddProduct(product)}>
+                  Add
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="legend">
         <span>
           <span className="sw c" />
@@ -144,14 +173,33 @@ export default function Plan({ ticked, onAddProduct }) {
           <h3>Nothing in your formulary covers these doses.</h3>
           <p>Add a product for each, or the series can't be finished with what you stock.</p>
           <ul className="gaplist">
-            {Object.entries(gapsBySeries).map(([key, doses]) => (
+            {Object.entries(gapsBySeries).map(([key, doses]) => {
+              const fixes = fixesForSeries(ticked, key, doses);
+              return (
               <li key={key}>
                 <b>{SERIES[key].name}</b>
-                <span>
-                  dose{doses.length > 1 ? 's' : ''} {doses.join(', ')} of {plan.placements[key]?.doses.length}
-                </span>
+                <ul className="gapdoses">
+                  {doses.map((doseN) => {
+                    const fix = fixes[doseN];
+                    const total = plan.placements[key]?.doses.length;
+                    return (
+                      <li className="gapdose" key={doseN}>
+                        <span>
+                          Nothing covers dose {doseN}
+                          {total ? ` of ${total}` : ''}.
+                        </span>
+                        {fix && (
+                          <button type="button" className="linkbtn" onClick={() => onAddProduct(fix)}>
+                            Add {fix}
+                          </button>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
               </li>
-            ))}
+              );
+            })}
           </ul>
         </div>
       )}
@@ -206,31 +254,6 @@ export default function Plan({ ticked, onAddProduct }) {
           <b>No vaccine is due at the other well-child visits:</b> {describeEmptyVisits(emptyVisits)}.
         </p>
       )}
-
-      <div className="panel">
-        <h3>Products that would save injections</h3>
-        <p>Products you don't stock, and how many injections each would save across the whole birth-to-18 plan.</p>
-        <div className="sugg">
-          {suggestions.length === 0 && <p>Nothing left to add would save an injection.</p>}
-          {suggestions.map(({ product, saves }) => {
-            const commonName = PRODUCTS.find((p) => p.name === product)?.commonName;
-            return (
-              <div className="sugg-row" key={product}>
-                <span className="s-nm">
-                  {product}
-                  {commonName && <span className="tag valence">{commonName}</span>}
-                </span>
-                <span className="s-win">
-                  −{saves} injection{saves === 1 ? '' : 's'}
-                </span>
-                <button type="button" onClick={() => onAddProduct(product)}>
-                  Add
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      </div>
     </main>
   );
 }

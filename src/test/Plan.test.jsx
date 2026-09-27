@@ -4,7 +4,7 @@
 // (separately tested) logic layer already computed for a few real
 // formularies, not a second copy of the scheduling rules.
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Plan from '../ui/Plan.jsx';
 import { PRODUCTS } from '../data/products.js';
@@ -19,6 +19,17 @@ describe('Plan — nothing stocked', () => {
     expect(screen.getByText('Nothing in your formulary covers these doses.')).toBeInTheDocument();
     expect(screen.getByText('Diphtheria, tetanus, pertussis')).toBeInTheDocument();
     expect(container.querySelectorAll('.shot')).toHaveLength(0);
+  });
+
+  // F2 — each gapped dose gets its own fix suggestion
+  it('offers an Add button naming a real product for each gapped dose (F2)', async () => {
+    const onAddProduct = vi.fn();
+    render(<Plan ticked={new Set()} onAddProduct={onAddProduct} />);
+    const hepaGroup = screen.getByText('Hepatitis A').closest('li');
+    expect(within(hepaGroup).getByText(/Nothing covers dose 1 of 2\./)).toBeInTheDocument();
+    const [addHepA] = within(hepaGroup).getAllByRole('button', { name: 'Add Havrix' });
+    await userEvent.click(addHepA);
+    expect(onAddProduct).toHaveBeenCalledWith('Havrix');
   });
 });
 
@@ -97,6 +108,16 @@ describe('Plan — a combination shot spells out the antigen count (A6)', () => 
 
 describe('Plan — a clinic with no combination products, and PedvaxHIB unstocked', () => {
   const ticked = new Set(['Engerix-B', 'ActHIB', 'Daptacel', 'IPOL', 'Prevnar 20', 'Rotarix']);
+
+  // F3 — moved up beside the injection count, ahead of the schedule itself
+  it('places "Products that would save injections" right after the stat tiles, before any visit card (F3)', () => {
+    const { container } = render(<Plan ticked={ticked} onAddProduct={() => {}} />);
+    const sum = container.querySelector('.sum');
+    const suggPanel = screen.getByText('Products that would save injections').closest('.panel');
+    const firstVisit = container.querySelector('.visit');
+    expect(sum.compareDocumentPosition(suggPanel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(suggPanel.compareDocumentPosition(firstVisit) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
 
   it('offers Vaxelis and PedvaxHIB as suggestions, and clicking Add reports the right product', async () => {
     const onAddProduct = vi.fn();

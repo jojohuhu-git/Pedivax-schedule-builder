@@ -3,13 +3,21 @@
 // localStorage, so a clinic can bookmark or share its own formulary
 // (docs/decisions.md, "State", same pattern as vaxapp). No date of birth and
 // no patient information is ever entered or stored.
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PRODUCTS } from '../data/products.js';
+import { buildPlan } from '../logic/plan.js';
+import { scorePlan } from '../logic/score.js';
 import Formulary from './Formulary.jsx';
 import Plan from './Plan.jsx';
 import Rulebook from './Rulebook.jsx';
 import './theme.css';
 import './print.css';
+
+const TICK_DELTA_MS = 4000;
+
+function injectionsFor(ticked) {
+  return scorePlan(buildPlan(ticked)).injections;
+}
 
 const STORAGE_KEY = 'pedivax-formulary';
 const VALID_NAMES = new Set(PRODUCTS.filter((p) => !p.retired).map((p) => p.name));
@@ -44,6 +52,29 @@ function initialFormulary() {
 export default function App() {
   const [ticked, setTicked] = useState(initialFormulary);
   const [view, setView] = useState('plan');
+  // F6: Reset used to wipe the formulary with no way back. `lastCleared`
+  // holds what Reset just cleared so Formulary can offer Undo in its place;
+  // any tick afterwards means the clinician has moved on, so it's dropped.
+  const [lastCleared, setLastCleared] = useState(null);
+  // F4: ticking a box silently re-rendered a long page with no sign of what
+  // just changed — on a phone the injection count is off-screen entirely.
+  // `tickDelta` is the before/after injection count for the tick that just
+  // happened, shown next to the checklist itself (where the clinician is
+  // already looking) and cleared a few seconds later.
+  const [tickDelta, setTickDelta] = useState(null);
+  const tickDeltaTimeout = useRef(null);
+
+  useEffect(() => () => clearTimeout(tickDeltaTimeout.current), []);
+
+  const showTickDelta = (before, after) => {
+    clearTimeout(tickDeltaTimeout.current);
+    if (before === after) {
+      setTickDelta(null);
+      return;
+    }
+    setTickDelta({ from: before, to: after });
+    tickDeltaTimeout.current = setTimeout(() => setTickDelta(null), TICK_DELTA_MS);
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -59,19 +90,45 @@ export default function App() {
   }, [ticked]);
 
   const toggle = (name) => {
-    setTicked((prev) => {
-      const next = new Set(prev);
-      if (next.has(name)) next.delete(name);
-      else next.add(name);
-      return next;
-    });
+    setLastCleared(null);
+    const next = new Set(ticked);
+    if (next.has(name)) next.delete(name);
+    else next.add(name);
+    showTickDelta(injectionsFor(ticked), injectionsFor(next));
+    setTicked(next);
   };
 
   const add = (name) => {
-    setTicked((prev) => (prev.has(name) ? prev : new Set(prev).add(name)));
+    setLastCleared(null);
+    if (ticked.has(name)) return;
+    const next = new Set(ticked).add(name);
+    showTickDelta(injectionsFor(ticked), injectionsFor(next));
+    setTicked(next);
   };
 
-  const reset = () => setTicked(new Set());
+  const reset = () => {
+    if (ticked.size === 0) return;
+    setLastCleared(ticked);
+    setTickDelta(null);
+    clearTimeout(tickDeltaTimeout.current);
+    setTicked(new Set());
+  };
+
+  const undoReset = () => {
+    if (!lastCleared) return;
+    setTickDelta(null);
+    clearTimeout(tickDeltaTimeout.current);
+    setTicked(lastCleared);
+    setLastCleared(null);
+  };
+
+  // F1: a one-tap starting formulary, then edited by hand from there.
+  const applyPreset = (names) => {
+    setLastCleared(null);
+    const next = new Set(names);
+    showTickDelta(injectionsFor(ticked), injectionsFor(next));
+    setTicked(next);
+  };
 
   return (
     <>
@@ -121,7 +178,15 @@ export default function App() {
 
       {view === 'plan' ? (
         <div className="wrap">
-          <Formulary ticked={ticked} onToggle={toggle} onReset={reset} />
+          <Formulary
+            ticked={ticked}
+            onToggle={toggle}
+            onReset={reset}
+            justCleared={lastCleared !== null}
+            onUndoReset={undoReset}
+            tickDelta={tickDelta}
+            onApplyPreset={applyPreset}
+          />
           <Plan ticked={ticked} onAddProduct={add} />
         </div>
       ) : (

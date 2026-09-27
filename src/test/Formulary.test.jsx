@@ -39,6 +39,30 @@ describe('Formulary', () => {
     expect(onReset).toHaveBeenCalled();
   });
 
+  // F6 — the heading states how many of the 30 active products are ticked
+  it('states how many of the active products are stocked in the heading (F6)', () => {
+    render(<Formulary ticked={new Set(['Engerix-B', 'RotaTeq'])} onToggle={() => {}} onReset={() => {}} />);
+    const total = PRODUCTS.filter((p) => !p.retired).length;
+    expect(screen.getByText(`· 2 of ${total} stocked`)).toBeInTheDocument();
+  });
+
+  // F6 — Reset used to wipe the formulary with no way back
+  it('shows Undo reset instead of Reset once the formulary has just been cleared (F6)', async () => {
+    const onUndoReset = vi.fn();
+    render(
+      <Formulary
+        ticked={new Set()}
+        onToggle={() => {}}
+        onReset={() => {}}
+        justCleared
+        onUndoReset={onUndoReset}
+      />
+    );
+    expect(screen.queryByRole('button', { name: 'Reset' })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Undo reset' }));
+    expect(onUndoReset).toHaveBeenCalled();
+  });
+
   it('labels Prevnar 20 and Vaxneuvance by valence, not the shared PCV abbreviation — they protect against different serotypes and are not the same product', () => {
     render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} />);
     expect(screen.getByText('PCV20')).toBeInTheDocument();
@@ -197,6 +221,75 @@ describe('Formulary', () => {
       expect(screen.getByText('Your formulary')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument();
       expect(screen.getByText('Single vaccines')).toBeInTheDocument();
+    });
+  });
+
+  // F1 — one-tap starting formularies, offered only before anything is ticked
+  describe('starting presets (F1)', () => {
+    it('offers both presets when nothing is ticked yet', () => {
+      render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} onApplyPreset={() => {}} />);
+      expect(screen.getByText('Start from a typical formulary:')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Single-brand basics/ })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Fewest injections/ })).toBeInTheDocument();
+    });
+
+    it('disappears once a clinic has its own formulary going', () => {
+      render(
+        <Formulary
+          ticked={new Set(['Engerix-B'])}
+          onToggle={() => {}}
+          onReset={() => {}}
+          onApplyPreset={() => {}}
+        />
+      );
+      expect(screen.queryByText('Start from a typical formulary:')).not.toBeInTheDocument();
+    });
+
+    it('applies the preset\'s product list when tapped', async () => {
+      const onApplyPreset = vi.fn();
+      render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} onApplyPreset={onApplyPreset} />);
+      await userEvent.click(screen.getByRole('button', { name: /Single-brand basics/ }));
+      expect(onApplyPreset).toHaveBeenCalledTimes(1);
+      const [products] = onApplyPreset.mock.calls[0];
+      expect(products).toContain('Engerix-B');
+      expect(products).toContain('MenQuadfi');
+    });
+  });
+
+  // F5 — search box, 30 products across two sections
+  describe('search (F5)', () => {
+    it('filters to only the matching product by name, hiding empty groups', async () => {
+      render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} />);
+      await userEvent.type(screen.getByRole('searchbox', { name: 'Search products' }), 'vaxelis');
+      expect(screen.getByText('Vaxelis')).toBeInTheDocument();
+      expect(screen.queryByText('Engerix-B')).not.toBeInTheDocument();
+      // Vaxelis's own group heading survives; a single-vaccine group with no
+      // matches (e.g. Rotavirus) should not render an empty heading.
+      expect(screen.queryByText('Rotavirus')).not.toBeInTheDocument();
+    });
+
+    it('hides the "Single vaccines" section heading itself when only a combination product matches', async () => {
+      render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} />);
+      await userEvent.type(screen.getByRole('searchbox', { name: 'Search products' }), 'kinrix');
+      expect(screen.queryByText('Single vaccines')).not.toBeInTheDocument();
+      expect(screen.getByText('Combination vaccines')).toBeInTheDocument();
+    });
+
+    it('also matches on commonName (PCV20), not just the product name', async () => {
+      render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} />);
+      await userEvent.type(screen.getByRole('searchbox', { name: 'Search products' }), 'pcv20');
+      expect(screen.getByText('Prevnar 20')).toBeInTheDocument();
+      expect(screen.queryByText('Vaxneuvance')).not.toBeInTheDocument();
+    });
+
+    it('shows a plain message when nothing matches, and Clear restores the full list', async () => {
+      render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} />);
+      await userEvent.type(screen.getByRole('searchbox', { name: 'Search products' }), 'xyzzy');
+      expect(screen.getByText('No product matches "xyzzy".')).toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
+      expect(screen.getByText('Engerix-B')).toBeInTheDocument();
+      expect(screen.queryByText(/No product matches/)).not.toBeInTheDocument();
     });
   });
 });
