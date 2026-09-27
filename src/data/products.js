@@ -995,10 +995,14 @@ export const PRODUCTS = [
           'No longer the routinely-used pneumococcal product — replaced by PCV15/PCV20. ' +
           'Kept here, not deleted, so an old saved plan can still be explained. Its own ' +
           'retirement date (30 April 2024) is commonly cited but rests on a document ' +
-          "title and search summaries of a PDF that returns HTTP 403 both this session " +
-          'and last — not a sentence read live. Recorded with a caveat rather than as a ' +
-          'plain verified fact; re-fetch the letter directly before treating the date ' +
-          'as settled.',
+          "title and search summaries of a PDF that returns HTTP 403 across three " +
+          'sessions now (WebFetch, curl, and a real browser all hit an active bot-' +
+          'verification wall, not a dead link) — not a sentence read live. Pfizer\'s own ' +
+          'Prevnar 20 marketing page (adult.prevnar20.com/whyprevnar20, fetched live ' +
+          '2026-09-26) independently states "Prevnar 13 was available for adults from ' +
+          '2012 to 2024" — corroborates the year, but gives no day-level date and is a ' +
+          'marketing page, not an organization or insert source. The specific day (30 ' +
+          'April) remains recorded with a caveat, not as a plain verified fact.',
         source: 'cdc2025PcvNotes',
         verified: '2026-09-25',
         quote: 'minimum age: 6 weeks [PCV15], [PCV 20]; 2 years [PPSV23]',

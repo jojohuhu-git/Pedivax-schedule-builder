@@ -138,6 +138,18 @@ immunize.org Ask the Experts (Pneumococcal, reviewed 13 November 2024) confirms 
 status but gives no date: *"PCV13 (Prevnar 13, Pfizer) is FDA-licensed and may still be
 available in some clinics. It is no longer routinely recommended."*
 
+**2026-09-26, third attempt — still not verified.** Owner supplied
+`https://adult.prevnar20.com/whyprevnar20` as a possible source. Fetched live: it states
+*"In the US, Prevnar 13 was available for adults from 2012 to 2024"* — confirms the
+**year** but gives no day-level date, and it's Pfizer's own marketing page, not an
+organization or insert-tier source. Also re-attempted the Medline discontinuation letter
+directly (found its real URL via search this time, not just a cached title): WebFetch,
+`curl` with a browser user-agent, and a real browser session all hit the same wall — not
+a dead link, an active "Verifying the device..." bot-detection challenge. Did not attempt
+to solve it (out of scope for this app, and not something to automate past). **Three
+sessions running, three different tools — the date stays a recorded-with-caveat fact,
+not a verified one**, until someone can open that PDF through a real browser by hand.
+
 **PCV7 / Prevnar — no discontinuation date exists in any authoritative source.**
 Searched and read live. What the sources actually say:
 - MMWR 59(9), 12 March 2010: *"On February 24, 2010, a 13-valent pneumococcal conjugate
