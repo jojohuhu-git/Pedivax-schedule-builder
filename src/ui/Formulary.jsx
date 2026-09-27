@@ -131,9 +131,17 @@ export default function Formulary({
   onApplyPreset,
 }) {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
   const active = PRODUCTS.filter((p) => !p.retired);
-  const singles = active.filter((p) => p.kind !== 'combination');
-  const combos = active.filter((p) => p.kind === 'combination');
+  // F5: 30 products across two sections — anyone who knows the product
+  // name wants to type it rather than scan for it. Matches the product's
+  // own name or its commonName (PCV20/PCV15), same names shown on the row.
+  const q = query.trim().toLowerCase();
+  const matching = q
+    ? active.filter((p) => p.name.toLowerCase().includes(q) || p.commonName?.toLowerCase().includes(q))
+    : active;
+  const singles = matching.filter((p) => p.kind !== 'combination');
+  const combos = matching.filter((p) => p.kind === 'combination');
 
   const singleGroups = SINGLE_GROUP_ORDER.map((key) => ({
     key,
@@ -190,6 +198,25 @@ export default function Formulary({
             </button>
           )}
         </div>
+        {/* F5: 30 products across two sections is a lot to scan. */}
+        <div className="search">
+          <input
+            type="search"
+            className="search-input"
+            placeholder="Search products…"
+            aria-label="Search products"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          {query && (
+            <button type="button" className="linkbtn" onClick={() => setQuery('')}>
+              Clear
+            </button>
+          )}
+        </div>
+        {q && singles.length === 0 && combos.length === 0 && (
+          <p className="search-empty">No product matches "{query.trim()}".</p>
+        )}
         {/* F1: opening the app fresh showed 0 injections and every antigen
             in red — a one-tap starting point fixes the first impression;
             the clinician edits from there, same as ticking by hand. Only
@@ -216,18 +243,20 @@ export default function Formulary({
             })}
           </div>
         )}
-        <div className="fml-section">
-          <div className="fml-section-t">Single vaccines</div>
-          {singleGroups.map((g) => (
-            <div key={g.key} className="grp">
-              <div className="grp-t">{g.heading}</div>
-              {g.sdm && <p className="sdmline">{g.sdm}</p>}
-              {g.items.map((p) => (
-                <ProductCheck product={p} ticked={ticked} onToggle={onToggle} key={p.name} />
-              ))}
-            </div>
-          ))}
-        </div>
+        {singleGroups.length > 0 && (
+          <div className="fml-section">
+            <div className="fml-section-t">Single vaccines</div>
+            {singleGroups.map((g) => (
+              <div key={g.key} className="grp">
+                <div className="grp-t">{g.heading}</div>
+                {g.sdm && <p className="sdmline">{g.sdm}</p>}
+                {g.items.map((p) => (
+                  <ProductCheck product={p} ticked={ticked} onToggle={onToggle} key={p.name} />
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
         {comboGroups.length > 0 && (
           <div className="fml-section">
             <div className="fml-section-t">Combination vaccines</div>

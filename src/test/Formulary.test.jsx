@@ -246,4 +246,41 @@ describe('Formulary', () => {
       expect(products).toContain('MenQuadfi');
     });
   });
+
+  // F5 — search box, 30 products across two sections
+  describe('search (F5)', () => {
+    it('filters to only the matching product by name, hiding empty groups', async () => {
+      render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} />);
+      await userEvent.type(screen.getByRole('searchbox', { name: 'Search products' }), 'vaxelis');
+      expect(screen.getByText('Vaxelis')).toBeInTheDocument();
+      expect(screen.queryByText('Engerix-B')).not.toBeInTheDocument();
+      // Vaxelis's own group heading survives; a single-vaccine group with no
+      // matches (e.g. Rotavirus) should not render an empty heading.
+      expect(screen.queryByText('Rotavirus')).not.toBeInTheDocument();
+    });
+
+    it('hides the "Single vaccines" section heading itself when only a combination product matches', async () => {
+      render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} />);
+      await userEvent.type(screen.getByRole('searchbox', { name: 'Search products' }), 'kinrix');
+      expect(screen.queryByText('Single vaccines')).not.toBeInTheDocument();
+      expect(screen.getByText('Combination vaccines')).toBeInTheDocument();
+    });
+
+    it('also matches on commonName (PCV20), not just the product name', async () => {
+      render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} />);
+      await userEvent.type(screen.getByRole('searchbox', { name: 'Search products' }), 'pcv20');
+      expect(screen.getByText('Prevnar 20')).toBeInTheDocument();
+      expect(screen.queryByText('Vaxneuvance')).not.toBeInTheDocument();
+    });
+
+    it('shows a plain message when nothing matches, and Clear restores the full list', async () => {
+      render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} />);
+      await userEvent.type(screen.getByRole('searchbox', { name: 'Search products' }), 'xyzzy');
+      expect(screen.getByText('No product matches "xyzzy".')).toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
+      expect(screen.getByText('Engerix-B')).toBeInTheDocument();
+      expect(screen.queryByText(/No product matches/)).not.toBeInTheDocument();
+    });
+  });
 });

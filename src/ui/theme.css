@@ -300,6 +300,34 @@ h1 {
 .grp.combo {
   background: var(--surface-2);
 }
+/* F5: search box for the checklist. */
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--line-strong);
+}
+.search-input {
+  flex: 1;
+  font: inherit;
+  font-size: 13px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r);
+  padding: 6px 10px;
+  background: var(--surface);
+  color: var(--ink);
+}
+.search-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.search-empty {
+  font-size: 13px;
+  color: var(--ink-2);
+  padding: 12px 15px;
+  margin: 0;
+}
 /* F1: one-tap starting formularies, offered only before anything is ticked. */
 .presets {
   padding: 12px 15px;
