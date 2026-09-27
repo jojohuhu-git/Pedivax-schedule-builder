@@ -48,9 +48,7 @@ function Shot({ shot, visitId, index, placements }) {
         <div className="shot-nm">
           {shot.product.name}
           {shot.product.commonName && <span className="tag valence">{shot.product.commonName}</span>}
-          {shot.product.kind === 'combination' && <span className="tag combo">Combination</span>}
           {shot.product.route === 'oral' && <span className="tag oral">Oral</span>}
-          {sdm && <span className="tag sdm">Shared decision</span>}
         </div>
         {shot.covers.length > 1 && (
           <p className="quiet combo-lede">
@@ -106,8 +104,9 @@ export default function Plan({ ticked, onAddProduct }) {
         </div>
         {allGaps.length > 0 ? (
           <div className="bad">
-            <div className="n">{Object.keys(gapsBySeries).length}</div>
-            <div className="l">{Object.keys(gapsBySeries).length === 1 ? 'antigen you cannot cover' : 'antigens you cannot cover'}</div>
+            <div className="gapmsg">
+              No product covers {Object.keys(gapsBySeries).map((key) => SERIES[key].abbr).join(', ')} — see the list below.
+            </div>
           </div>
         ) : (
           <div className="sd">

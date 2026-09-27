@@ -37,19 +37,42 @@ describe('Plan — every current product stocked', () => {
     expect(screen.getByText('Nothing left to add would save an injection.')).toBeInTheDocument();
   });
 
-  it('shows Pentacel carrying DTaP and Hib together, tagged as a combination product', () => {
-    render(<Plan ticked={ALL_PRODUCTS} onAddProduct={() => {}} />);
-    const pentacel = screen.getByText('Pentacel');
-    expect(pentacel.parentElement.querySelector('.tag.combo')).toHaveTextContent('Combination');
+  it('shows Pentacel carrying DTaP and Hib together, said in the sentence rather than a "Combination" chip (E3)', () => {
+    const { container } = render(<Plan ticked={ALL_PRODUCTS} onAddProduct={() => {}} />);
+    const pentacelShots = [...container.querySelectorAll('.shot')].filter((shot) =>
+      shot.querySelector('.shot-nm').textContent.startsWith('Pentacel')
+    );
+    expect(pentacelShots.length).toBeGreaterThan(0);
+    const sayItInWords = pentacelShots.every((shot) =>
+      /One injection covering (two|three|four) vaccines/.test(shot.textContent)
+    );
+    expect(sayItInWords).toBe(true);
+    // No shot anywhere still renders the redundant chip — every combination
+    // shot already says so in the lead-in sentence.
+    expect(container.querySelectorAll('.tag.combo')).toHaveLength(0);
   });
 });
 
-describe('Plan — every current product stocked, including Bexsero (A5)', () => {
+describe('Plan — every current product stocked, including Bexsero (A5, E3)', () => {
   it('states a shared-decision product is included, without contradicting the schedule below it', () => {
     render(<Plan ticked={ALL_PRODUCTS} onAddProduct={() => {}} />);
     expect(screen.getByText('Included')).toBeInTheDocument();
     expect(screen.getByText('shared-decision product in this plan')).toBeInTheDocument();
     expect(screen.queryByText('None')).not.toBeInTheDocument();
+  });
+
+  it('drops the redundant "Shared decision" chip — the sdmline sentence beneath the shot already says it', () => {
+    const { container } = render(<Plan ticked={ALL_PRODUCTS} onAddProduct={() => {}} />);
+    expect(container.querySelectorAll('.tag.sdm')).toHaveLength(0);
+    expect(screen.getAllByText(/shared clinical decision-making/).length).toBeGreaterThan(0);
+  });
+});
+
+describe('Plan — a formulary with a real gap names which antigens (E4)', () => {
+  it('states the missing antigens in a sentence instead of a bare failing count', () => {
+    render(<Plan ticked={new Set()} onAddProduct={() => {}} />);
+    expect(screen.getByText(/No product covers .* — see the list below\./)).toBeInTheDocument();
+    expect(screen.queryByText('antigens you cannot cover')).not.toBeInTheDocument();
   });
 });
 
