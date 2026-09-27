@@ -43,6 +43,8 @@ Pedivax-schedule-builder/
     │   ├── sources/  saved copies of pages and PDFs, so a quote stays traceable
     │   └── applied/  one dated note per link, saying what changed and what did not
     └── archive/       finished plans and end-of-session handoffs go here
+        └── handoff-2026-09-26-b4-b5-complete.md   ← read this one; it
+            supersedes every earlier handoff in this folder
         └── handoff-2026-09-26-b3-plan-js.md   ← superseded by this file's own
             summary below (B3 fully done; Formulary.jsx/Plan.jsx now built too) —
             see git log for a fresher handoff once one is written
