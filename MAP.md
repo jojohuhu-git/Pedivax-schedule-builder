@@ -28,7 +28,8 @@ Pedivax-schedule-builder/
 │   │   ├── App.jsx      the app shell — owns the ticked formulary, syncs ?s= + localStorage
 │   │   ├── Formulary.jsx  tick the products you stock
 │   │   ├── Plan.jsx     the schedule
-│   │   ├── Rulebook.jsx  every rule, generated from src/data (not built yet)
+│   │   ├── Rulebook.jsx  every rule, generated from src/data, with a jump-to-antigen nav
+│   │   ├── print.css    hides the tick list/nav so only the schedule or rulebook prints
 │   │   └── theme.css    design tokens + component styles, from the frozen mockups
 │   └── test/        the six required tests, plus UI rendering tests for each screen
 ├── mockups/         clickable HTML mockups — frozen, reference only, not the real app
@@ -48,6 +49,7 @@ Pedivax-schedule-builder/
 ```
 
 `src/data/` (B2) and `src/logic/` (B3 — `cover.js`, `seriesLength.js`, `plan.js`,
-`score.js`, `suggest.js`) are all built and tested — B3 is done. `App.jsx`,
-`Formulary.jsx`, and `Plan.jsx` (B4) are built, live-verified, and tested.
-`Rulebook.jsx` and `src/ui/print.css` are not built yet.
+`score.js`, `suggest.js`) are all built and tested — B3 is done. B4 (all three
+screens — `App.jsx`, `Formulary.jsx`, `Plan.jsx`, `Rulebook.jsx`, `print.css`)
+is built, live-verified, and tested. All six required tests exist and pass —
+B5 is done. See `docs/archive/` for the latest handoff.

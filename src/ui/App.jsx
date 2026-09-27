@@ -7,7 +7,9 @@ import { useEffect, useState } from 'react';
 import { PRODUCTS } from '../data/products.js';
 import Formulary from './Formulary.jsx';
 import Plan from './Plan.jsx';
+import Rulebook from './Rulebook.jsx';
 import './theme.css';
+import './print.css';
 
 const STORAGE_KEY = 'pedivax-formulary';
 const VALID_NAMES = new Set(PRODUCTS.filter((p) => !p.retired).map((p) => p.name));
@@ -41,6 +43,7 @@ function initialFormulary() {
 
 export default function App() {
   const [ticked, setTicked] = useState(initialFormulary);
+  const [view, setView] = useState('plan');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -78,27 +81,52 @@ export default function App() {
             <div className="eyebrow">Healthy child, birth to 18 years · no prior vaccines</div>
             <h1>Pedivax Schedule Builder</h1>
             <p className="sub">
-              Tick the vaccine products your clinic stocks. The plan below shows every visit from birth to 18
-              years for a healthy child with no prior vaccines, and which antigen each shot covers.
+              {view === 'plan'
+                ? 'Tick the vaccine products your clinic stocks. The plan below shows every visit from birth to 18 years for a healthy child with no prior vaccines, and which antigen each shot covers.'
+                : "Every schedule rule and every product rule the plan uses, with its source and the sentence it was read from."}
             </p>
           </div>
-          <button id="print" type="button" onClick={() => window.print()}>
-            Print / save PDF
-          </button>
-        </div>
-        <div className="banner">
-          <div className="note">
-            <b>Not included in this plan:</b> influenza (every year from 6 months) and COVID-19 (per current
-            season) follow their own annual cadence, not fixed well-child ages. RSV antibody is seasonal and is
-            not a vaccine series. Give these alongside the plan below.
+          <div className="btns">
+            <nav className="viewnav">
+              <button
+                type="button"
+                className={view === 'plan' ? 'active' : ''}
+                onClick={() => setView('plan')}
+              >
+                Plan
+              </button>
+              <button
+                type="button"
+                className={view === 'rulebook' ? 'active' : ''}
+                onClick={() => setView('rulebook')}
+              >
+                Rulebook
+              </button>
+            </nav>
+            <button id="print" type="button" onClick={() => window.print()}>
+              Print / save PDF
+            </button>
           </div>
         </div>
+        {view === 'plan' && (
+          <div className="banner">
+            <div className="note">
+              <b>Not included in this plan:</b> influenza (every year from 6 months) and COVID-19 (per current
+              season) follow their own annual cadence, not fixed well-child ages. RSV antibody is seasonal and is
+              not a vaccine series. Give these alongside the plan below.
+            </div>
+          </div>
+        )}
       </header>
 
-      <div className="wrap">
-        <Formulary ticked={ticked} onToggle={toggle} onReset={reset} />
-        <Plan ticked={ticked} onAddProduct={add} />
-      </div>
+      {view === 'plan' ? (
+        <div className="wrap">
+          <Formulary ticked={ticked} onToggle={toggle} onReset={reset} />
+          <Plan ticked={ticked} onAddProduct={add} />
+        </div>
+      ) : (
+        <Rulebook />
+      )}
 
       <footer>Pedivax Schedule Builder · healthy child, no prior doses, no risk factors.</footer>
     </>

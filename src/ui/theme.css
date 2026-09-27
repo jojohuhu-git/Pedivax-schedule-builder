@@ -123,6 +123,35 @@ h1 {
   border-color: var(--accent);
   color: var(--accent);
 }
+.btns {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.viewnav {
+  display: flex;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.viewnav button {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  background: var(--surface);
+  color: var(--ink-2);
+  padding: 7px 15px;
+  cursor: pointer;
+}
+.viewnav button + button {
+  border-left: 1px solid var(--line-strong);
+}
+.viewnav button.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
 .banner {
   margin-top: 16px;
   display: flex;
@@ -301,6 +330,10 @@ label.chk input:focus-visible {
   font-weight: 600;
   color: var(--ink);
 }
+.combo-lede {
+  margin: 2px 0 6px;
+  font-size: 12px;
+}
 
 .legend {
   display: flex;
@@ -425,6 +458,12 @@ label.chk input:focus-visible {
   background: var(--sdm-soft);
   color: var(--sdm);
   border: 1px solid var(--sdm-line);
+}
+.tag.valence {
+  background: var(--surface-2);
+  color: var(--ink-3);
+  border: 1px solid var(--line);
+  font-family: var(--f-mono);
 }
 .ants {
   display: flex;
@@ -565,4 +604,94 @@ footer {
   padding-block: 16px 30px;
   font-size: 12px;
   color: var(--ink-3);
+}
+
+/* Rulebook */
+.rulebook {
+  padding-block: 22px 44px;
+}
+.rule-jump {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.rule-jump a {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r);
+  padding: 3px 11px;
+  text-decoration: none;
+}
+.rule-jump a:hover {
+  border-color: var(--accent);
+}
+.rule-series {
+  border-top: 1px solid var(--line);
+  padding-block: 20px;
+}
+.rule-series:first-of-type {
+  border-top: none;
+}
+.rule-series h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.rule-series h2 .quiet {
+  display: inline;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+}
+.rule-products {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+.rule-product {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 12px 15px;
+}
+.rule-product h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+.fact {
+  border-left: 2px solid var(--line-strong);
+  padding: 3px 0 3px 12px;
+  margin: 10px 0;
+}
+.fact-claim {
+  margin: 0 0 4px;
+  font-size: 13px;
+}
+.fact blockquote {
+  margin: 0 0 4px;
+  padding: 0;
+  font-size: 12.5px;
+  font-style: italic;
+  color: var(--ink-2);
+}
+.fact-src {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+.fact-src a {
+  color: var(--ink-3);
+}
+.fact.stale {
+  border-left-color: var(--warn-line);
+}
+.stalewarn {
+  color: var(--warn);
+  font-weight: 600;
 }
