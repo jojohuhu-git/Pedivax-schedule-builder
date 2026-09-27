@@ -32,7 +32,7 @@ export default function Formulary({ ticked, onToggle, onReset }) {
   return (
     <aside className="rail">
       <div className="rail-head">
-        <h2>What we stock</h2>
+        <h2>Your formulary</h2>
         <button className="linkbtn" type="button" onClick={onReset}>
           Reset
         </button>

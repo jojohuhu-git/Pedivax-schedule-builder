@@ -82,7 +82,7 @@ export default function App() {
             <h1>Pedivax Schedule Builder</h1>
             <p className="sub">
               {view === 'plan'
-                ? 'Tick the vaccine products your clinic stocks. The plan below shows every visit from birth to 18 years for a healthy child with no prior vaccines, and which antigen each shot covers.'
+                ? 'Tick the vaccine products your clinic stocks. The plan below shows every visit from birth to 18 years and which antigen each shot covers.'
                 : "Every schedule rule and every product rule the plan uses, with its source and the sentence it was read from."}
             </p>
           </div>
