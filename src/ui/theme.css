@@ -75,10 +75,11 @@ body {
 h1, h2, h3 {
   margin: 0;
 }
+/* E1 (2026-09-26 UX queue, Batch E): sentence case, one size up, normal
+   letter-spacing — the uppercase/letter-spaced micro-label was the single
+   most recognisable "AI-built" tell in the review. */
 .eyebrow {
-  font-size: 11px;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  font-size: 12.5px;
   color: var(--ink-3);
   font-weight: 600;
 }
@@ -274,9 +275,7 @@ h1 {
   border-bottom: none;
 }
 .grp-t {
-  font-size: 11px;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
+  font-size: 12.5px;
   color: var(--ink-3);
   font-weight: 600;
   margin-bottom: 7px;
@@ -318,7 +317,6 @@ label.chk .cv {
   display: block;
   color: var(--ink-3);
   font-size: 11.5px;
-  font-family: var(--f-mono);
   margin-top: 1px;
 }
 label.chk:has(input:checked) .nm {
@@ -360,12 +358,20 @@ label.chk input:focus-visible {
   color: var(--ink-2);
   margin-top: 2px;
 }
-.sum .bad .n {
-  color: var(--gap);
-}
 .sum .sd .n {
   color: var(--sdm);
   font-size: 22px;
+  /* E2/E4: a status word ("Included"/"Optional"), not a number — don't
+     dress it in the tabular-numeral font the two real counts use. */
+  font-family: var(--f-sans);
+}
+/* E4: the gap tile fails, it doesn't count — say what's missing in a
+   sentence instead of styling a digit like the two good stats beside it. */
+.sum .bad .gapmsg {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--gap);
+  line-height: 1.4;
 }
 .quiet {
   font-size: 12.5px;
@@ -444,7 +450,6 @@ label.chk input:focus-visible {
 .v-meta {
   font-size: 12px;
   color: var(--ink-2);
-  font-family: var(--f-mono);
   margin-left: auto;
 }
 .shots {
@@ -510,7 +515,11 @@ label.chk input:focus-visible {
   background: var(--surface-2);
   color: var(--ink-3);
   border: 1px solid var(--line);
-  font-family: var(--f-mono);
+}
+.tag.retired {
+  background: var(--surface-2);
+  color: var(--ink-2);
+  border: 1px solid var(--line-strong);
 }
 .ants {
   display: flex;
@@ -532,7 +541,6 @@ label.chk input:focus-visible {
   font-weight: 600;
 }
 .ant .d {
-  font-family: var(--f-mono);
   font-size: 11px;
   color: var(--ink-2);
   font-variant-numeric: tabular-nums;
@@ -618,7 +626,6 @@ label.chk input:focus-visible {
   min-width: 96px;
 }
 .sugg-row .s-cv {
-  font-family: var(--f-mono);
   font-size: 11.5px;
   color: var(--ink-3);
   flex: 1;
