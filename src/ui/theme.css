@@ -593,16 +593,34 @@ label.chk input:focus-visible {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 10px;
 }
-.gaplist li {
+.gaplist > li {
   font-size: 13px;
-  display: flex;
-  gap: 9px;
 }
 .gaplist b {
   font-weight: 600;
-  min-width: 74px;
+}
+/* F2: one row per gapped dose, each with its own "Add <product>" fix —
+   fixGap.js works out which unstocked product actually closes that dose. */
+.gapdoses {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.gapdose {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink-2);
+}
+.gapdose .linkbtn {
+  flex: none;
+  white-space: nowrap;
 }
 .sugg {
   display: flex;
