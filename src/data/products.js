@@ -256,6 +256,7 @@ export const PRODUCTS = [
   },
   {
     name: 'Prevnar 20',
+    commonName: 'PCV20',
     group: 'Pneumococcal',
     kind: 'single',
     route: 'injection',
@@ -283,6 +284,7 @@ export const PRODUCTS = [
   },
   {
     name: 'Vaxneuvance',
+    commonName: 'PCV15',
     group: 'Pneumococcal',
     kind: 'single',
     route: 'injection',
@@ -975,6 +977,7 @@ export const PRODUCTS = [
   },
   {
     name: 'Prevnar 13',
+    commonName: 'PCV13',
     group: 'Pneumococcal',
     kind: 'single',
     route: 'injection',

@@ -41,4 +41,11 @@ describe('Formulary', () => {
     expect(screen.getByText('DTaP + IPV + Hib + HepB')).toBeInTheDocument(); // Vaxelis
     expect(screen.getAllByText('RV · oral')).toHaveLength(2); // Rotarix, RotaTeq
   });
+
+  it('labels Prevnar 20 and Vaxneuvance by valence, not the shared PCV abbreviation — they protect against different serotypes and are not the same product', () => {
+    render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} />);
+    expect(screen.getByText('PCV20')).toBeInTheDocument();
+    expect(screen.getByText('PCV15')).toBeInTheDocument();
+    expect(screen.queryByText('PCV', { exact: true })).not.toBeInTheDocument();
+  });
 });

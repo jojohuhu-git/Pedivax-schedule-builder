@@ -2,6 +2,7 @@
 // and `suggest` from the logic layer and renders them; makes no scheduling
 // decision of its own (CLAUDE.md: cover.js/plan.js are the only place a
 // decision is made).
+import { PRODUCTS } from '../data/products.js';
 import { SERIES } from '../data/series.js';
 import { VISITS } from '../data/visits.js';
 import { buildPlan } from '../logic/plan.js';
@@ -20,14 +21,19 @@ function abbr(seriesKey) {
   return SERIES[seriesKey]?.abbr ?? seriesKey;
 }
 
+function visitLabel(id) {
+  return VISITS.find((v) => v.id === id)?.label ?? id;
+}
+
 function movedNote(covers, visitId) {
   const moved = covers.find((c) => c.dose.at.length > 1 && c.dose.at[0] !== visitId);
   if (!moved) return null;
-  const options = moved.dose.at.map((id) => VISITS.find((v) => v.id === id)?.label ?? id);
-  return `This dose's window also allows ${options.join(' or ')}; it landed here because that costs no extra shot or visit.`;
+  const earliest = visitLabel(moved.dose.at[0]);
+  const here = visitLabel(visitId);
+  return `Earliest due at ${earliest}; scheduled at ${here} instead to combine with another vaccine due at that visit, without an extra injection or visit.`;
 }
 
-function Shot({ shot, visitId, index }) {
+function Shot({ shot, visitId, index, placements }) {
   const sdm = isSdmShot(shot);
   const note = movedNote(shot.covers, visitId);
   return (
@@ -36,20 +42,30 @@ function Shot({ shot, visitId, index }) {
       <div className="shot-body">
         <div className="shot-nm">
           {shot.product.name}
+          {shot.product.commonName && <span className="tag valence">{shot.product.commonName}</span>}
           {shot.product.kind === 'combination' && <span className="tag combo">Combination</span>}
           {shot.product.route === 'oral' && <span className="tag oral">Oral</span>}
           {sdm && <span className="tag sdm">Shared decision</span>}
         </div>
+        {shot.covers.length > 1 && (
+          <p className="quiet combo-lede">
+            One injection, {shot.covers.length} vaccines — covers:
+          </p>
+        )}
         <div className="ants">
-          {shot.covers.map((c) => (
-            <span className={`ant${c.dose.booster ? ' boost' : ''}`} key={`${c.seriesKey}-${c.dose.n}`}>
-              <span className="a">{abbr(c.seriesKey)}</span>
-              <span className="d">
-                Dose {c.dose.n}
-                {c.dose.booster ? ' · booster' : ''}
+          {shot.covers.map((c) => {
+            const total = placements[c.seriesKey]?.doses.length;
+            return (
+              <span className={`ant${c.dose.booster ? ' boost' : ''}`} key={`${c.seriesKey}-${c.dose.n}`}>
+                <span className="a">{abbr(c.seriesKey)}</span>
+                <span className="d">
+                  Dose {c.dose.n}
+                  {total ? ` of ${total}` : ''}
+                  {c.dose.booster ? ' · booster' : ''}
+                </span>
               </span>
-            </span>
-          ))}
+            );
+          })}
         </div>
         {sdm && <div className="sdmline">{SERIES[shot.covers[0].seriesKey].sdm}</div>}
         {note && <div className="seriesnote">{note}</div>}
@@ -168,7 +184,13 @@ export default function Plan({ ticked, onAddProduct }) {
               </div>
               <div className="shots">
                 {allShots.map((shot, i) => (
-                  <Shot shot={shot} visitId={visit.id} index={i} key={`${shot.product.name}-${i}`} />
+                  <Shot
+                    shot={shot}
+                    visitId={visit.id}
+                    index={i}
+                    placements={plan.placements}
+                    key={`${shot.product.name}-${i}`}
+                  />
                 ))}
               </div>
             </div>
@@ -181,17 +203,23 @@ export default function Plan({ ticked, onAddProduct }) {
         <p>Products you don't stock, and how many injections each would save across the whole birth-to-18 plan.</p>
         <div className="sugg">
           {suggestions.length === 0 && <p>Nothing left to add would save an injection.</p>}
-          {suggestions.map(({ product, saves }) => (
-            <div className="sugg-row" key={product}>
-              <span className="s-nm">{product}</span>
-              <span className="s-win">
-                −{saves} injection{saves === 1 ? '' : 's'}
-              </span>
-              <button type="button" onClick={() => onAddProduct(product)}>
-                Add
-              </button>
-            </div>
-          ))}
+          {suggestions.map(({ product, saves }) => {
+            const commonName = PRODUCTS.find((p) => p.name === product)?.commonName;
+            return (
+              <div className="sugg-row" key={product}>
+                <span className="s-nm">
+                  {product}
+                  {commonName && <span className="tag valence">{commonName}</span>}
+                </span>
+                <span className="s-win">
+                  −{saves} injection{saves === 1 ? '' : 's'}
+                </span>
+                <button type="button" onClick={() => onAddProduct(product)}>
+                  Add
+                </button>
+              </div>
+            );
+          })}
         </div>
       </div>
     </main>

@@ -28,6 +28,9 @@
 | **"What you could add" ships** — the planner names products the clinic did *not* tick and says what stocking one would save. | 2026-09-25 |
 | **One update inbox per repo.** `docs/updates/INBOX.md` lives here; MeningoVax and PneumoVax keep their own. Each applied note names the other apps that owe the same change. | 2026-09-25 |
 | **Refines the row above:** when two visit choices cost the exact same number of shots, the app picks the one touching fewer checkups — free tidiness, never a shots-for-visits trade. There is still no toggle and no alternate plan shown; visit count remains display-only otherwise. | 2026-09-26 |
+| **Products are labeled by valence where that matters, not just by the shared series abbreviation.** Prevnar 20 and Vaxneuvance both cover "PCV," but PCV20 and PCV15 protect against different serotype sets and are not the same product — the checklist, schedule, and rulebook all now tag them `PCV20`/`PCV15`/`PCV13` instead of the ambiguous shared `PCV`. | 2026-09-26 |
+| **The schedule states each dose's total, not just its number** (e.g. "Hib Dose 1 of 4"), because a combination product can silently commit a whole series to a longer path — "Dose 1" alone doesn't say whether that's 1 of 3 or 1 of 4. A combination shot also gets a plain lead-in line ("One injection, 3 vaccines — covers:") before its antigen tags. | 2026-09-26 |
+| **Schedule notes use clinical scheduling language, not casual explanation** — e.g. "Earliest due at 1 month; scheduled at 2 months instead to combine with another vaccine due at that visit" rather than "it landed here because that costs no extra shot or visit" (owner feedback: the app is used by a clinician, not a lay reader). | 2026-09-26 |
 
 ## Found while mocking up
 

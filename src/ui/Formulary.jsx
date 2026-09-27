@@ -10,6 +10,11 @@ import { PRODUCTS } from '../data/products.js';
 import { SERIES } from '../data/series.js';
 
 function abbrsFor(product) {
+  // A product's commonName (e.g. Vaxneuvance = "PCV15", Prevnar 20 = "PCV20")
+  // says more than the shared series abbreviation ("PCV") — those two
+  // products protect against different sets of pneumococcal strains and are
+  // not the same vaccine, even though this app schedules them identically.
+  if (product.commonName) return product.commonName;
   return product.covers.map((c) => SERIES[c.series]?.abbr ?? c.series).join(' + ');
 }
 
