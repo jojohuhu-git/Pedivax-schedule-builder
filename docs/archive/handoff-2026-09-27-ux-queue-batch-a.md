@@ -1,3 +1,7 @@
+> **Superseded** by
+> [handoff-2026-09-26-ux-queue-batch-b.md](handoff-2026-09-26-ux-queue-batch-b.md) — PR #1
+> is merged and Batch B is also done. Resume from that file instead.
+
 # Pedivax Schedule Builder — Handoff after UX copy queue Batch A (2026-09-27)
 
 Branch: `fix/ux-copy-queue-batch-a`, off `main`. **Pushed** and PR open:
