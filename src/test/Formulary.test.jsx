@@ -214,4 +214,36 @@ describe('Formulary', () => {
       expect(screen.getByText('Single vaccines')).toBeInTheDocument();
     });
   });
+
+  // F1 — one-tap starting formularies, offered only before anything is ticked
+  describe('starting presets (F1)', () => {
+    it('offers both presets when nothing is ticked yet', () => {
+      render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} onApplyPreset={() => {}} />);
+      expect(screen.getByText('Start from a typical formulary:')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Single-brand basics/ })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Fewest injections/ })).toBeInTheDocument();
+    });
+
+    it('disappears once a clinic has its own formulary going', () => {
+      render(
+        <Formulary
+          ticked={new Set(['Engerix-B'])}
+          onToggle={() => {}}
+          onReset={() => {}}
+          onApplyPreset={() => {}}
+        />
+      );
+      expect(screen.queryByText('Start from a typical formulary:')).not.toBeInTheDocument();
+    });
+
+    it('applies the preset\'s product list when tapped', async () => {
+      const onApplyPreset = vi.fn();
+      render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} onApplyPreset={onApplyPreset} />);
+      await userEvent.click(screen.getByRole('button', { name: /Single-brand basics/ }));
+      expect(onApplyPreset).toHaveBeenCalledTimes(1);
+      const [products] = onApplyPreset.mock.calls[0];
+      expect(products).toContain('Engerix-B');
+      expect(products).toContain('MenQuadfi');
+    });
+  });
 });

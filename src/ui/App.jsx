@@ -122,6 +122,14 @@ export default function App() {
     setLastCleared(null);
   };
 
+  // F1: a one-tap starting formulary, then edited by hand from there.
+  const applyPreset = (names) => {
+    setLastCleared(null);
+    const next = new Set(names);
+    showTickDelta(injectionsFor(ticked), injectionsFor(next));
+    setTicked(next);
+  };
+
   return (
     <>
       <header>
@@ -177,6 +185,7 @@ export default function App() {
             justCleared={lastCleared !== null}
             onUndoReset={undoReset}
             tickDelta={tickDelta}
+            onApplyPreset={applyPreset}
           />
           <Plan ticked={ticked} onAddProduct={add} />
         </div>

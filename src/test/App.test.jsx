@@ -62,3 +62,14 @@ describe('App — F4 shows the effect of a tick', () => {
     expect(screen.queryByText(/→/)).not.toBeInTheDocument();
   });
 });
+
+describe('App — F1 starting presets', () => {
+  it('ticks every product in the preset and reports the injection-count effect, end to end', async () => {
+    render(<App />);
+    await userEvent.click(screen.getByRole('button', { name: /Single-brand basics/ }));
+    expect(screen.getByRole('checkbox', { name: /Engerix-B/ })).toBeChecked();
+    expect(screen.getByRole('checkbox', { name: /MenQuadfi/ })).toBeChecked();
+    expect(screen.getByText('0 → 32 injections')).toBeInTheDocument();
+    expect(screen.queryByText('Start from a typical formulary:')).not.toBeInTheDocument();
+  });
+});

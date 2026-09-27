@@ -21,6 +21,9 @@
 import { useState } from 'react';
 import { PRODUCTS } from '../data/products.js';
 import { SERIES } from '../data/series.js';
+import { PRESETS } from '../data/presets.js';
+import { buildPlan } from '../logic/plan.js';
+import { scorePlan } from '../logic/score.js';
 
 // C2: row order copied live from the CDC 2025 child/adolescent immunization
 // schedule table (docs/updates/sources/2026-09-26-cdc2025-schedule-table-row-
@@ -118,7 +121,15 @@ function ProductCheck({ product, ticked, onToggle }) {
   );
 }
 
-export default function Formulary({ ticked, onToggle, onReset, justCleared, onUndoReset, tickDelta }) {
+export default function Formulary({
+  ticked,
+  onToggle,
+  onReset,
+  justCleared,
+  onUndoReset,
+  tickDelta,
+  onApplyPreset,
+}) {
   const [open, setOpen] = useState(false);
   const active = PRODUCTS.filter((p) => !p.retired);
   const singles = active.filter((p) => p.kind !== 'combination');
@@ -179,6 +190,32 @@ export default function Formulary({ ticked, onToggle, onReset, justCleared, onUn
             </button>
           )}
         </div>
+        {/* F1: opening the app fresh showed 0 injections and every antigen
+            in red — a one-tap starting point fixes the first impression;
+            the clinician edits from there, same as ticking by hand. Only
+            offered before anything is ticked — once a clinic has its own
+            formulary going, a "starting point" isn't the right offer. */}
+        {ticked.size === 0 && (
+          <div className="presets">
+            <p className="presets-lede">Start from a typical formulary:</p>
+            {PRESETS.map((preset) => {
+              const injections = scorePlan(buildPlan(new Set(preset.products))).injections;
+              return (
+                <button
+                  type="button"
+                  className="preset-row"
+                  key={preset.id}
+                  onClick={() => onApplyPreset(preset.products)}
+                >
+                  <span className="preset-nm">{preset.label}</span>
+                  <span className="preset-desc">
+                    {preset.description} {injections} injections.
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
         <div className="fml-section">
           <div className="fml-section-t">Single vaccines</div>
           {singleGroups.map((g) => (
