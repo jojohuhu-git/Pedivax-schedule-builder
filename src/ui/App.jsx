@@ -44,6 +44,10 @@ function initialFormulary() {
 export default function App() {
   const [ticked, setTicked] = useState(initialFormulary);
   const [view, setView] = useState('plan');
+  // F6: Reset used to wipe the formulary with no way back. `lastCleared`
+  // holds what Reset just cleared so Formulary can offer Undo in its place;
+  // any tick afterwards means the clinician has moved on, so it's dropped.
+  const [lastCleared, setLastCleared] = useState(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -59,6 +63,7 @@ export default function App() {
   }, [ticked]);
 
   const toggle = (name) => {
+    setLastCleared(null);
     setTicked((prev) => {
       const next = new Set(prev);
       if (next.has(name)) next.delete(name);
@@ -68,10 +73,21 @@ export default function App() {
   };
 
   const add = (name) => {
+    setLastCleared(null);
     setTicked((prev) => (prev.has(name) ? prev : new Set(prev).add(name)));
   };
 
-  const reset = () => setTicked(new Set());
+  const reset = () => {
+    if (ticked.size === 0) return;
+    setLastCleared(ticked);
+    setTicked(new Set());
+  };
+
+  const undoReset = () => {
+    if (!lastCleared) return;
+    setTicked(lastCleared);
+    setLastCleared(null);
+  };
 
   return (
     <>
@@ -121,7 +137,13 @@ export default function App() {
 
       {view === 'plan' ? (
         <div className="wrap">
-          <Formulary ticked={ticked} onToggle={toggle} onReset={reset} />
+          <Formulary
+            ticked={ticked}
+            onToggle={toggle}
+            onReset={reset}
+            justCleared={lastCleared !== null}
+            onUndoReset={undoReset}
+          />
           <Plan ticked={ticked} onAddProduct={add} />
         </div>
       ) : (

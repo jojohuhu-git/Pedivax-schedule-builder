@@ -185,19 +185,22 @@ h1 {
   }
 }
 
+/* F7 (2026-09-26 UX queue, Batch F): no independent scroll box. The rail
+   used to cap its own height and scroll internally, so the mouse wheel did
+   different things depending on which side of the page the pointer sat on.
+   `position: sticky` alone still keeps the checklist in view while it fits,
+   then scrolls with the page like everything else once the page scrolls
+   past it — one scrollbar for the whole app. */
 .rail {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--r);
   position: sticky;
   top: 12px;
-  max-height: calc(100vh - 28px);
-  overflow-y: auto;
 }
 @media (max-width: 860px) {
   .rail {
     position: static;
-    max-height: none;
   }
 }
 
@@ -252,6 +255,12 @@ h1 {
 .rail-head h2 {
   font-size: 14px;
   font-weight: 600;
+}
+.rail-head h2 .quiet {
+  display: inline;
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 400;
 }
 .linkbtn {
   background: none;

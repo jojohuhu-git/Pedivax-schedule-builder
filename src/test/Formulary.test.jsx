@@ -39,6 +39,30 @@ describe('Formulary', () => {
     expect(onReset).toHaveBeenCalled();
   });
 
+  // F6 — the heading states how many of the 30 active products are ticked
+  it('states how many of the active products are stocked in the heading (F6)', () => {
+    render(<Formulary ticked={new Set(['Engerix-B', 'RotaTeq'])} onToggle={() => {}} onReset={() => {}} />);
+    const total = PRODUCTS.filter((p) => !p.retired).length;
+    expect(screen.getByText(`· 2 of ${total} stocked`)).toBeInTheDocument();
+  });
+
+  // F6 — Reset used to wipe the formulary with no way back
+  it('shows Undo reset instead of Reset once the formulary has just been cleared (F6)', async () => {
+    const onUndoReset = vi.fn();
+    render(
+      <Formulary
+        ticked={new Set()}
+        onToggle={() => {}}
+        onReset={() => {}}
+        justCleared
+        onUndoReset={onUndoReset}
+      />
+    );
+    expect(screen.queryByRole('button', { name: 'Reset' })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Undo reset' }));
+    expect(onUndoReset).toHaveBeenCalled();
+  });
+
   it('labels Prevnar 20 and Vaxneuvance by valence, not the shared PCV abbreviation — they protect against different serotypes and are not the same product', () => {
     render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} />);
     expect(screen.getByText('PCV20')).toBeInTheDocument();

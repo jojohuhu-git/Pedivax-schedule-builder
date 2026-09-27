@@ -118,7 +118,7 @@ function ProductCheck({ product, ticked, onToggle }) {
   );
 }
 
-export default function Formulary({ ticked, onToggle, onReset }) {
+export default function Formulary({ ticked, onToggle, onReset, justCleared, onUndoReset }) {
   const [open, setOpen] = useState(false);
   const active = PRODUCTS.filter((p) => !p.retired);
   const singles = active.filter((p) => p.kind !== 'combination');
@@ -156,10 +156,18 @@ export default function Formulary({ ticked, onToggle, onReset }) {
       </button>
       <div className="rail-body" id="rail-body">
         <div className="rail-head">
-          <h2>Your formulary</h2>
-          <button className="linkbtn" type="button" onClick={onReset}>
-            Reset
-          </button>
+          <h2>
+            Your formulary <span className="quiet">· {n} of {active.length} stocked</span>
+          </h2>
+          {justCleared ? (
+            <button className="linkbtn" type="button" onClick={onUndoReset}>
+              Undo reset
+            </button>
+          ) : (
+            <button className="linkbtn" type="button" onClick={onReset}>
+              Reset
+            </button>
+          )}
         </div>
         <div className="fml-section">
           <div className="fml-section-t">Single vaccines</div>
