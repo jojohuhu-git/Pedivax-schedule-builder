@@ -161,6 +161,40 @@ describe('buildPlan — PedvaxHIB stocked with no DTaP/IPV combination product',
   });
 });
 
+describe('buildPlan — PedvaxHIB and Vaxelis both stocked (A: Hib booster fix)', () => {
+  // Finding 1 (docs/archive/handoff-2026-09-28-brand-indication-airtight-queue.md):
+  // PedvaxHIB used to cover only Hib doses [1,3], so it could never serve the
+  // 12-15 month booster (dose 4) of the mixed/PRP-T 4-dose path. With no
+  // product able to fill that slot, plan.js fell back to the all-PedvaxHIB
+  // 3-dose path — forcing a dedicated PedvaxHIB shot at every visit while
+  // Vaxelis's own Hib content rode along uncounted, delivering Hib 6 times
+  // for a plan that claimed 3 doses. PedvaxHIB is a monovalent Hib product
+  // (not a DTaP-IPV-Hib-HepB combo), so it is an acceptable booster per
+  // immunize.org and Merck's own interchangeability guidance — it should
+  // cover doses [1,4].
+  const plan = buildPlan(new Set(['PedvaxHIB', 'Vaxelis']));
+
+  it('counts exactly 4 Hib doses, matching the 4-dose mixed-brand path Vaxelis commits the series to', () => {
+    const hibDoses = plan.visits
+      .flatMap((v) => v.injections.flatMap((i) => i.covers))
+      .filter((c) => c.seriesKey === 'Hib');
+    expect(hibDoses.map((d) => d.dose.n).sort()).toEqual([1, 2, 3, 4]);
+  });
+
+  it('lets PedvaxHIB serve the 12-15 month Hib booster instead of forcing a redundant all-PedvaxHIB path', () => {
+    const m15 = plan.visits.find((v) => v.visit.id === 'm15');
+    const booster = m15.injections.find((i) =>
+      i.covers.some((c) => c.seriesKey === 'Hib' && c.dose.n === 4),
+    );
+    expect(booster?.product.name).toBe('PedvaxHIB');
+  });
+
+  it('drops to 4 total injections (no dedicated PedvaxHIB shot at m2/m4 riding alongside Vaxelis)', () => {
+    const totalInjections = plan.visits.reduce((sum, v) => sum + v.injections.length, 0);
+    expect(totalInjections).toBe(4);
+  });
+});
+
 describe('buildPlan — nothing stocked', () => {
   const plan = buildPlan(new Set());
 

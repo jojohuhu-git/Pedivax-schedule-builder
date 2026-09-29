@@ -179,7 +179,13 @@ export const PRODUCTS = [
     group: 'Hib',
     kind: 'single',
     route: 'injection',
-    covers: [{ series: 'Hib', doses: [1, 3] }],
+    // Doses [1,4], not [1,3]: PedvaxHIB is a monovalent Hib product (not a
+    // DTaP-IPV-Hib-HepB combo), so per immunize.org it is an acceptable
+    // booster too. Without dose 4 covered here, a mixed PedvaxHIB+Vaxelis
+    // formulary had no product left to fill the 4-dose path's booster slot
+    // and silently fell back to an all-PedvaxHIB 3-dose plan while Vaxelis's
+    // own Hib content rode along uncounted (handoff-2026-09-28, Finding 1).
+    covers: [{ series: 'Hib', doses: [1, 4] }],
     minAgeDays: 42,
     maxAgeDays: null,
     insertMinAgeDays: 42,
