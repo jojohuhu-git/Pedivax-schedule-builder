@@ -1,3 +1,10 @@
+> **STATUS 2026-09-29: this queue is FULLY CONSUMED. Do not resume it.**
+> All five items are done and merged: A (PR #11), B (PR #13), C (PR #14), D (PR #16),
+> E (PR #17). 679 tests passing. Item E's own writeup, including the two defects it
+> surfaced and the authority-pin reasoning for Penmenvy, is in
+> `handoff-2026-09-29-item-e-pentavalent-done.md` — read that, not this file, if you are
+> picking up where this left off.
+
 # Pedivax Schedule Builder — Handoff: brand-indication airtightness queue (2026-09-28)
 
 > This is a **new queue**, not a resumption. The previous handoff
