@@ -1,8 +1,16 @@
-// The single gate. "May THIS product give THIS dose of THIS series at THIS
-// visit?" is answered here and nowhere else — no screen, and no other logic
-// file, may ask that question itself (docs/data-design.md). Mirrors
-// `brandRules.js` in vaxapp, which exists for the same reason: local brand
-// checks scattered across surfaces drift apart.
+// The single gate. Two questions are answered here and nowhere else — no
+// screen, and no other logic file, may ask either of them itself
+// (docs/data-design.md):
+//
+//   1. "May THIS product give THIS dose of THIS series at THIS visit?"
+//      — `canCover`, below.
+//   2. "May this product be given at this visit at all, given that a
+//      syringe delivers everything in it?" — `deliverableAt`, at the foot
+//      of this file. That is the rule that makes a pentavalent usable only
+//      when MenACWY and MenB are both due the same day.
+//
+// Mirrors `brandRules.js` in vaxapp, which exists for the same reason:
+// local brand checks scattered across surfaces drift apart.
 //
 // Checks run in this order (docs/data-design.md's own list):
 //   1. the product is stocked and not retired
@@ -23,6 +31,8 @@
 //      dose can shift (to catch a combination product) and change which of
 //      several nominal visits is actually legal
 //
+import { PRODUCTS } from '../data/products.js';
+
 // `dose` is the resolved dose definition for this dose number — either a
 // plain series' `doses[n-1]`, or (for Hib/RV/MenB) the chosen variant's
 // `doses[n-1]` from seriesLength.js. `prevVisit` is the visit where the
@@ -110,4 +120,82 @@ export function doseWindowOk(dose, visit, prevVisit) {
     }
   }
   return { ok: true };
+}
+
+
+// ── The whole-syringe gate ────────────────────────────────────────────────
+//
+// `canCover` above answers a one-series question. This answers the other
+// half of the same gate, and it has to live here rather than in a screen or
+// in plan.js for the reason this file exists at all: it is the rule most
+// likely to be re-derived somewhere else and drift. Moved here from
+// plan.js on 2026-09-29 (item E) because the pentavalents made it a
+// clinical rule in its own right rather than an internal scoring detail —
+// the owner's standing instruction is that Penbraya/Penmenvy may be used
+// ONLY when MenACWY and MenB are both due the same clinic day, and in
+// MeningoVax that rule lives in recommend.js with a second copy in the
+// validator and has regressed repeatedly. Here there is one copy.
+//
+// A syringe delivers everything in it. `product.covers` is the product's
+// actual antigen content (Pentacel's three entries ARE DTaP + IPV + Hib),
+// so giving a product at a visit gives the child every one of those
+// antigens — whether or not the planner picked the product for them. The
+// invariant (docs/decisions.md, item B of the 2026-09-28 queue):
+//
+//   Every antigen delivered must be a planned, counted dose of that series.
+//   Nothing else may be delivered at all.
+//
+// So a product is offerable at a visit only if EVERY series it contains has
+// a dose due at that visit which this product may legally give. One antigen
+// with nothing due — Pentacel's Hib at the 4-year visit once the Hib series
+// is finished, or a pentavalent's MenB half at the 11-year visit where only
+// MenACWY is due — disqualifies the whole product, because there is no way
+// to give the part the planner wanted without also giving the part it
+// didn't. Before this rule the planner scored only the doses it
+// deliberately picked a product for, so it could "save an injection" and
+// quietly add a dose that appeared nowhere on the schedule.
+//
+// `allAntigensMustBeDue` is the mandatory declaration item E asked for: a
+// product containing more than one antigen must say, in its own data, that
+// this rule applies to it. It is not a toggle — there is no useful `false`,
+// since a real combination vaccine cannot be split in the syringe — it is
+// an acknowledgement, and it is load-bearing rather than documentation: an
+// undeclared combination is refused outright here, so the next
+// Penbraya-like product added without it fails loudly instead of quietly
+// being allowed to deliver an uncounted antigen. pentavalent.test.js fails
+// the suite for any such product, naming it.
+//
+// Returns one entry per offerable product: `covers` is exactly the set of
+// due doses that product would deliver — its whole content, nothing less.
+export function deliverableAt(items, ticked) {
+  const dueBySeries = new Map(items.map((item) => [item.seriesKey, item]));
+  return PRODUCTS.filter((p) => ticked.has(p.name) && !p.retired)
+    .map((product) => {
+      if (product.covers.length > 1 && product.allAntigensMustBeDue !== true) {
+        return null; // undeclared combination — see the note above
+      }
+      const covers = [];
+      for (const content of product.covers) {
+        const item = dueBySeries.get(content.series);
+        if (!item) return null; // antigen in the syringe with no dose due here
+        if (item.allowedProducts && !item.allowedProducts.has(product.name)) return null;
+        const verdict = canCover({
+          product,
+          ticked,
+          seriesKey: item.seriesKey,
+          dose: item.dose,
+          visit: item.visit,
+          prevVisit: item.prevVisit,
+        });
+        if (!verdict.ok) return null;
+        covers.push(item);
+      }
+      if (!covers.length) return null;
+      // Report the doses in the order this visit lists them, not the order
+      // the product's antigens happen to be written in — the schedule
+      // screen prints this list, and its reading order shouldn't depend on
+      // how a product entry was typed.
+      return { product, covers: items.filter((item) => covers.includes(item)) };
+    })
+    .filter(Boolean);
 }

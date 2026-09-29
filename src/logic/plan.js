@@ -14,9 +14,10 @@
 //
 // The search stays small because of the data's own shape: only a handful of
 // doses across all 13 series have more than one nominal `at` visit, and only
-// two small groups of series ever share a combination product — DTaP/IPV/
-// Hib/HepB (Pediarix, Pentacel, Vaxelis, Kinrix, Quadracel) and MMR/VAR
-// (ProQuad). Series outside a shared-product group can't have their visit
+// three small groups of series ever share a combination product — DTaP/IPV/
+// Hib/HepB (Pediarix, Pentacel, Vaxelis, Kinrix, Quadracel), MMR/VAR
+// (ProQuad), and MenACWY/MenB (Penbraya, Penmenvy — added 2026-09-29 with
+// item E). Series outside a shared-product group can't have their visit
 // choice change the injection count at all (no product would ever cover two
 // of their doses at once), so they're searched the same way — as a
 // cluster of one — and it's cheap: the exhaustive per-cluster search below
@@ -24,8 +25,8 @@
 import { SERIES } from '../data/series.js';
 import { PRODUCTS } from '../data/products.js';
 import { VISITS, VISIT_INDEX } from '../data/visits.js';
-import { resolveSeriesLength } from './seriesLength.js';
-import { canCover, doseWindowOk } from './cover.js';
+import { resolveSeriesLength, familyChoiceNote } from './seriesLength.js';
+import { deliverableAt, doseWindowOk } from './cover.js';
 
 function visitById(id) {
   return VISITS[VISIT_INDEX[id]];
@@ -128,7 +129,14 @@ function clusterVariantOptions(seriesKey, ticked) {
         (!v.requiresAllDosesFrom || v.requiresAllDosesFrom.some((name) => ticked.has(name)))
     )
     .sort((a, b) => a.doseCount - b.doseCount);
-  const ordered = [...eligible, fallback];
+  // MenB is the one variant-bearing series with NO fallback variant: its
+  // two paths are two brand families, and a clinic stocking neither has no
+  // MenB series at all rather than a default one (seriesLength.js says the
+  // same, and buildPlan reports it as `unresolved`). Until item E this
+  // function was only ever reached by Hib/HepB/IPV, which all have a
+  // fallback, so appending it unconditionally was safe; the pentavalents
+  // put MenACWY and MenB in one cluster and brought MenB through here.
+  const ordered = fallback ? [...eligible, fallback] : eligible;
   return ordered.map((v) => ({
     variant: v,
     doses: v.doses,
@@ -138,60 +146,13 @@ function clusterVariantOptions(seriesKey, ticked) {
   }));
 }
 
-// A syringe delivers everything in it. `product.covers` is the product's
-// actual antigen content (Pentacel's three entries ARE DTaP + IPV + Hib),
-// so giving a product at a visit gives the child every one of those
-// antigens — whether or not the planner picked the product for them.
-//
-// The invariant this function exists to enforce (docs/decisions.md, item B
-// of the 2026-09-28 brand-indication queue):
-//
-//   Every antigen delivered must be a planned, counted dose of that series.
-//   Nothing else may be delivered at all.
-//
-// So a product is offerable at a visit only if EVERY series it contains has
-// a dose due at that visit which this product may legally give. One antigen
-// with nothing due — Pentacel's Hib at the 4-year visit, once the Hib series
-// is finished — disqualifies the whole product, because there is no way to
-// give the part the planner wanted without also giving the part it didn't.
-//
-// Before this rule the planner scored only the doses it deliberately picked
-// a product for, so it could "save an injection" by using a combination
-// product and quietly adding a 5th DTaP, IPV or Hib dose that appeared
-// nowhere on the schedule. Those plans are now unscoreable rather than
-// merely wrong, which is why this lives here and not in a detector.
-//
-// Returns one entry per offerable product: `covers` is exactly the set of
-// due doses that product would deliver — its whole content, nothing less.
-function deliverableAt(items, ticked) {
-  const dueBySeries = new Map(items.map((item) => [item.seriesKey, item]));
-  return PRODUCTS.filter((p) => ticked.has(p.name) && !p.retired)
-    .map((product) => {
-      const covers = [];
-      for (const content of product.covers) {
-        const item = dueBySeries.get(content.series);
-        if (!item) return null; // antigen in the syringe with no dose due here
-        if (item.allowedProducts && !item.allowedProducts.has(product.name)) return null;
-        const verdict = canCover({
-          product,
-          ticked,
-          seriesKey: item.seriesKey,
-          dose: item.dose,
-          visit: item.visit,
-          prevVisit: item.prevVisit,
-        });
-        if (!verdict.ok) return null;
-        covers.push(item);
-      }
-      if (!covers.length) return null;
-      // Report the doses in the order this visit lists them, not the order
-      // the product's antigens happen to be written in — the schedule
-      // screen prints this list, and its reading order shouldn't depend on
-      // how a product entry was typed.
-      return { product, covers: items.filter((item) => covers.includes(item)) };
-    })
-    .filter(Boolean);
-}
+// The whole-syringe question — "may this product be given here at all,
+// given that a syringe delivers everything in it?" — used to live right
+// here. Item E (2026-09-29) moved it into cover.js beside `canCover`: it
+// is a clinical rule, not a scoring detail (it is what makes a pentavalent
+// usable only when MenACWY and MenB are both due the same day), and the
+// gate file is where this app keeps the rules that must never be
+// re-derived anywhere else. Nothing about the behaviour changed.
 
 // Fewest products that deliver the most of `items`, where every chosen
 // product delivers its whole content and no two chosen products share a
@@ -497,6 +458,16 @@ export function buildPlan(ticked, { objective = 'injections' } = {}) {
     if (!placements[key]) continue;
     const actualDoseCount = placements[key].doses.length;
     if (r.doseCount === actualDoseCount) {
+      // Same dose count, but possibly not the same variant: MenB's two
+      // brand families are both 2 doses, so the search can move to the
+      // other one (because it closes the series where the preferred one
+      // leaves a gap at 17 years) without changing the count. Re-derive
+      // the sentence from the family actually used — resolveSeriesLength's
+      // copy would name the wrong one (item E, 2026-09-29).
+      if (placements[key].variant && placements[key].variant !== r.variant) {
+        seriesNotes[key] = familyChoiceNote(SERIES[key], ticked, placements[key].variant);
+        continue;
+      }
       if (r.note) seriesNotes[key] = r.note;
       continue;
     }

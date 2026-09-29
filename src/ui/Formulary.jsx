@@ -78,6 +78,10 @@ const COMBO_VISIT_GROUPS = [
   { id: 'infant', label: 'For the 2, 4 and 6 month visits' },
   { id: 'toddler', label: 'For 12 months and 4 years' },
   { id: 'booster', label: 'For the 4-to-6 year booster' },
+  // Item E, 2026-09-29: the pentavalent MenABCWY products. They serve the
+  // 16-year visit specifically — the one day a MenACWY dose and a MenB dose
+  // are both due — which is also the only day they may be used at all.
+  { id: 'adolescent', label: 'For the 16 year visit' },
 ];
 
 // C5: the per-product sub-line is noise on a single vaccine sitting under a

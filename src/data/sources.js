@@ -121,6 +121,39 @@ export const SOURCES = {
     snapshot: '2026-09-25-menb.md',
     tier: 'insert',
   },
+  // The pentavalent MenABCWY products (item E, 2026-09-29). Snapshot:
+  // docs/updates/sources/2026-09-29-pentavalent-menabcwy.md.
+  //
+  // No `insert*` source here on purpose: both MMWRs state the FDA licence
+  // themselves ("licensed for use among persons aged 10-25 years"), so the
+  // licensed range is recorded from an organization-tier read rather than
+  // from a DailyMed URL nobody on this branch actually fetched.
+  cdc2025PentavalentNotes: {
+    label: 'CDC Child Immunization Schedule Notes, 2025 \u2014 pentavalent MenABCWY (Penbraya)',
+    edition: 'last reviewed July 2, 2025',
+    url: 'https://www.cdc.gov/vaccines/hcp/imz-schedules/child-adolescent-notes.html',
+    snapshot: '2026-09-29-pentavalent-menabcwy.md',
+    tier: 'organization',
+  },
+  acipPenbraya2024: {
+    label:
+      'ACIP: Pfizer pentavalent MenACWY-TT/MenB-FHbp (Penbraya), persons aged 10\u201325 years',
+    edition: 'MMWR 2024;73(15), published April 18, 2024',
+    url: 'https://www.cdc.gov/mmwr/volumes/73/wr/mm7315a4.htm',
+    snapshot: '2026-09-29-pentavalent-menabcwy.md',
+    tier: 'organization',
+  },
+  acipPenmenvy2025: {
+    // ACIP acted 16 April 2025 \u2014 before the mid-2025 cutoff this app is
+    // pinned to; only the MMWR write-up is later. The snapshot explains why
+    // that keeps Penmenvy inside the pin.
+    label:
+      'ACIP: GSK pentavalent MenACWY-CRM/MenB-4C (Penmenvy), persons aged 10\u201325 years',
+    edition: 'ACIP recommendation April 16, 2025; MMWR 2026;75(1), published January 8, 2026',
+    url: 'https://www.cdc.gov/mmwr/volumes/75/wr/mm7501a2.htm',
+    snapshot: '2026-09-29-pentavalent-menabcwy.md',
+    tier: 'organization',
+  },
   insertTrumenba: {
     label: 'Trumenba package insert (DailyMed)',
     edition: 'label revision 1/2026',
