@@ -207,6 +207,18 @@ years **and** at least 6 months after dose 3).
   shaped sentence in `facts[]` with no matching entry here fails the suite, and vice
   versa) and a **reason-code test** (for each entry, `cover.js` must refuse *for that
   reason*, isolated from every numeric coincidence that happens to reach the same answer).
+  **Item D, 2026-09-29:** `Rulebook.jsx`'s `boosterNotes()` prints each entry with its
+  citation (the source it names) instead of leaving the reader to find a matching fact by
+  eye, and both functions are exported so `one-source-of-truth.test.js` can call the same
+  code the page renders — not just re-read `products.js` — to prove a restriction is
+  printed if and only if `cover.js` enforces it.
+- **`insertMinAgeDays`/`insertMaxAgeDays`** — the package-insert age range, recorded
+  alongside the CDC/ACIP-governed `minAgeDays`/`maxAgeDays` that `cover.js` actually
+  enforces, so a gap between the two (Rotarix, RotaTeq: both inserts want the series
+  finished earlier than CDC/ACIP requires) can be shown programmatically rather than
+  resting on a hand-written fact that could drift from the fields. `Rulebook.jsx`'s
+  `insertGapNotes()` (item D) prints a line whenever they diverge; `one-source-of-
+  truth.test.js` checks it fires exactly when they diverge, no more and no less.
 - **`retired`** — products are retired, never deleted, so old printed plans stay
   explainable. A retired product is hidden from the tick list and still shown in the
   rulebook.

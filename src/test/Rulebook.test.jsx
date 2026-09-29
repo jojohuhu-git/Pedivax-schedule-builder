@@ -61,4 +61,47 @@ describe('Rulebook', () => {
     const headings = [...container.querySelectorAll('.rule-series h2')].map((h) => h.textContent);
     expect(headings[headings.length - 1]).toContain('Meningococcal B');
   });
+
+  it('prints Pentacel\'s booster restriction with a clickable citation to its source, not just the sentence (item D)', () => {
+    render(<Rulebook />);
+    // Pentacel covers both DTaP and IPV, so the SeriesRule for each prints
+    // its own ProductRule card — same sentence appears once per series.
+    const sentences = screen.getAllByText(
+      'Pentacel may not be used as the booster dose for: DTaP, IPV, from the 4 years visit on.'
+    );
+    expect(sentences.length).toBeGreaterThan(0);
+    for (const sentence of sentences) {
+      const link = sentence.parentElement.querySelector('a');
+      expect(link).not.toBeNull();
+      expect(link.href).toContain('immunize.org');
+    }
+  });
+
+  it('prints Vaxelis\'s never-a-booster restriction with its own citation', () => {
+    render(<Rulebook />);
+    const sentences = screen.getAllByText('Vaxelis may not be used as the booster dose for: DTaP, IPV, Hib.');
+    expect(sentences.length).toBeGreaterThan(0);
+    for (const sentence of sentences) {
+      expect(sentence.parentElement.querySelector('a')).not.toBeNull();
+    }
+  });
+
+  it('shows the insert-vs-CDC/ACIP age gap for RotaTeq and Rotarix, not just inside a fact quote (item D)', () => {
+    render(<Rulebook />);
+    expect(
+      screen.getByText(
+        'Package insert allows RotaTeq only through 32 weeks; this app follows CDC/ACIP, which allows it through 8 months instead.'
+      )
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Package insert allows Rotarix only through 24 weeks; this app follows CDC/ACIP, which allows it through 8 months instead.'
+      )
+    ).toBeInTheDocument();
+  });
+
+  it('prints no insert-age-gap line for a product whose insert and CDC/ACIP ranges already agree', () => {
+    const { container } = render(<Rulebook />);
+    expect(container.querySelectorAll('.insert-gap').length).toBe(2);
+  });
 });

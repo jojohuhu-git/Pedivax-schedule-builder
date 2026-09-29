@@ -61,22 +61,28 @@ function coverageLine(product) {
 
 // A written restriction may apply from birth (Vaxelis: never the booster) or
 // only from some age on (Pentacel: fine as the 15-month booster, barred from
-// the 4-6-year one) — grouped by that age so products with the same age
-// floor across several series print one sentence, not one per series.
-function boosterNotes(product) {
-  const bySeries = new Map();
+// the 4-6-year one) — grouped by (age, source) so products with the same age
+// floor and citation across several series print one sentence, not one per
+// series. Exported so one-source-of-truth.test.js can check this function's
+// own output against `restrictions[]` and `cover.js`, not just the data.
+export function boosterNotes(product) {
+  const grouped = new Map();
   for (const r of product.restrictions ?? []) {
     if (r.rule !== 'not-booster') continue;
-    const key = r.minAgeDays ?? 'always';
-    if (!bySeries.has(key)) bySeries.set(key, []);
-    bySeries.get(key).push(SERIES[r.series]?.abbr ?? r.series);
+    const key = `${r.minAgeDays ?? 'always'}|${r.source}`;
+    if (!grouped.has(key)) {
+      grouped.set(key, { minAgeDays: r.minAgeDays, source: r.source, seriesKeys: [] });
+    }
+    grouped.get(key).seriesKeys.push(r.series);
   }
-  return [...bySeries.entries()].map(([ageDays, series]) => {
-    const who = series.join(', ');
-    return ageDays === 'always'
-      ? `${product.name} may not be used as the booster dose for: ${who}.`
-      : `${product.name} may not be used as the booster dose for: ${who}, from the ` +
-          `${visitAtAge(ageDays)} visit on.`;
+  return [...grouped.values()].map(({ minAgeDays, source, seriesKeys }) => {
+    const who = seriesKeys.map((k) => SERIES[k]?.abbr ?? k).join(', ');
+    const text =
+      minAgeDays == null
+        ? `${product.name} may not be used as the booster dose for: ${who}.`
+        : `${product.name} may not be used as the booster dose for: ${who}, from the ` +
+            `${visitAtAge(minAgeDays)} visit on.`;
+    return { text, source, minAgeDays, seriesKeys };
   });
 }
 
@@ -84,11 +90,49 @@ function visitAtAge(ageDays) {
   return VISITS.find((v) => v.ageDays === ageDays)?.label ?? `day ${ageDays}`;
 }
 
+// The insert is often older or narrower than current CDC/ACIP guidance
+// (CLAUDE.md); products.js records both the governed range `cover.js`
+// actually enforces (minAgeDays/maxAgeDays) and the insert's own
+// (insertMinAgeDays/insertMaxAgeDays) precisely so this gap can be shown
+// programmatically instead of resting on a hand-written fact that could
+// drift from the fields. Exported for the same reason as boosterNotes.
+export function insertGapNotes(product) {
+  const notes = [];
+  if (product.insertMinAgeDays != null && product.insertMinAgeDays !== product.minAgeDays) {
+    notes.push({
+      bound: 'min',
+      text:
+        `Package insert does not start ${product.name} before ${humanAge(product.insertMinAgeDays)}; ` +
+        `this app follows CDC/ACIP, which allows it from ${humanAge(product.minAgeDays)}.`,
+    });
+  }
+  if (product.insertMaxAgeDays != null && product.insertMaxAgeDays !== product.maxAgeDays) {
+    notes.push({
+      bound: 'max',
+      text:
+        `Package insert allows ${product.name} only through ${humanAge(product.insertMaxAgeDays)}; ` +
+        `this app follows CDC/ACIP, which allows it through ${humanAge(product.maxAgeDays)} instead.`,
+    });
+  }
+  return notes;
+}
+
+function humanAge(days) {
+  if (days === 0) return 'birth';
+  if (days % 7 === 0) {
+    const weeks = days / 7;
+    return `${weeks} week${weeks === 1 ? '' : 's'}`;
+  }
+  const months = Math.round(days / 30.4);
+  return `${months} month${months === 1 ? '' : 's'}`;
+}
+
 function ProductRule({ product }) {
   const lengthNotes = Object.entries(product.setsSeriesLength ?? {}).map(
     ([key, n]) => `Using ${product.name} commits ${SERIES[key]?.abbr ?? key} to a ${n}-dose series.`
   );
   const boosterLines = boosterNotes(product);
+  const insertGapLines = insertGapNotes(product);
 
   return (
     <div className="rule-product">
@@ -105,9 +149,24 @@ function ProductRule({ product }) {
           {n}
         </p>
       ))}
-      {boosterLines.map((n) => (
-        <p className="quiet" key={n}>
-          {n}
+      {boosterLines.map((n) => {
+        const source = SOURCES[n.source];
+        return (
+          <p className="quiet" key={n.text}>
+            {n.text}{' '}
+            {source ? (
+              <a href={source.url} target="_blank" rel="noreferrer">
+                ({source.label})
+              </a>
+            ) : (
+              `(${n.source})`
+            )}
+          </p>
+        );
+      })}
+      {insertGapLines.map((n) => (
+        <p className="quiet insert-gap" key={n.bound}>
+          {n.text}
         </p>
       ))}
       {product.lineage && (
