@@ -53,15 +53,57 @@ export function resolveSeriesLength(series, ticked) {
     note = chosen.chosenNote ?? null;
   } else if (eligible.length > 1) {
     // MenB: no variant is a "fallback" and neither is clinically shorter —
-    // both Bexsero and Trumenba are 2-dose series; the only real question is
-    // which single brand the whole series commits to. If more than one is
-    // stocked, pick the first in declaration order and say so plainly,
+    // both families are 2-dose series; the only real question is which one
+    // the whole series commits to. If products from more than one family
+    // are stocked, pick the first in declaration order and say so plainly,
     // since there is no dose-count reason to prefer either.
-    note =
-      `${series.name} — ${chosen.doseCount} doses either way. You stock both ` +
-      `${chosen.noun} and ${eligible[1].noun}; the plan uses ${chosen.noun}. The same ` +
-      `brand must be used for both doses — the two are not interchangeable within a series.`;
+    note = familyChoiceNote(series, ticked, chosen);
   }
 
   return { variant: chosen, doseCount: chosen.doseCount, doses: chosen.doses, note };
+}
+
+// Which of a variant's named products this clinic actually stocks.
+function stockedFrom(variant, ticked) {
+  return (variant.requiresAllDosesFrom ?? []).filter((name) => ticked.has(name));
+}
+
+function listOf(names) {
+  if (names.length < 2) return names[0] ?? '';
+  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
+
+// The sentence for a series whose variants are brand FAMILIES rather than
+// single brands — MenB, and only MenB today.
+//
+// Item E, 2026-09-29: this used to read "You stock both Bexsero and
+// Trumenba; the plan uses Bexsero," naming each variant's canonical brand.
+// Once the pentavalents joined the variants' product lists that sentence
+// could name a brand the clinic doesn't own at all — a clinic stocking
+// Penmenvy and Trumenba would have been told the plan uses Bexsero. So it
+// now names the stocked products and the family, and says which FAMILY is
+// in use rather than a brand that may not be the one giving the dose.
+//
+// `chosen` is passed in rather than re-derived because for MenB the final
+// say belongs to plan.js's cluster search, not to this file — the search
+// can prefer the other family when that one closes the series and this
+// one leaves a gap. plan.js re-calls this with the family it actually
+// landed on (see buildPlan's seriesNotes).
+export function familyChoiceNote(series, ticked, chosen) {
+  const others = series.variants.filter(
+    (v) => v !== chosen && stockedFrom(v, ticked).length > 0
+  );
+  if (others.length === 0) return null;
+  // A colon-led list, not "X and Y and Z": a single family can itself hold
+  // two stocked brands (Bexsero and Penmenvy are both 4C), and joining the
+  // families with "and" as well then reads as one flat run-on — "You stock
+  // Bexsero and Penmenvy (MenB-4C) and Penbraya (MenB-FHbp)". The colon
+  // keeps the two levels apart at a glance.
+  const describe = (v) => `${listOf(stockedFrom(v, ticked))} (${v.family})`;
+  return (
+    `${series.name} — ${chosen.doseCount} doses either way. You stock products from ` +
+    `both families: ${[chosen, ...others].map(describe).join(', ')}. The plan uses ` +
+    `${chosen.family}. Both doses must come from the same family — the two are not ` +
+    `interchangeable within a series.`
+  );
 }

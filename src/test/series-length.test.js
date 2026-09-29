@@ -79,7 +79,9 @@ describe('seriesLength.js — MenB', () => {
     const result = resolveSeriesLength(SERIES.MenB, new Set(['Bexsero']));
     expect(result.doseCount).toBe(2);
     expect(result.variant.id).toBe('bexsero');
-    expect(result.variant.requiresAllDosesFrom).toEqual(['Bexsero']);
+    // Item E, 2026-09-29: each variant now names a brand FAMILY, so the
+    // pentavalent carrying that family's MenB component belongs in the list.
+    expect(result.variant.requiresAllDosesFrom).toEqual(['Bexsero', 'Penmenvy']);
   });
 
   it('is one brand throughout — Trumenba alone resolves to Trumenba for both doses', () => {
@@ -96,23 +98,42 @@ describe('seriesLength.js — MenB', () => {
     expect(bexsero.doseCount).toBe(trumenba.doseCount);
   });
 
-  it('stocking both picks one brand and says so, since there is no dose-count reason to prefer either', () => {
+  it('stocking both families picks one and says so, since there is no dose-count reason to prefer either', () => {
     const result = resolveSeriesLength(SERIES.MenB, new Set(['Bexsero', 'Trumenba']));
     expect(result.doseCount).toBe(2);
     expect(['bexsero', 'trumenba']).toContain(result.variant.id);
     expect(result.note).toBe(
-      'Meningococcal B — 2 doses either way. You stock both Bexsero and Trumenba; the ' +
-        'plan uses Bexsero. The same brand must be used for both doses — the two are ' +
-        'not interchangeable within a series.'
+      'Meningococcal B — 2 doses either way. You stock products from both ' +
+        'families: Bexsero (MenB-4C), Trumenba (MenB-FHbp). The plan uses MenB-4C. ' +
+        'Both doses must come from the same family — the two are not ' +
+        'interchangeable within a series.'
     );
-    // B1: must state the same-brand rule, never invite a mid-series switch,
+    // B1: must state the same-family rule, never invite a mid-series switch,
     // and never repeat the seam bug where only one mention of the brand
     // dropped its trailing phrase ("Bexsero for both doses was picked").
     expect(result.note).not.toMatch(/switch/i);
     expect(result.note).not.toMatch(/for both doses was picked/i);
   });
 
-  it('reports no usable variant when neither brand is stocked — MenB has no fallback', () => {
+  // Item E, 2026-09-29: the sentence above used to name each variant's
+  // canonical brand. Now that a pentavalent can be the only product a clinic
+  // owns from its family, naming the canonical brand would name a product
+  // that is not in the fridge at all — this is that case.
+  it('names the products actually stocked, not the family’s canonical brand', () => {
+    const result = resolveSeriesLength(SERIES.MenB, new Set(['Penmenvy', 'Trumenba']));
+    expect(result.note).toContain('Penmenvy (MenB-4C)');
+    expect(result.note).not.toContain('Bexsero');
+  });
+
+  it('a pentavalent alone still makes its family available — the series is planned, not abandoned', () => {
+    const result = resolveSeriesLength(SERIES.MenB, new Set(['Penbraya']));
+    expect(result.variant.id).toBe('trumenba');
+    expect(result.doseCount).toBe(2);
+    // One family only, so there is no choice to explain.
+    expect(result.note).toBeNull();
+  });
+
+  it('reports no usable variant when no MenB product at all is stocked — MenB has no fallback', () => {
     const result = resolveSeriesLength(SERIES.MenB, new Set());
     expect(result.variant).toBeNull();
     expect(result.doseCount).toBeNull();

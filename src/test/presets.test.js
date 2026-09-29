@@ -36,6 +36,6 @@ describe('PRESETS', () => {
     // Verified real values (not guessed) — a change here means products.js
     // changed and these presets should be re-picked, not that the test is wrong.
     expect(basicsInjections).toBe(32);
-    expect(fewestInjections).toBe(23);
+    expect(fewestInjections).toBe(22);
   });
 });

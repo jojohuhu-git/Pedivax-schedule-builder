@@ -513,6 +513,7 @@ export const PRODUCTS = [
     insertMaxAgeDays: 4383,
     lineage: null,
     setsSeriesLength: null,
+    allAntigensMustBeDue: true,
     restrictions: [],
     retired: null,
     facts: [
@@ -769,6 +770,7 @@ export const PRODUCTS = [
     insertMaxAgeDays: 2192,
     lineage: null,
     setsSeriesLength: { HepB: 4 },
+    allAntigensMustBeDue: true,
     restrictions: [],
     retired: null,
     facts: [
@@ -839,6 +841,7 @@ export const PRODUCTS = [
     // `maxAgeDays: 1461` (tighter than the 1,826-day/5-year floor the fact
     // names), checked by restrictions.test.js's prose test so it can't
     // silently stop being true.
+    allAntigensMustBeDue: true,
     restrictions: [
       { series: 'DTaP', rule: 'not-booster', minAgeDays: 1461, source: 'izPentacel' },
       { series: 'IPV', rule: 'not-booster', minAgeDays: 1461, source: 'izPentacel' },
@@ -903,6 +906,7 @@ export const PRODUCTS = [
     // between a stocked Vaxelis and an illegal Hib booster. See
     // restrictions.test.js's reason-code test, which proves each entry
     // fires for the reason named here, not a numeric coincidence.
+    allAntigensMustBeDue: true,
     restrictions: [
       { series: 'DTaP', rule: 'not-booster', minAgeDays: null, source: 'izVaxelis' },
       { series: 'IPV', rule: 'not-booster', minAgeDays: null, source: 'izVaxelis' },
@@ -972,6 +976,7 @@ export const PRODUCTS = [
         'or when Kinrix or Quadracel is the only product stocked.',
     },
     setsSeriesLength: null,
+    allAntigensMustBeDue: true,
     restrictions: [],
     retired: null,
     facts: [
@@ -1024,6 +1029,7 @@ export const PRODUCTS = [
         'or when Kinrix or Quadracel is the only product stocked.',
     },
     setsSeriesLength: null,
+    allAntigensMustBeDue: true,
     restrictions: [],
     retired: null,
     facts: [
@@ -1049,6 +1055,161 @@ export const PRODUCTS = [
           'Quadracel as the fifth dose of DTaP and fourth dose of IPV at age 4 ' +
           'through 6 years if the previous brand is unknown or if Kinrix or ' +
           'Quadracel is the only product stocked.',
+      },
+    ],
+  },
+  // ── The pentavalent MenABCWY products (item E, 2026-09-29) ─────────────
+  //
+  // One injection that is simultaneously a MenACWY dose and a MenB dose.
+  // The whole reason they earn a place here: without one, a clinic's
+  // 16-year visit costs two shots (a plain MenACWY plus a plain MenB) for
+  // two doses that are always due on the same day.
+  //
+  // The rule the owner asked to be unbreakable (2026-09-28, and CDC's own
+  // words): a pentavalent may be used ONLY when MenACWY and MenB are both
+  // due that clinic day. Nothing special implements that. It falls out of
+  // the whole-syringe gate item B built — `allAntigensMustBeDue` below,
+  // enforced in cover.js's deliverableAt — which already refuses any
+  // product one of whose antigens has no dose due at the visit. In
+  // MeningoVax the same rule is written out longhand in recommend.js with
+  // a second copy in the validator, and it kept drifting apart; here there
+  // is no second copy to drift from.
+  //
+  // MenB is covered for dose 1 ONLY. CDC states it positively — after a
+  // pentavalent dose 1, the matching plain brand gives dose 2 — so the
+  // dose-number licence IS the rule here, not a coincidence standing in
+  // for one (contrast Pentacel, whose real restriction needed its own
+  // `restrictions[]` entry because its dose-number licence said nothing
+  // about the 4-year visit). A clinic that stocks a pentavalent but not
+  // its matching plain brand therefore gets an honest gap at 17 years
+  // naming what to add, never a second pentavalent dose.
+  //
+  // The two are NOT interchangeable with each other: Penbraya's MenB half
+  // is FHbp (Trumenba's family), Penmenvy's is 4C (Bexsero's). That is
+  // expressed in series.js's MenB variants, which name the whole family
+  // rather than the single plain brand they used to.
+  {
+    name: 'Penbraya',
+    group: 'Combination products',
+    kind: 'combination',
+    route: 'injection',
+    comboVisitGroup: 'adolescent',
+    comboRank: 1,
+    comboLabel: 'MenACWY + MenB (Trumenba family)',
+    covers: [
+      { series: 'MenACWY', doses: [1, 2] },
+      { series: 'MenB', doses: [1, 1] },
+    ],
+    minAgeDays: 3653, // 10 years
+    maxAgeDays: 9131, // 25 years, same ceiling as Bexsero/Trumenba
+    // Recorded from the MMWR's own statement of the FDA licence rather
+    // than a DailyMed fetch, so there is no gap to show; sources.js says
+    // why there is no separate insert source.
+    insertMinAgeDays: 3653,
+    insertMaxAgeDays: 9131,
+    lineage: null,
+    setsSeriesLength: { MenB: 2 },
+    allAntigensMustBeDue: true,
+    restrictions: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'May be given only when a MenACWY dose and a MenB dose are both due on the ' +
+          'same clinic day, from age 10 years. This is the whole condition of use, and ' +
+          'the app enforces it in one place (cover.js) rather than re-deriving it per ' +
+          'screen.',
+        source: 'cdc2025PentavalentNotes',
+        verified: '2026-09-29',
+        quote:
+          'Children age 10 years or older may receive a single dose of Penbraya as an ' +
+          'alternative to separate administration of MenACWY and MenB when both ' +
+          'vaccines would be given on the same clinic day',
+      },
+      {
+        claim:
+          'Gives MenB dose 1 only. Dose 2 must be Trumenba (MenB-FHbp) — the same ' +
+          "family as Penbraya's own MenB component. A clinic stocking Penbraya without " +
+          'Trumenba sees a gap at 17 years naming it, not a second Penbraya dose.',
+        source: 'cdc2025PentavalentNotes',
+        verified: '2026-09-29',
+        quote:
+          'For age-eligible children not at increased risk, if Penbraya is used for ' +
+          'dose 1 MenB, MenB-FHbp (Trumenba) should be administered for dose 2 MenB.',
+      },
+      {
+        claim: 'Licensed 10 through 25 years.',
+        source: 'acipPenbraya2024',
+        verified: '2026-09-29',
+        quote: 'licensed for use among persons aged 10–25 years',
+      },
+      {
+        claim:
+          'ACIP states the same both-due condition in its own words, and the 6-month ' +
+          'spacing to the second MenB dose — which this app’s fixed well-child ' +
+          'calendar already satisfies (16 years to 17 years).',
+        source: 'acipPenbraya2024',
+        verified: '2026-09-29',
+        quote:
+          'MenACWY-TT/MenB-FHbp may be used when both MenACWY and MenB are indicated ' +
+          'at the same visit',
+      },
+    ],
+  },
+  {
+    name: 'Penmenvy',
+    group: 'Combination products',
+    kind: 'combination',
+    route: 'injection',
+    comboVisitGroup: 'adolescent',
+    comboRank: 2,
+    comboLabel: 'MenACWY + MenB (Bexsero family)',
+    covers: [
+      { series: 'MenACWY', doses: [1, 2] },
+      { series: 'MenB', doses: [1, 1] },
+    ],
+    minAgeDays: 3653,
+    maxAgeDays: 9131,
+    insertMinAgeDays: 3653,
+    insertMaxAgeDays: 9131,
+    lineage: null,
+    setsSeriesLength: { MenB: 2 },
+    allAntigensMustBeDue: true,
+    restrictions: [],
+    retired: null,
+    facts: [
+      {
+        claim:
+          'May be given only when a MenACWY dose and a MenB dose are both due at the ' +
+          'same visit, from age 10 years — the same condition as Penbraya.',
+        source: 'acipPenmenvy2025',
+        verified: '2026-09-29',
+        quote:
+          'MenACWY-CRM/MenB-4C may be used when both MenACWY and MenB are indicated ' +
+          'at the same visit',
+      },
+      {
+        claim:
+          'Gives MenB dose 1 only. Dose 2 must be Bexsero (MenB-4C) — the same ' +
+          "family as Penmenvy's own MenB component — six months later, which the " +
+          '16-to-17-year gap in this app’s calendar satisfies.',
+        source: 'acipPenmenvy2025',
+        verified: '2026-09-29',
+        quote:
+          'should complete the MenB series with a dose of MenB-4C administered 6 ' +
+          'months after the MenACWY-CRM/MenB-4C dose',
+      },
+      {
+        claim:
+          'Licensed 10 through 25 years. ACIP recommended it on 16 April 2025 — ' +
+          "before this app's mid-2025 authority cutoff (docs/decisions.md); only the " +
+          'MMWR write-up is later, and the CDC 2025 schedule notes page, last reviewed ' +
+          '2 July 2025, does not mention Penmenvy at all. That silence is a ' +
+          'publication lag, not a disagreement: AAP’s 2026 schedule carries ' +
+          'Penmenvy alongside Penbraya. See the snapshot for the full reasoning.',
+        source: 'acipPenmenvy2025',
+        verified: '2026-09-29',
+        quote: 'licensed for use in persons aged 10–25 years',
       },
     ],
   },

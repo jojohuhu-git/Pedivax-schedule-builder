@@ -174,3 +174,56 @@ describe('Plan — a clinic with no combination products, and PedvaxHIB unstocke
     expect(screen.getByText('Dose counts set by the brands you stock')).toBeInTheDocument();
   });
 });
+
+// Item E, 2026-09-29. CLAUDE.md requires both layers for anything visible:
+// pentavalent.test.js proves the planner's answer, these prove the clinician
+// actually sees it — the one-injection 16-year visit, and the honest gap a
+// clinic gets when it stocks a pentavalent without its family's plain brand.
+describe('Plan — a pentavalent MenABCWY product', () => {
+  const withPartner = new Set(['Penbraya', 'Trumenba', 'MenQuadfi']);
+  const withoutPartner = new Set(['Penbraya', 'MenQuadfi']);
+
+  function shotsNamed(container, name) {
+    return [...container.querySelectorAll('.shot')].filter((shot) =>
+      shot.querySelector('.shot-nm').textContent.startsWith(name)
+    );
+  }
+
+  it('shows the 16-year visit as one injection carrying both MenACWY and MenB', () => {
+    const { container } = render(<Plan ticked={withPartner} onAddProduct={() => {}} />);
+    const [penbraya] = shotsNamed(container, 'Penbraya');
+    expect(penbraya).toBeDefined();
+    expect(penbraya.textContent).toMatch(/One injection covering two vaccines/);
+    expect(penbraya.textContent).toContain('MenACWY');
+    expect(penbraya.textContent).toContain('MenB');
+  });
+
+  it('never shows a second pentavalent dose — the plain brand finishes the series', () => {
+    const { container } = render(<Plan ticked={withPartner} onAddProduct={() => {}} />);
+    expect(shotsNamed(container, 'Penbraya')).toHaveLength(1);
+    expect(shotsNamed(container, 'Trumenba')).toHaveLength(1);
+  });
+
+  it('without the matching plain brand, shows a MenB gap offering the right partner by name', async () => {
+    const onAddProduct = vi.fn();
+    const { container } = render(<Plan ticked={withoutPartner} onAddProduct={onAddProduct} />);
+    // The pentavalent still gives dose 1 — the gap is dose 2 only.
+    expect(shotsNamed(container, 'Penbraya')).toHaveLength(1);
+    const menbGroup = screen.getByText('Meningococcal B').closest('li');
+    expect(within(menbGroup).getByText(/Nothing covers dose 2 of 2\./)).toBeInTheDocument();
+    // Trumenba, not Bexsero: Penbraya's MenB half is the FHbp family.
+    const [addPartner] = within(menbGroup).getAllByRole('button', { name: 'Add Trumenba' });
+    await userEvent.click(addPartner);
+    expect(onAddProduct).toHaveBeenCalledWith('Trumenba');
+  });
+
+  it('is not offered at the 11-year visit, where only MenACWY is due', () => {
+    const { container } = render(<Plan ticked={withoutPartner} onAddProduct={() => {}} />);
+    const y11 = [...container.querySelectorAll('.visit')].find((v) =>
+      v.textContent.includes('11 years')
+    );
+    expect(y11).toBeDefined();
+    expect(y11.textContent).toContain('MenQuadfi');
+    expect(y11.textContent).not.toContain('Penbraya');
+  });
+});

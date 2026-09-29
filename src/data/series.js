@@ -856,16 +856,31 @@ export const SERIES = {
     sdm: 'Not a routine dose. CDC recommends MenB for adolescents not at increased ' +
       'risk age 16–23 years (preferred 16–18) by shared clinical decision-making ' +
       'with the family, not as a universal recommendation.',
+    // Item E, 2026-09-29: each variant is now a brand FAMILY, not a single
+    // brand. The pentavalents carry a MenB component belonging to one of
+    // these two families — Penmenvy's is 4C (Bexsero's), Penbraya's is FHbp
+    // (Trumenba's) — and CDC's rule is stated in exactly those terms: after
+    // a pentavalent dose 1, dose 2 comes from the matching family. So a
+    // clinic stocking only Penbraya still has a workable FHbp series (its
+    // second dose is a gap naming Trumenba, not an unplanned series), and
+    // the "same brand for all doses" commitment now means the same family.
+    //
+    // `requiresAllDosesFrom` does double duty, as it always has: it decides
+    // which variant a formulary makes available (seriesLength.js) AND which
+    // products may give that variant's doses (plan.js's allowedProductsFor).
+    // Listing the pentavalent in it is what stops the 4C and FHbp halves
+    // from ever being mixed inside one child's series.
     variants: [
       {
         id: 'bexsero',
-        label: 'Bexsero for both doses',
-        // For seriesLength.js's prose when both brands are stocked — kept
+        family: 'MenB-4C',
+        label: 'Bexsero (the MenB-4C family) for both doses',
+        // For seriesLength.js's prose when both families are stocked — kept
         // separate from `label` so that sentence never has to strip a
         // trailing phrase back off (Batch B, B1).
         noun: 'Bexsero',
         doseCount: 2,
-        requiresAllDosesFrom: ['Bexsero'],
+        requiresAllDosesFrom: ['Bexsero', 'Penmenvy'],
         doses: [
           { n: 1, at: ['y16', 'y17', 'y18'] },
           { n: 2, at: ['y16', 'y17', 'y18'], minIntervalFromPrevDays: 183 },
@@ -873,10 +888,11 @@ export const SERIES = {
       },
       {
         id: 'trumenba',
-        label: 'Trumenba for both doses',
+        family: 'MenB-FHbp',
+        label: 'Trumenba (the MenB-FHbp family) for both doses',
         noun: 'Trumenba',
         doseCount: 2,
-        requiresAllDosesFrom: ['Trumenba'],
+        requiresAllDosesFrom: ['Trumenba', 'Penbraya'],
         doses: [
           { n: 1, at: ['y16', 'y17', 'y18'] },
           { n: 2, at: ['y16', 'y17', 'y18'], minIntervalFromPrevDays: 183 },
@@ -920,6 +936,30 @@ export const SERIES = {
         source: 'cdc2025MenBNotes',
         verified: '2026-09-25',
         quote: 'Bexsero or Trumenba (use same brand for all doses): 2-dose series at least 6 months apart',
+      },
+      {
+        claim:
+          'A pentavalent (MenABCWY) dose counts as MenB dose 1 and commits the series ' +
+          "to that product's own MenB family: after Penbraya (FHbp) dose 2 must be " +
+          'Trumenba, and after Penmenvy (4C) it must be Bexsero. This is why each ' +
+          'variant above names a family rather than a single brand.',
+        source: 'cdc2025PentavalentNotes',
+        verified: '2026-09-29',
+        quote:
+          'For age-eligible children not at increased risk, if Penbraya is used for ' +
+          'dose 1 MenB, MenB-FHbp (Trumenba) should be administered for dose 2 MenB.',
+      },
+      {
+        claim:
+          'The 6 months this app leaves between MenB dose 1 and dose 2 is the same ' +
+          'interval ACIP states after a pentavalent dose — the 16-year and 17-year ' +
+          'well-child visits already satisfy it, so a pentavalent never shortens the ' +
+          'series or adds a visit.',
+        source: 'acipPenmenvy2025',
+        verified: '2026-09-29',
+        quote:
+          'should complete the MenB series with a dose of MenB-4C administered 6 ' +
+          'months after the MenACWY-CRM/MenB-4C dose',
       },
     ],
   },

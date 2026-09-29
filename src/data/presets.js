@@ -52,6 +52,14 @@ export const PRESETS = [
       'Adacel',
       'Gardasil 9',
       'MenQuadfi',
+      // Penmenvy (MenABCWY) with Bexsero, not Penbraya (2026-09-29, item E).
+      // A pentavalent only helps a clinic that also stocks the matching
+      // plain MenB brand for dose 2, and Penmenvy's MenB half is Bexsero's
+      // family (4C) while Penbraya's is Trumenba's (FHbp). Adding Penbraya
+      // here instead would change nothing at all: the planner would leave
+      // it on the shelf rather than open a gap at 17 years. Penmenvy turns
+      // the 16-year visit from two shots into one.
+      'Penmenvy',
       'Bexsero',
     ],
   },

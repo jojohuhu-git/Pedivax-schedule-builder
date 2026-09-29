@@ -292,4 +292,28 @@ describe('Formulary', () => {
       expect(screen.queryByText(/No product matches/)).not.toBeInTheDocument();
     });
   });
+
+  // Item E, 2026-09-29: the pentavalents needed a fourth combination
+  // sub-group. Without one they would have been filtered out of the list
+  // entirely (Formulary.jsx builds combo groups from a fixed list of visit
+  // ids), so a clinic could never tick them — which is exactly how this
+  // test caught it.
+  describe('the pentavalent MenABCWY products', () => {
+    it('are listed under their own combination sub-group, tickable like any other product', async () => {
+      const onToggle = vi.fn();
+      render(<Formulary ticked={new Set()} onToggle={onToggle} onReset={() => {}} />);
+      const group = screen.getByText('For the 16 year visit').closest('.grp');
+      expect(within(group).getByText('Penbraya')).toBeInTheDocument();
+      expect(within(group).getByText('Penmenvy')).toBeInTheDocument();
+
+      await userEvent.click(within(group).getByText('Penbraya'));
+      expect(onToggle).toHaveBeenCalledWith('Penbraya');
+    });
+
+    it('name the MenB family each one belongs to, since the two are not interchangeable', () => {
+      render(<Formulary ticked={new Set()} onToggle={() => {}} onReset={() => {}} />);
+      expect(screen.getByText('MenACWY + MenB (Trumenba family)')).toBeInTheDocument();
+      expect(screen.getByText('MenACWY + MenB (Bexsero family)')).toBeInTheDocument();
+    });
+  });
 });
