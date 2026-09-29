@@ -179,7 +179,7 @@ years **and** at least 6 months after dose 3).
     escape:'Either product may be used when the earlier brand is unknown or is the only one stocked.'
   },
   setsSeriesLength:null,                  // Pentacel and Vaxelis set {Hib:4}
-  cannotBeBooster:[],                     // Vaxelis has ['Hib']
+  restrictions:[],                        // see below — replaced cannotBeBooster, item C 2026-09-29
   retired:null,                           // Prevnar 13 has a date here
   facts:[ ... ]
 }
@@ -193,6 +193,20 @@ years **and** at least 6 months after dose 3).
   Quadracel is the matched product, and reassure one stocking only Kinrix that the escape
   clause covers them. It must never refuse a plan on lineage grounds.
 - **`setsSeriesLength`** — the field that stops the mockup's silent extra injection.
+- **`restrictions`** — one entry per written "not used for" rule, precise enough to name
+  what the source actually says: `{ series, rule: 'not-booster', minAgeDays, source }`.
+  `minAgeDays: null` bars the booster at every age (Vaxelis: never the booster for DTaP,
+  IPV, or Hib); a number bars it only from that age on (Pentacel: its own dose 4 IS the
+  correct 12-15-month booster, but it must not be the 4-6-year one — `minAgeDays: 1461`).
+  Replaced the old blunt `cannotBeBooster: [seriesKey]` (item C, 2026-09-29) because that
+  flag couldn't express Pentacel's case at all, and testing every written restriction
+  against `cover.js` found most were enforced by a numeric coincidence (the dose-number
+  licence, a visit-window mismatch) rather than by the rule itself — exactly the kind of
+  block that silently evaporates if the numbering ever changes.
+  `restrictions.test.js` has two tests guarding this: a **prose test** (a restriction-
+  shaped sentence in `facts[]` with no matching entry here fails the suite, and vice
+  versa) and a **reason-code test** (for each entry, `cover.js` must refuse *for that
+  reason*, isolated from every numeric coincidence that happens to reach the same answer).
 - **`retired`** — products are retired, never deleted, so old printed plans stay
   explainable. A retired product is hidden from the tick list and still shown in the
   rulebook.
@@ -205,9 +219,12 @@ years **and** at least 6 months after dose 3).
 
 **The only place that answers "may this product give this dose of this series at this
 visit?"** No screen, and no other logic file, may ask that question itself. It checks, in
-order: the product is stocked and not retired · the series matches · the dose number is
-inside `covers[].doses` · the visit age is inside the product's min/max · the dose's own
-`minAgeDays` and interval are satisfied · the product is not barred as a booster.
+order: the product is stocked and not retired · the series matches · a written
+`restrictions[]` entry doesn't bar this series' booster dose at this visit's age (checked
+**before** the dose-number licence, so a sourced restriction is always the reported reason
+when it applies, never buried behind a coincidence) · the dose number is inside
+`covers[].doses` · the visit age is inside the product's min/max · the dose's own
+`minAgeDays` and interval are satisfied.
 
 This mirrors `brandRules.js` in vaxapp, which exists because local brand checks scattered
 across surfaces drifted apart. An exhaustive invariant test walks every product × series

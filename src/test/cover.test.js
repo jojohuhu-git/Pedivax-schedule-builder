@@ -6,7 +6,7 @@ import { describe, it, expect } from 'vitest';
 import { SERIES } from '../data/series.js';
 import { PRODUCTS } from '../data/products.js';
 import { VISITS } from '../data/visits.js';
-import { canCover } from '../logic/cover.js';
+import { canCover, restrictionBlocking } from '../logic/cover.js';
 
 const VISIT_AGE = Object.fromEntries(VISITS.map((v) => [v.id, v.ageDays]));
 
@@ -18,15 +18,38 @@ const VISIT_AGE = Object.fromEntries(VISITS.map((v) => [v.id, v.ageDays]));
 // Deliberately not a full chained schedule: whether a chain of real doses
 // from possibly-different products stays internally consistent is
 // plan.js/needles-vs-visits territory, not this licence check.
-function findLegalVisit(dose, product) {
+//
+// Also skips a candidate visit a written restriction bars as a booster
+// (item C, 2026-09-29) — e.g. Pentacel's IPV dose 4 is only reachable via
+// the standard variant's y4/y5/y6 window, which is exactly the 4-6-year
+// booster its own restriction now excludes; the search should find that
+// dose number is still licensed via a DIFFERENT path (the combination
+// variant's earlier, non-booster dose 4), not report it unreachable.
+function findLegalVisit(dose, product, seriesKey) {
   const loAge = Math.max(dose.minAgeDays ?? 0, product.minAgeDays ?? 0);
   const hiAge = Math.min(dose.maxAgeDays ?? Infinity, product.maxAgeDays ?? Infinity);
   const id = dose.at.find((visitId) => {
     const age = VISIT_AGE[visitId];
-    return age >= loAge && age <= hiAge;
+    if (age < loAge || age > hiAge) return false;
+    if (dose.booster && restrictionBlocking(product, seriesKey, { ageDays: age })) return false;
+    return true;
   });
   if (!id) return null;
   return { id, ageDays: VISIT_AGE[id] };
+}
+
+// The refusal a licence-boundary dose (one number outside `covers[].doses`)
+// should get: the plain numeric reason, UNLESS a written restriction ALSO
+// independently bars it as a booster at this visit's age — in which case
+// that named reason must be reported instead, never masked by the
+// coincidence (item C's whole point; see restrictions.test.js for the
+// isolated version of this same check).
+function expectedLicenceRefusal(product, seriesKey, dose, visit) {
+  if (dose.booster) {
+    const restriction = restrictionBlocking(product, seriesKey, visit);
+    if (restriction) return { ok: false, reason: 'restricted-booster', restriction };
+  }
+  return { ok: false, reason: 'dose-number-not-licensed' };
 }
 
 function syntheticPrevVisit(dose, visit) {
@@ -84,7 +107,7 @@ describe('cover.js — exhaustive product x series x dose-number licence', () =>
             const dose = doses[n - 1];
             if (!dose) continue;
             tried.push(dose.at.join('/'));
-            const visit = findLegalVisit(dose, product);
+            const visit = findLegalVisit(dose, product, seriesKey);
             if (visit) {
               found = { dose, visit };
               break;
@@ -113,7 +136,7 @@ describe('cover.js — exhaustive product x series x dose-number licence', () =>
       const belowRange = lo > 1 && lo - 1 <= doses.length ? doses[lo - 2] : null;
       if (belowRange && !product.retired) {
         it(`${product.name} may NOT give ${seriesKey} dose ${belowRange.n} (below its licence)`, () => {
-          const visit = findLegalVisit(belowRange, product) ?? {
+          const visit = findLegalVisit(belowRange, product, seriesKey) ?? {
             id: belowRange.at[0],
             ageDays: VISIT_AGE[belowRange.at[0]],
           };
@@ -125,14 +148,14 @@ describe('cover.js — exhaustive product x series x dose-number licence', () =>
             visit,
             prevVisit: syntheticPrevVisit(belowRange, visit),
           });
-          expect(result).toEqual({ ok: false, reason: 'dose-number-not-licensed' });
+          expect(result).toEqual(expectedLicenceRefusal(product, seriesKey, belowRange, visit));
         });
       }
 
       const aboveRange = hi < doses.length && !product.retired ? doses[hi] : null;
       if (aboveRange) {
         it(`${product.name} may NOT give ${seriesKey} dose ${aboveRange.n} (above its licence)`, () => {
-          const visit = findLegalVisit(aboveRange, product) ?? {
+          const visit = findLegalVisit(aboveRange, product, seriesKey) ?? {
             id: aboveRange.at[0],
             ageDays: VISIT_AGE[aboveRange.at[0]],
           };
@@ -144,7 +167,7 @@ describe('cover.js — exhaustive product x series x dose-number licence', () =>
             visit,
             prevVisit: syntheticPrevVisit(aboveRange, visit),
           });
-          expect(result).toEqual({ ok: false, reason: 'dose-number-not-licensed' });
+          expect(result).toEqual(expectedLicenceRefusal(product, seriesKey, aboveRange, visit));
         });
       }
     }
@@ -268,13 +291,14 @@ describe('cover.js — the other gates', () => {
     expect(result).toEqual({ ok: true });
   });
 
-  it('bars a product from being a series’ booster dose when cannotBeBooster names that series', () => {
+  it('bars a product from being a series’ booster dose when its restrictions[] names that series', () => {
     const vaxelis = PRODUCTS.find((p) => p.name === 'Vaxelis');
-    expect(vaxelis.cannotBeBooster).toContain('Hib');
-    // Vaxelis's real dose-number licence (1-3) already excludes Hib's real
-    // booster (dose 4), so this uses a synthetic booster-flagged dose to
-    // isolate the cannotBeBooster check itself, per the fuller citation
-    // recorded in products.js (izVaxelis).
+    expect(vaxelis.restrictions.map((r) => r.series)).toEqual(['DTaP', 'IPV', 'Hib']);
+    // Vaxelis's real Hib dose-number licence (1-3) reaches all the way to
+    // the pedvax-variant Hib booster (dose 3, in-range) — a synthetic dose
+    // is used only so this test doesn't depend on which variant plan.js
+    // happens to pick; restrictions.test.js's reason-code test covers the
+    // full item-C spec (all three series, both age-conditional shapes).
     const syntheticBoosterDose = { n: 2, at: ['m4'], booster: true };
     const result = canCover({
       product: vaxelis,
@@ -284,6 +308,10 @@ describe('cover.js — the other gates', () => {
       visit: m4,
       prevVisit: m2,
     });
-    expect(result).toEqual({ ok: false, reason: 'cannot-be-booster' });
+    expect(result).toEqual({
+      ok: false,
+      reason: 'restricted-booster',
+      restriction: { series: 'Hib', rule: 'not-booster', minAgeDays: null, source: 'izVaxelis' },
+    });
   });
 });
