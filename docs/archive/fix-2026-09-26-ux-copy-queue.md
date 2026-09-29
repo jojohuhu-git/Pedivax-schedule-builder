@@ -4,7 +4,13 @@
 375 × 812 px (iPhone size). Findings artifact: *Formulary Rail Rethink*
 (https://claude.ai/artifact/RJ9jXrVGVjaK2fjwTetR17).
 
-**Status:** OPEN. Batch A is DONE (A1–A6, merged as PR #1). Batch B is DONE (B1–B4,
+**Status:** CONSUMED 2026-09-27 — all six batches (A–F) done and merged. See
+`docs/archive/handoff-2026-09-27-batch-e-f-complete.md` for the final state, test
+count, and the one deferred item (F4's auto-clear timer has no automated test —
+noted there, not silently dropped). This file is kept for the item-by-item history;
+do not resume work from it as if it were still open.
+
+**Status (historical, as of when Batch C finished):** OPEN. Batch A is DONE (A1–A6, merged as PR #1). Batch B is DONE (B1–B4,
 merged as PR #2). Batch C is DONE (C1–C5, PR opened 2026-09-26; C2's source fetch is
 in `docs/updates/sources/2026-09-26-cdc2025-schedule-table-row-order.md`) — see its own
 STOP line below for the baseline the next session (Batch D) should verify against.
