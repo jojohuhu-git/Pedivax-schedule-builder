@@ -37,16 +37,24 @@ function syntheticPrevVisit(dose, visit) {
 // Which variant (or plain doses[]) a given product actually commits a
 // brand-length-setting series to, so the schedule built for that product
 // matches what it would really receive.
-function dosesForProduct(series, product, seriesKey) {
-  if (!series.variants) return series.doses;
+// Every dose list a product could find itself giving a dose from, most
+// likely path first. A dose NUMBER does not mean the same thing in every
+// path — IPV dose 4 is the 4-6 year booster on the standard path but the
+// 15-18 month extra dose on the combination path (series.js, IPV) — so a
+// product's declared licence for dose n is satisfied if ANY path of the
+// series has a legal place for it. Which path a product is actually
+// allowed to serve is plan.js's job (its `allowedProducts`), not
+// cover.js's; this file only proves the licence is exercisable at all.
+function doseListsForProduct(series, product, seriesKey) {
+  if (!series.variants) return [series.doses];
+  const preferred = [];
   const bySelf = series.variants.find((v) => v.requiresAllDosesFrom?.includes(product.name));
-  if (bySelf) return bySelf.doses;
+  if (bySelf) preferred.push(bySelf.doses);
   const count = product.setsSeriesLength?.[seriesKey];
-  if (count != null) {
-    const byCount = series.variants.find((v) => v.doseCount === count);
-    if (byCount) return byCount.doses;
-  }
-  return series.variants.find((v) => v.fallback)?.doses ?? series.variants[0].doses;
+  const byCount = count != null ? series.variants.find((v) => v.doseCount === count) : null;
+  if (byCount) preferred.push(byCount.doses);
+  const rest = series.variants.map((v) => v.doses).filter((d) => !preferred.includes(d));
+  return [...preferred, ...rest];
 }
 
 describe('cover.js — exhaustive product x series x dose-number licence', () => {
@@ -54,33 +62,45 @@ describe('cover.js — exhaustive product x series x dose-number licence', () =>
     for (const coverage of product.covers) {
       const { series: seriesKey, doses: [lo, hi] } = coverage;
       const series = SERIES[seriesKey];
-      const doses = dosesForProduct(series, product, seriesKey);
+      const doseLists = doseListsForProduct(series, product, seriesKey);
+      // The below-/above-licence checks below read the most likely path —
+      // "one dose number outside the licence" only means something against
+      // a single numbering.
+      const doses = doseLists[0];
       const ticked = new Set([product.name]);
-      // Cap at the doses the series actually defines — a product's own
-      // licence can reach a dose number the routine schedule never uses
-      // (Quadracel's IPV licence covers "4th or 5th" even though the
-      // routine series only ever reaches dose 4); there's no dose
-      // definition to test past the series' real length.
-      const cappedHi = Math.min(hi, doses.length);
+      // Cap at the doses the series actually defines on its longest path —
+      // a product's own licence can reach a dose number no path uses, and
+      // there is no dose definition to test past that.
+      const cappedHi = Math.min(hi, Math.max(...doseLists.map((d) => d.length)));
 
       for (let n = lo; n <= cappedHi; n++) {
         const testName = product.retired
           ? `${product.name} (retired) may NOT give ${seriesKey} dose ${n}`
           : `${product.name} may give ${seriesKey} dose ${n} (licensed ${lo}-${hi})`;
         it(testName, () => {
-          const dose = doses[n - 1];
-          const visit = findLegalVisit(dose, product);
+          const tried = [];
+          let found = null;
+          for (const doses of doseLists) {
+            const dose = doses[n - 1];
+            if (!dose) continue;
+            tried.push(dose.at.join('/'));
+            const visit = findLegalVisit(dose, product);
+            if (visit) {
+              found = { dose, visit };
+              break;
+            }
+          }
           expect(
-            visit,
-            `no visit in ${dose.at.join(', ')} fits both the dose window and ${product.name}'s own age range`
+            found,
+            `no visit in ${tried.join(' or ')} fits both the dose window and ${product.name}'s own age range`
           ).not.toBeNull();
           const result = canCover({
             product,
             ticked,
             seriesKey,
-            dose,
-            visit,
-            prevVisit: syntheticPrevVisit(dose, visit),
+            dose: found.dose,
+            visit: found.visit,
+            prevVisit: syntheticPrevVisit(found.dose, found.visit),
           });
           if (product.retired) {
             expect(result).toEqual({ ok: false, reason: 'retired' });
@@ -167,7 +187,7 @@ describe('cover.js — the other gates', () => {
       product: daptacel,
       ticked: new Set([daptacel.name]),
       seriesKey: 'IPV',
-      dose: SERIES.IPV.doses[0],
+      dose: SERIES.IPV.variants[0].doses[0],
       visit: m2,
       prevVisit: null,
     });

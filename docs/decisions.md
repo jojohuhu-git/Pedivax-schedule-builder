@@ -270,6 +270,62 @@ two choices cost the exact same number of shots (see the Settled table above). T
 still no toggle and no alternate plan ever shown to the clinician; this only changes which
 one of several equally-good-on-shots schedules the app picks.
 
+## Found while building item B (whole-syringe accounting), 2026-09-28
+
+**Polio is a 5-dose series whenever Pentacel is used, and the app was hiding the 5th.**
+
+Item B's rule is that a syringe delivers everything in it, so a product may only be given
+at a visit where every antigen it contains has a dose due. Applying that turned up
+something the planner had been quietly papering over: on the everything-stocked plan —
+the one the app opens with — Pentacel was used at 15 months for the DTaP and Hib boosters,
+and its polio content was delivered and never counted. Enforcing the rule strictly would
+have refused Pentacel there and cost an extra needle.
+
+But the extra polio dose is not a mistake. Checked live on 2026-09-28, CDC and AAP say it
+in identical words:
+
+> "4 or more doses of IPV can be administered before age 4 years when a combination
+> vaccine containing IPV is used. However, a dose is still recommended on or after age 4
+> years and at least 6 months after the previous dose."
+
+— CDC child/adolescent schedule notes, Poliovirus vaccination; the AAP-published schedule
+carries the same sentence, so there is no AAP-vs-CDC tiebreak to make here. Pentacel is
+given at 2, 4, 6 **and** 15–18 months, so a Pentacel child genuinely receives four polio
+doses before the fourth birthday and a fifth at 4–6 years. That is the standard result of
+using Pentacel, not over-vaccination.
+
+So polio became a fifth brand-length-setting series (`variants[]`, like Hib/RV/HepB/MenB):
+a standard 4-dose path and a 5-dose combination path. It differs from the other four in
+one way worth remembering — **neither path names a brand.** Every polio product may give
+doses in either; which path a clinic lands on falls out of *where* its products land on
+the calendar, not what is in its fridge. `seriesLength.js` and `plan.js` were generalised
+so a variant that names no products is always available, and the one-source-of-truth test
+gained a `reachedWith` field for the single variant no brand list can identify.
+
+Checked at the same time: the Hib and DTaP notes carry **no** equivalent allowance, so
+polio is the only series that needed one.
+
+**Two consequences worth knowing about, both of which the data already implied:**
+
+- **Kinrix and Quadracel are not interchangeable after Pentacel.** Kinrix is approved as
+  "the fourth dose of IPV" (the Infanrix/Pediarix lineage); Quadracel as "the fourth or
+  fifth dose". A Pentacel child's 4–6 year shot is their fifth, so Quadracel is the right
+  partner and Kinrix cannot finish the series. Both quotes were already in `products.js`
+  and already encoded as `IPV [4,4]` vs `IPV [4,5]`; nothing about them changed. What
+  changed is that the planner now acts on them. The **"Fewest injections" starting preset
+  was mis-paired** (Pentacel + Kinrix) and showed a real 2-dose gap at 15 months once the
+  accounting was honest — swapped to Quadracel, which closes it.
+- **A Pentacel-only clinic now shows a gap at 4 years** for the last DTaP and polio doses,
+  instead of a 5th Hib and DTaP dose delivered by a Pentacel its own rulebook entry says
+  must not be used at 4–6 years. This is Finding 3 of the 2026-09-28 queue, which item C
+  was scheduled to fix explicitly; item B makes it structurally impossible first.
+
+**Also fixed, because item B exposed it:** `fixGap.js` ranked candidate products by
+injection count alone, so it told a Pentacel-only clinic to "Add Kinrix" for the last
+polio dose — which closes that gap and opens two others, for no net improvement, because
+a plan that gives up on two doses needs fewer needles than one that gives them. It now
+ranks by remaining gaps first, then injections, matching `plan.js`'s own `isBetter`.
+
 ## Still open
 
 - **Re-fetch Pfizer's Prevnar 13 discontinuation letter** to confirm 30 April 2024 from

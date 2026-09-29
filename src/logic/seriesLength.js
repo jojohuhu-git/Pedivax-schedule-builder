@@ -20,8 +20,17 @@ export function resolveSeriesLength(series, ticked) {
   // always a single product so the two read the same, but HepB's
   // monovalent variant lists two interchangeable products (Engerix-B,
   // Recombivax HB), either of which is enough to run the shorter path.
+  //
+  // A variant that names no products at all is always available: IPV's
+  // standard 4-dose path is open to every polio product, and which path a
+  // clinic ends up on depends on where its products land on the calendar,
+  // not on which brand it buys (series.js, IPV). Being always available it
+  // is also always the preferred pick here, which is right — it is the
+  // shorter of the two, and plan.js only moves to the longer path when the
+  // shorter one would actually cost an injection.
   const eligible = series.variants
-    .filter((v) => !v.fallback && v.requiresAllDosesFrom.some((name) => ticked.has(name)))
+    .filter((v) => !v.fallback && (v.requiresAllDosesFrom ?? []).some((name) => ticked.has(name)))
+    .concat(series.variants.filter((v) => !v.fallback && !v.requiresAllDosesFrom))
     .sort((a, b) => a.doseCount - b.doseCount);
 
   const chosen = eligible[0] ?? fallback;

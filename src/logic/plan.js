@@ -117,11 +117,20 @@ function allowedProductsFor(seriesKey, variant) {
 function clusterVariantOptions(seriesKey, ticked) {
   const series = SERIES[seriesKey];
   const fallback = series.variants.find((v) => v.fallback);
+  // Same eligibility rule as seriesLength.js: a variant that names brands
+  // needs one of them stocked; a variant that names none (IPV's standard
+  // 4-dose path) is always on offer. Shortest first, fallback last, so a
+  // tie keeps the shorter series.
   const eligible = series.variants
-    .filter((v) => !v.fallback && v.requiresAllDosesFrom?.some((name) => ticked.has(name)))
+    .filter(
+      (v) =>
+        !v.fallback &&
+        (!v.requiresAllDosesFrom || v.requiresAllDosesFrom.some((name) => ticked.has(name)))
+    )
     .sort((a, b) => a.doseCount - b.doseCount);
   const ordered = [...eligible, fallback];
   return ordered.map((v) => ({
+    variant: v,
     doses: v.doses,
     sequences: seriesSequences(v.doses),
     allowedProducts: allowedProductsFor(seriesKey, v),
@@ -129,75 +138,180 @@ function clusterVariantOptions(seriesKey, ticked) {
   }));
 }
 
-// Minimum-size product set (from `coverage`, each `{product, covers}`) whose
-// union covers every item in `reachable`. Brute force over subset size,
-// smallest first, first fit wins — n is always small (a handful of stocked
-// products relevant to one visit), so this is exact, not a greedy
-// approximation, and ties resolve to `coverage`'s own declaration order.
-function firstCoveringCombo(coverage, size, reachable) {
-  const n = coverage.length;
-  const idx = Array.from({ length: size }, (_, i) => i);
-  while (idx[0] <= n - size) {
-    const chosen = idx.map((i) => coverage[i]);
-    const union = new Set();
-    for (const c of chosen) for (const item of c.covers) union.add(item);
-    if (reachable.every((item) => union.has(item))) return chosen;
-    let i = size - 1;
-    while (i >= 0 && idx[i] === n - size + i) i--;
-    if (i < 0) return null;
-    idx[i]++;
-    for (let j = i + 1; j < size; j++) idx[j] = idx[j - 1] + 1;
-  }
-  return null;
+// A syringe delivers everything in it. `product.covers` is the product's
+// actual antigen content (Pentacel's three entries ARE DTaP + IPV + Hib),
+// so giving a product at a visit gives the child every one of those
+// antigens — whether or not the planner picked the product for them.
+//
+// The invariant this function exists to enforce (docs/decisions.md, item B
+// of the 2026-09-28 brand-indication queue):
+//
+//   Every antigen delivered must be a planned, counted dose of that series.
+//   Nothing else may be delivered at all.
+//
+// So a product is offerable at a visit only if EVERY series it contains has
+// a dose due at that visit which this product may legally give. One antigen
+// with nothing due — Pentacel's Hib at the 4-year visit, once the Hib series
+// is finished — disqualifies the whole product, because there is no way to
+// give the part the planner wanted without also giving the part it didn't.
+//
+// Before this rule the planner scored only the doses it deliberately picked
+// a product for, so it could "save an injection" by using a combination
+// product and quietly adding a 5th DTaP, IPV or Hib dose that appeared
+// nowhere on the schedule. Those plans are now unscoreable rather than
+// merely wrong, which is why this lives here and not in a detector.
+//
+// Returns one entry per offerable product: `covers` is exactly the set of
+// due doses that product would deliver — its whole content, nothing less.
+function deliverableAt(items, ticked) {
+  const dueBySeries = new Map(items.map((item) => [item.seriesKey, item]));
+  return PRODUCTS.filter((p) => ticked.has(p.name) && !p.retired)
+    .map((product) => {
+      const covers = [];
+      for (const content of product.covers) {
+        const item = dueBySeries.get(content.series);
+        if (!item) return null; // antigen in the syringe with no dose due here
+        if (item.allowedProducts && !item.allowedProducts.has(product.name)) return null;
+        const verdict = canCover({
+          product,
+          ticked,
+          seriesKey: item.seriesKey,
+          dose: item.dose,
+          visit: item.visit,
+          prevVisit: item.prevVisit,
+        });
+        if (!verdict.ok) return null;
+        covers.push(item);
+      }
+      if (!covers.length) return null;
+      // Report the doses in the order this visit lists them, not the order
+      // the product's antigens happen to be written in — the schedule
+      // screen prints this list, and its reading order shouldn't depend on
+      // how a product entry was typed.
+      return { product, covers: items.filter((item) => covers.includes(item)) };
+    })
+    .filter(Boolean);
 }
 
-function minimalCover(items, coverage) {
+// Fewest products that deliver the most of `items`, where every chosen
+// product delivers its whole content and no two chosen products share a
+// series (giving the same antigen twice in one visit is the duplicate this
+// whole item exists to prevent). That makes this an exact-cover problem,
+// not the set cover it used to be: a due dose may be left as a gap even
+// when a stocked product could give it, if the only way to give it would
+// also duplicate something else.
+//
+// Exhaustive, memoized on the set of series already spoken for — at most a
+// handful of series come due at one visit, so this is exact, not greedy.
+// Options are walked in `PRODUCTS` declaration order and only a strict
+// improvement replaces the incumbent, so ties resolve the same way the
+// previous minimum-cover search resolved them.
+function bestPacking(items, options) {
   if (items.length === 0) return { chosen: [], gaps: [] };
-  const reachable = items.filter((item) => coverage.some((c) => c.covers.includes(item)));
-  const gaps = items.filter((item) => !reachable.includes(item));
-  if (reachable.length === 0) return { chosen: [], gaps };
-  for (let size = 1; size <= coverage.length; size++) {
-    const combo = firstCoveringCombo(coverage, size, reachable);
-    if (combo) return { chosen: combo.map((c) => ({ product: c.product, covers: c.covers })), gaps };
+  const bitOf = new Map(items.map((item, i) => [item.seriesKey, 1 << i]));
+  const masked = options.map((o, order) => ({
+    ...o,
+    order,
+    mask: o.covers.reduce((m, item) => m | bitOf.get(item.seriesKey), 0),
+  }));
+  const memo = new Map();
+
+  function solve(used) {
+    let i = 0;
+    while (i < items.length && used & (1 << i)) i++;
+    if (i === items.length) return { gaps: 0, chosen: [] };
+    if (memo.has(used)) return memo.get(used);
+    let best = null;
+    const consider = (candidate) => {
+      if (
+        !best ||
+        candidate.gaps < best.gaps ||
+        (candidate.gaps === best.gaps && candidate.chosen.length < best.chosen.length)
+      ) {
+        best = candidate;
+      }
+    };
+    for (const option of masked) {
+      if (!(option.mask & (1 << i))) continue; // doesn't answer the first open series
+      if (option.mask & used) continue; // would duplicate an antigen already given
+      const rest = solve(used | option.mask);
+      consider({ gaps: rest.gaps, chosen: [option, ...rest.chosen] });
+    }
+    const withoutIt = solve(used | (1 << i));
+    consider({ gaps: withoutIt.gaps + 1, chosen: withoutIt.chosen });
+    memo.set(used, best);
+    return best;
   }
-  return { chosen: [], gaps: items };
+
+  const { chosen } = solve(0);
+  const covered = chosen.reduce((m, o) => m | o.mask, 0);
+  return {
+    // Listed in `options` order (which follows PRODUCTS), not the order the
+    // search happened to pick them in — a visit's shots read the same way
+    // however the search arrived at them.
+    chosen: chosen
+      .slice()
+      .sort((a, b) => a.order - b.order)
+      .map((o) => ({ product: o.product, covers: o.covers })),
+    gaps: items.filter((item) => !(covered & bitOf.get(item.seriesKey))),
+  };
 }
 
-function coverageFor(items, candidates, ticked) {
-  return candidates
-    .map((product) => ({
-      product,
-      covers: items.filter(
-        (d) =>
-          (!d.allowedProducts || d.allowedProducts.has(product.name)) &&
-          canCover({
-            product,
-            ticked,
-            seriesKey: d.seriesKey,
-            dose: d.dose,
-            visit: d.visit,
-            prevVisit: d.prevVisit,
-          }).ok
-      ),
-    }))
-    .filter((c) => c.covers.length > 0);
-}
-
-// Which stocked products could cover which of this visit's due doses, and
-// the fewest-injection way to combine them. Oral doses (rotavirus) never
-// combine with an injection and are reported separately — they cost the
-// child nothing in the needle count. `d.allowedProducts` (set for any dose
-// that came from a brand-committed variant) narrows candidates before
-// cover.js's own gate runs, so a product that's numerically licensed for a
-// dose but belongs to the WRONG variant is never offered.
+// Which stocked products may be given at this visit, and the fewest-needle
+// way to combine them. Oral doses (rotavirus) never combine with an
+// injection and are packed separately — they cost the child nothing in the
+// needle count, and no product mixes the two routes, so splitting them
+// cannot hide an antigen from deliverableAt's whole-syringe check.
+// `d.allowedProducts` (set for any dose that came from a brand-committed
+// variant) is part of that check too, so a product numerically licensed for
+// a dose but belonging to the WRONG variant is never offered.
 function coverVisit(due, ticked) {
   const oral = due.filter((d) => d.route === 'oral');
   const injectable = due.filter((d) => d.route !== 'oral');
-  const candidates = PRODUCTS.filter((p) => ticked.has(p.name) && !p.retired);
 
-  const { chosen, gaps } = minimalCover(injectable, coverageFor(injectable, candidates, ticked));
-  const oralResult = minimalCover(oral, coverageFor(oral, candidates, ticked));
-  return { injections: chosen, oral: oralResult.chosen, gaps: [...gaps, ...oralResult.gaps] };
+  const shots = bestPacking(injectable, deliverableAt(injectable, ticked));
+  const drops = bestPacking(oral, deliverableAt(oral, ticked));
+  return { injections: shots.chosen, oral: drops.chosen, gaps: [...shots.gaps, ...drops.gaps] };
+}
+
+// The cluster search below scores thousands of whole-schedule assignments,
+// and the same visit keeps coming back with the same doses due: shifting
+// DTaP's booster from 15 to 18 months changes nothing about what the
+// 2-month visit looks like, but every combination re-derives it. This
+// caches one visit's answer by what is actually due there.
+//
+// The key has to name everything coverVisit's answer depends on: the dose
+// definitions themselves (stable objects straight out of series.js — two
+// doses both numbered "Hib dose 2" are different objects on the 3-dose and
+// 4-dose paths, which is exactly the distinction that must not collapse),
+// where the previous dose landed, and any brand restriction the variant
+// carries. `ticked` is fixed for the whole of one buildPlan, so it needn't
+// be in the key — the cache is cleared at the top of every buildPlan, and
+// nothing here is async, so no two plans ever share it.
+const visitCache = new Map();
+let nextObjectId = 1;
+const objectIds = new WeakMap();
+function objectId(o) {
+  if (!o) return 0;
+  let id = objectIds.get(o);
+  if (!id) {
+    id = nextObjectId++;
+    objectIds.set(o, id);
+  }
+  return id;
+}
+
+function cachedCoverVisit(due, ticked) {
+  const key = due
+    .map((d) => `${objectId(d.dose)}@${d.visit.id}<${d.prevVisit?.id ?? ''}#${objectId(d.allowedProducts)}`)
+    .sort()
+    .join('|');
+  let hit = visitCache.get(key);
+  if (!hit) {
+    hit = coverVisit(due, ticked);
+    visitCache.set(key, hit);
+  }
+  return hit;
 }
 
 // Lexicographic score: an assignment that leaves more doses uncovered by any
@@ -210,7 +324,7 @@ function evaluateAssignment(dueByVisit, ticked) {
   let gaps = 0;
   let injections = 0;
   for (const due of Object.values(dueByVisit)) {
-    const result = coverVisit(due, ticked);
+    const result = cachedCoverVisit(due, ticked);
     gaps += result.gaps.length;
     injections += result.injections.length;
   }
@@ -272,7 +386,12 @@ function searchCluster(clusterKeys, resolved, ticked, objective) {
       const series = SERIES[key];
       if (series.variants && clusterKeys.length > 1) {
         const choices = clusterVariantOptions(key, ticked).flatMap((opt) =>
-          opt.sequences.map((seq) => ({ doses: opt.doses, seq, allowedProducts: opt.allowedProducts }))
+          opt.sequences.map((seq) => ({
+            variant: opt.variant,
+            doses: opt.doses,
+            seq,
+            allowedProducts: opt.allowedProducts,
+          }))
         );
         return { key, choices };
       }
@@ -281,7 +400,15 @@ function searchCluster(clusterKeys, resolved, ticked, objective) {
       const allowedProducts = resolved[key].variant
         ? allowedProductsFor(key, resolved[key].variant)
         : null;
-      return { key, choices: seriesSequences(doses).map((seq) => ({ doses, seq, allowedProducts })) };
+      return {
+        key,
+        choices: seriesSequences(doses).map((seq) => ({
+          variant: resolved[key].variant ?? null,
+          doses,
+          seq,
+          allowedProducts,
+        })),
+      };
     })
     .filter((m) => m.choices.length > 0);
 
@@ -322,7 +449,7 @@ function searchCluster(clusterKeys, resolved, ticked, objective) {
 // Returns:
 //   visits         — in calendar order, only visits with something due, each
 //                     { visit, injections: [{product, covers}], oral, gaps }
-//   placements     — seriesKey -> { doses, seq, allowedProducts } actually used
+//   placements     — seriesKey -> { variant, doses, seq, allowedProducts } used
 //   resolved       — seriesLength.js's per-series output, incl. its note —
 //                     the PREFERRED variant before the cluster search runs;
 //                     see seriesNotes below for what actually happened
@@ -334,6 +461,9 @@ function searchCluster(clusterKeys, resolved, ticked, objective) {
 //                     `resolved`'s note when the search overrode it (Hib/
 //                     HepB only — see clusterVariantOptions)
 export function buildPlan(ticked, { objective = 'injections' } = {}) {
+  // One plan, one cache — `ticked` is fixed for the whole of this call, so
+  // nothing from a previous formulary may survive into this one.
+  visitCache.clear();
   const resolved = {};
   for (const [key, series] of Object.entries(SERIES)) {
     resolved[key] = resolveSeriesLength(series, ticked);
@@ -359,7 +489,7 @@ export function buildPlan(ticked, { objective = 'injections' } = {}) {
 
   const visits = VISITS.filter((v) => dueByVisit[v.id]).map((v) => ({
     visit: v,
-    ...coverVisit(dueByVisit[v.id], ticked),
+    ...cachedCoverVisit(dueByVisit[v.id], ticked),
   }));
 
   const seriesNotes = {};
@@ -375,6 +505,17 @@ export function buildPlan(ticked, { objective = 'injections' } = {}) {
     // only overrides the shorter/preferred pick when the shorter one would
     // cost an extra injection (evaluateAssignment's tie-break never moves
     // the OTHER way: a strictly-preferred shorter choice always wins ties).
+    //
+    // "even though a shorter path is also stocked" is only true when the
+    // shorter path is a brand you actually buy (Hib's PedvaxHIB, HepB's
+    // monovalents). IPV's shorter path names no brand — every polio
+    // product can give it, and the series gets longer because of WHERE a
+    // combination product lands, not because of what is in the fridge. For
+    // that case say the variant's own sentence instead.
+    if (!r.variant?.requiresAllDosesFrom && placements[key].variant?.chosenNote) {
+      seriesNotes[key] = placements[key].variant.chosenNote;
+      continue;
+    }
     seriesNotes[key] =
       `Stocking a product that already covers another dose at the same visit ` +
       `(a combination product) commits this series to ${actualDoseCount} doses ` +

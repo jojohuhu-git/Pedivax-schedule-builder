@@ -58,3 +58,20 @@ describe('fixesForSeries', () => {
     expect(fixes[1]).toBe(fixFor(GAPPY_FORMULARY, 'MenACWY', 1));
   });
 });
+
+// Item B (2026-09-28 brand-indication queue). Ranking candidates by
+// injections alone suggested a product that closed the named gap while
+// opening the same number of gaps elsewhere.
+describe('a fix must not trade one gap for another', () => {
+  it('sends a Pentacel-only clinic to Quadracel, not Kinrix, for the last polio dose', () => {
+    const ticked = new Set(['Pentacel']);
+    // Kinrix is licensed for the FOURTH polio dose; a Pentacel child's
+    // 4-6 year shot is their fifth, which is what Quadracel is for.
+    expect(fixFor(ticked, 'IPV', 5)).toBe('Quadracel');
+    const withKinrix = buildPlan(new Set([...ticked, 'Kinrix']));
+    const withQuadracel = buildPlan(new Set([...ticked, 'Quadracel']));
+    const gaps = (plan) => plan.visits.flatMap((v) => v.gaps).length;
+    expect(gaps(withKinrix)).toBe(gaps(buildPlan(ticked)));
+    expect(gaps(withQuadracel)).toBeLessThan(gaps(buildPlan(ticked)));
+  });
+});

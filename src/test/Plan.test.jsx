@@ -62,6 +62,40 @@ describe('Plan — every current product stocked', () => {
     // shot already says so in the lead-in sentence.
     expect(container.querySelectorAll('.tag.combo')).toHaveLength(0);
   });
+
+  // Item B (2026-09-28 brand-indication queue). Pentacel contains polio and
+  // is given at 15 months, so that shot is a real 4th polio dose. Until
+  // item B the card said "covering two vaccines" and listed only DTaP and
+  // Hib — the polio dose was delivered and never shown.
+  it('shows Pentacel\'s polio dose at 15 months, counted out of five', () => {
+    const { container } = render(<Plan ticked={ALL_PRODUCTS} onAddProduct={() => {}} />);
+    const pentacel = [...container.querySelectorAll('.shot')].find((shot) =>
+      shot.querySelector('.shot-nm').textContent.startsWith('Pentacel')
+    );
+    expect(pentacel).toBeDefined();
+    expect(pentacel.textContent).toMatch(/One injection covering three vaccines/);
+    const antigens = [...pentacel.querySelectorAll('.ant')].map((a) => a.textContent);
+    expect(antigens).toContain('IPVDose 4 of 5');
+  });
+});
+
+// Item B. A clinic stocking only Pentacel gets an honest 4-year gap:
+// Pentacel must not be used as the 4-6 year booster, and its polio content
+// means it cannot be given at a visit where polio is not also due.
+describe('Plan — a Pentacel-only clinic', () => {
+  it('leaves the 4-year visit empty and names the missing polio and DTaP doses', () => {
+    const { container } = render(<Plan ticked={new Set(['Pentacel'])} onAddProduct={() => {}} />);
+    const gapPanel = screen.getByText('Nothing in your formulary covers these doses.').closest('.panel');
+    const polio = within(gapPanel).getByText('Inactivated poliovirus').closest('li');
+    expect(within(polio).getByText(/Nothing covers dose 5 of 5\./)).toBeInTheDocument();
+    const dtap = within(gapPanel).getByText('Diphtheria, tetanus, pertussis').closest('li');
+    expect(within(dtap).getByText(/Nothing covers dose 5 of 5\./)).toBeInTheDocument();
+    // ...and no shot anywhere is Pentacel at a visit past the 15-month one.
+    const pentacelShots = [...container.querySelectorAll('.shot')].filter((s) =>
+      s.querySelector('.shot-nm').textContent.startsWith('Pentacel')
+    );
+    expect(pentacelShots).toHaveLength(4);
+  });
 });
 
 describe('Plan — every current product stocked, including Bexsero (A5, E3)', () => {
