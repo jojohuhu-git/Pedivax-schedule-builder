@@ -1,5 +1,11 @@
 # Pedivax Schedule Builder — Handoff after item A (Hib booster fix) (2026-09-29)
 
+> **SUPERSEDED (2026-09-29)** — item B has since been done and merged too
+> (PR #13, `main` at `fe1bb8d`, 543 tests). The remaining queue is **C, D, E**, not
+> **B, C, D, E** as this file says below. Read
+> `handoff-2026-09-29-item-b-whole-syringe-done.md` instead; item C's scope has also
+> shrunk, because B fixed its Pentacel-at-4-years part structurally.
+
 > **Supersedes nothing** — this continues
 > `handoff-2026-09-28-brand-indication-airtight-queue.md` (now committed to `main`,
 > it had never been committed before this session). That file's Findings 1-3, owner
