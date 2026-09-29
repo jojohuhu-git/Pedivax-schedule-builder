@@ -96,8 +96,14 @@ const COMBO_VISIT_GROUPS = [
 function subLine(product) {
   if (product.kind === 'combination') return product.comboLabel;
   if (product.commonName) return product.commonName;
+  // Prefer setsSeriesLength over the covers[] dose-number span: for a
+  // product on the series' exclusive shorter path (PedvaxHIB), the two can
+  // differ — PedvaxHIB covers Hib doses [1,4] (it may also serve the 4-dose
+  // path's booster when brands are mixed) but its OWN path is still 3 doses
+  // start to finish (A: handoff-2026-09-28-brand-indication-airtight-queue.md).
+  const seriesKey = product.covers[0].series;
   const [lo, hi] = product.covers[0].doses;
-  const n = hi - lo + 1;
+  const n = product.setsSeriesLength?.[seriesKey] ?? hi - lo + 1;
   const doseText = `${n} dose${n === 1 ? '' : 's'}`;
   return product.route === 'oral' ? `${doseText} · oral` : doseText;
 }
