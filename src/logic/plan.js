@@ -274,6 +274,46 @@ function coverVisit(due, ticked) {
   return { injections: shots.chosen, oral: drops.chosen, gaps: [...shots.gaps, ...drops.gaps] };
 }
 
+// The cluster search below scores thousands of whole-schedule assignments,
+// and the same visit keeps coming back with the same doses due: shifting
+// DTaP's booster from 15 to 18 months changes nothing about what the
+// 2-month visit looks like, but every combination re-derives it. This
+// caches one visit's answer by what is actually due there.
+//
+// The key has to name everything coverVisit's answer depends on: the dose
+// definitions themselves (stable objects straight out of series.js — two
+// doses both numbered "Hib dose 2" are different objects on the 3-dose and
+// 4-dose paths, which is exactly the distinction that must not collapse),
+// where the previous dose landed, and any brand restriction the variant
+// carries. `ticked` is fixed for the whole of one buildPlan, so it needn't
+// be in the key — the cache is cleared at the top of every buildPlan, and
+// nothing here is async, so no two plans ever share it.
+const visitCache = new Map();
+let nextObjectId = 1;
+const objectIds = new WeakMap();
+function objectId(o) {
+  if (!o) return 0;
+  let id = objectIds.get(o);
+  if (!id) {
+    id = nextObjectId++;
+    objectIds.set(o, id);
+  }
+  return id;
+}
+
+function cachedCoverVisit(due, ticked) {
+  const key = due
+    .map((d) => `${objectId(d.dose)}@${d.visit.id}<${d.prevVisit?.id ?? ''}#${objectId(d.allowedProducts)}`)
+    .sort()
+    .join('|');
+  let hit = visitCache.get(key);
+  if (!hit) {
+    hit = coverVisit(due, ticked);
+    visitCache.set(key, hit);
+  }
+  return hit;
+}
+
 // Lexicographic score: an assignment that leaves more doses uncovered by any
 // stocked product is always worse, no matter how few injections it uses —
 // "fewest injections" is a score over deliverable plans, not a way to make
@@ -284,7 +324,7 @@ function evaluateAssignment(dueByVisit, ticked) {
   let gaps = 0;
   let injections = 0;
   for (const due of Object.values(dueByVisit)) {
-    const result = coverVisit(due, ticked);
+    const result = cachedCoverVisit(due, ticked);
     gaps += result.gaps.length;
     injections += result.injections.length;
   }
@@ -421,6 +461,9 @@ function searchCluster(clusterKeys, resolved, ticked, objective) {
 //                     `resolved`'s note when the search overrode it (Hib/
 //                     HepB only — see clusterVariantOptions)
 export function buildPlan(ticked, { objective = 'injections' } = {}) {
+  // One plan, one cache — `ticked` is fixed for the whole of this call, so
+  // nothing from a previous formulary may survive into this one.
+  visitCache.clear();
   const resolved = {};
   for (const [key, series] of Object.entries(SERIES)) {
     resolved[key] = resolveSeriesLength(series, ticked);
@@ -446,7 +489,7 @@ export function buildPlan(ticked, { objective = 'injections' } = {}) {
 
   const visits = VISITS.filter((v) => dueByVisit[v.id]).map((v) => ({
     visit: v,
-    ...coverVisit(dueByVisit[v.id], ticked),
+    ...cachedCoverVisit(dueByVisit[v.id], ticked),
   }));
 
   const seriesNotes = {};

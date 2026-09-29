@@ -2,7 +2,7 @@
 // App.jsx — owns the ticked formulary and the F6 undo-reset wiring. Beyond
 // this, App holds no logic of its own; Formulary/Plan/Rulebook render what
 // it passes them (already covered by their own test files).
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../ui/App.jsx';
@@ -10,6 +10,24 @@ import App from '../ui/App.jsx';
 beforeEach(() => {
   window.history.replaceState(null, '', '/');
   localStorage.clear();
+  // The F4 tick-delta message dismisses itself after a real 4 seconds
+  // (App.jsx, TICK_DELTA_MS), which made the assertions below a race
+  // against the machine rather than a test of the app: on CI's slower
+  // runner the F1 preset test took 9.6s end to end and the message had
+  // already cleared itself before the assertion ran. Neutralise that one
+  // timer — and only that one, by its length, since nothing else in the
+  // app schedules anything remotely that long — so userEvent's own short
+  // internal delays keep running on the real clock. (Swapping in vitest's
+  // fake timers wholesale does not work here: userEvent and Testing
+  // Library both stall on a clock that only advances when asked.)
+  const realSetTimeout = globalThis.setTimeout;
+  vi.stubGlobal('setTimeout', (fn, ms, ...rest) =>
+    ms >= 4000 ? 0 : realSetTimeout(fn, ms, ...rest)
+  );
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 // A near-empty formulary gaps most of the 13 series at once, and each gap
