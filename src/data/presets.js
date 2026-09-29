@@ -33,9 +33,17 @@ export const PRESETS = [
     id: 'fewest',
     label: 'Fewest injections',
     description: 'Every combination product this app models that actually helps.',
+    // Quadracel, not Kinrix, is the 4-6 year partner for Pentacel. Pentacel
+    // contains polio and is given at 15-18 months, so a Pentacel child has
+    // had four polio doses before the 4th birthday and the 4-6 year shot is
+    // their FIFTH — which is what Quadracel is approved for ("the fourth or
+    // fifth dose in the IPV series"), while Kinrix is approved as the fourth
+    // (the Infanrix/Pediarix lineage). Shipped as Kinrix until 2026-09-28,
+    // when item B's whole-syringe accounting made the mismatch visible as a
+    // real 2-dose gap at 15 months; see products.js's Kinrix/Quadracel facts.
     products: [
       'Pentacel',
-      'Kinrix',
+      'Quadracel',
       'ProQuad',
       'Engerix-B',
       'Rotarix',

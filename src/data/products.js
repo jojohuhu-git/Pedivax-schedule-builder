@@ -372,12 +372,18 @@ export const PRODUCTS = [
     group: 'IPV',
     kind: 'single',
     route: 'injection',
-    covers: [{ series: 'IPV', doses: [1, 4] }],
+    // Plain IPV, licensed for any dose of the polio series — including the
+    // 5th, which exists only on the combination path (series.js, IPV
+    // `combination` variant). `setsSeriesLength` keeps IPOL's own checklist
+    // line honest at "4 doses": an all-IPOL clinic runs the standard 4-dose
+    // series, and the wider covers[] span only means IPOL may also finish a
+    // series that a combination product made longer.
+    covers: [{ series: 'IPV', doses: [1, 5] }],
     minAgeDays: 42,
     maxAgeDays: null,
     insertMinAgeDays: 42,
     lineage: null,
-    setsSeriesLength: null,
+    setsSeriesLength: { IPV: 4 },
     cannotBeBooster: [],
     retired: null,
     facts: [
@@ -391,6 +397,19 @@ export const PRODUCTS = [
           'The primary series of IPOL vaccine consists of three 0.5 mL doses ' +
           'administered intramuscularly or subcutaneously, preferably eight or more ' +
           'weeks apart and usually at ages 2, 4, and 6 to 18 months.',
+      },
+      {
+        claim:
+          'Plain IPV carries no dose-number restriction of its own, so IPOL can ' +
+          'give the dose after the 4th birthday whether that dose is the 4th or ' +
+          '(after a polio-containing combination at 15-18 months) the 5th.',
+        source: 'cdc2025IpvNotes',
+        verified: '2026-09-28',
+        quote:
+          '4 or more doses of IPV can be administered before age 4 years when a ' +
+          'combination vaccine containing IPV is used. However, a dose is still ' +
+          'recommended on or after age 4 years and at least 6 months after the ' +
+          'previous dose.',
       },
     ],
   },

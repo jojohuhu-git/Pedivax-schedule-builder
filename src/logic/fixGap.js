@@ -19,9 +19,20 @@ import { scorePlan } from './score.js';
 
 // doseNumbers: the dose numbers of `seriesKey` currently gapped (Plan.jsx
 // already has this from gapsBySeries). Returns { [doseNumber]: productName
-// | null } — the unstocked product that closes that dose, if any, preferring
-// whichever leaves the fewest total injections (this app's own scoring
-// goal), tie-broken by name for a stable answer.
+// | null } — the unstocked product that closes that dose, if any.
+//
+// Candidates are ranked the way plan.js's own `isBetter` ranks plans:
+// fewest REMAINING GAPS across the whole schedule first, then fewest
+// injections, then name for a stable answer. Gaps have to come first
+// because closing one gap can open another: a Pentacel-only clinic is
+// missing the 4-6 year DTaP and polio doses, and adding Kinrix closes them
+// but takes the 15-month Pentacel shot away (Kinrix can only give the
+// FOURTH polio dose, so polio drops back to a 4-dose series and Pentacel's
+// 15-month polio content no longer has a dose to be) — leaving exactly as
+// many gaps as before, just somewhere else. Quadracel, licensed for the
+// fourth OR fifth polio dose, actually finishes the schedule. Ranking on
+// injections alone preferred Kinrix, because a plan that gives up on two
+// doses needs fewer needles than one that gives them.
 export function fixesForSeries(ticked, seriesKey, doseNumbers) {
   const candidates = PRODUCTS.filter(
     (p) => !p.retired && !ticked.has(p.name) && p.covers.some((c) => c.series === seriesKey)
@@ -33,20 +44,23 @@ export function fixesForSeries(ticked, seriesKey, doseNumbers) {
     const withProduct = new Set(ticked);
     withProduct.add(product.name);
     const plan = buildPlan(withProduct);
+    const allGaps = plan.visits.flatMap((v) => v.gaps);
     const stillGapped = new Set(
-      plan.visits
-        .flatMap((v) => v.gaps)
-        .filter((g) => g.seriesKey === seriesKey)
-        .map((g) => g.dose.n)
+      allGaps.filter((g) => g.seriesKey === seriesKey).map((g) => g.dose.n)
     );
+    const gaps = allGaps.length;
     const injections = scorePlan(plan).injections;
 
     for (const doseN of doseNumbers) {
       if (stillGapped.has(doseN)) continue;
       const current = best.get(doseN);
-      if (!current || injections < current.injections || (injections === current.injections && product.name < current.product)) {
-        best.set(doseN, { product: product.name, injections });
-      }
+      const better =
+        !current ||
+        gaps < current.gaps ||
+        (gaps === current.gaps &&
+          (injections < current.injections ||
+            (injections === current.injections && product.name < current.product)));
+      if (better) best.set(doseN, { product: product.name, gaps, injections });
     }
   }
 

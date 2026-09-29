@@ -29,12 +29,18 @@ describe('one source of truth — the rulebook and the planner agree on every do
   // For each variant, tick exactly the formulary that should commit the
   // planner to it: one of its named products, or (for the fallback variant,
   // which names none) nothing at all — resolveSeriesLength's own fallback
-  // rule.
+  // rule. IPV's 5-dose combination path is the one variant no brand list
+  // identifies — it is reached by WHERE a product lands on the calendar,
+  // not by which brand is stocked — so it names its own `reachedWith`
+  // formulary and this test uses that.
   const variantCases = variantSeries.flatMap((series) =>
     series.variants.map((variant) => ({
       seriesKey: series.key,
       variant,
-      ticked: variant.requiresAllDosesFrom ? new Set([variant.requiresAllDosesFrom[0]]) : new Set(),
+      ticked: new Set(
+        variant.reachedWith ??
+          (variant.requiresAllDosesFrom ? [variant.requiresAllDosesFrom[0]] : [])
+      ),
     }))
   );
 

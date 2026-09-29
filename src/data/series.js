@@ -437,9 +437,25 @@ export const SERIES = {
     ],
   },
 
-  // IPV is another plain series, like HepB/PCV/DTaP — IPOL is the only
-  // single-antigen product, no brand choice, no variants. Unlike the other
-  // boosters in this app, dose 4 has a real absolute-age floor (4 years)
+  // IPV is normally a 4-dose series, but it is the ONE series where CDC and
+  // AAP explicitly say a combination product may add a dose: "4 or more
+  // doses of IPV can be administered before age 4 years when a combination
+  // vaccine containing IPV is used. However, a dose is still recommended on
+  // or after age 4 years." Pentacel is given at 2, 4, 6 AND 15-18 months,
+  // so a Pentacel child really does get four polio doses before the fourth
+  // birthday and a fifth at 4-6 years. That is the standard outcome of
+  // using Pentacel, not over-vaccination — so it is modelled as a real
+  // 5-dose path rather than left as an uncounted extra antigen (checked
+  // 2026-09-28: the Hib and DTaP notes carry no equivalent allowance, so
+  // IPV is the only series that needs one).
+  //
+  // A 5th brand-length-setting series, then — but unlike Hib/RV/HepB/MenB,
+  // neither path is tied to a brand: every IPV product may give doses in
+  // either, and which path a clinic lands on falls out of where its
+  // products actually land on the calendar. plan.js's cluster search picks
+  // it, preferring the shorter 4-dose path on a tie.
+  //
+  // In both paths the final dose has a real absolute-age floor (4 years)
   // that binds on-time, not just a minimum interval — it's placed at the
   // y4 visit rather than the earlier m18/y3 visits the interval alone would
   // allow.
@@ -449,19 +465,78 @@ export const SERIES = {
     abbr: 'IPV',
     route: 'injection',
     ageBlock: 'infant',
-    doses: [
-      { n: 1, at: ['m2'], minAgeDays: 42 },
-      { n: 2, at: ['m4'], minIntervalFromPrevDays: 28 },
-      { n: 3, at: ['m6', 'm12', 'm15', 'm18'], minIntervalFromPrevDays: 28 },
+    variants: [
       {
-        n: 4,
-        at: ['y4', 'y5', 'y6'],
-        booster: true,
-        minAgeDays: 1461,
-        minIntervalFromPrevDays: 183,
+        id: 'standard',
+        label: 'Any IPV product, no polio-containing shot at the 15–18-month visit',
+        doseCount: 4,
+        chosenNote:
+          'Polio — 4 doses at 2, 4, 6–18 months and 4–6 years. A combination ' +
+          'product that also contains polio and is given at the 15–18-month ' +
+          'booster visit (Pentacel) makes it a 5-dose series instead; the extra ' +
+          'dose is expected, and the 4–6 year dose is still needed either way.',
+        doses: [
+          { n: 1, at: ['m2'], minAgeDays: 42 },
+          { n: 2, at: ['m4'], minIntervalFromPrevDays: 28 },
+          { n: 3, at: ['m6', 'm12', 'm15', 'm18'], minIntervalFromPrevDays: 28 },
+          {
+            n: 4,
+            at: ['y4', 'y5', 'y6'],
+            booster: true,
+            minAgeDays: 1461,
+            minIntervalFromPrevDays: 183,
+          },
+        ],
+      },
+      {
+        id: 'combination',
+        label: 'A polio-containing combination product at the 15–18-month visit (Pentacel)',
+        doseCount: 5,
+        fallback: true,
+        // The one variant in this app that no brand list can identify: it is
+        // reached by WHERE a product lands, not by which brand is stocked.
+        // Named here so one-source-of-truth.test.js can build the formulary
+        // that commits the planner to it.
+        reachedWith: ['Pentacel'],
+        chosenNote:
+          'Polio — 5 doses at 2, 4, 6, 15–18 months and 4–6 years. Pentacel ' +
+          'contains polio and is given at the 15–18-month booster visit, so that ' +
+          'shot is a 4th polio dose; a dose on or after the 4th birthday is still ' +
+          'recommended, which makes five. CDC and AAP both allow this explicitly.',
+        doses: [
+          { n: 1, at: ['m2'], minAgeDays: 42 },
+          { n: 2, at: ['m4'], minIntervalFromPrevDays: 28 },
+          { n: 3, at: ['m6'], minIntervalFromPrevDays: 28 },
+          // The extra dose exists because a DTaP-IPV combination lands on
+          // the 15-18 month DTaP booster visit — that is the only place it
+          // ever comes from, so that is the only window it is offered in.
+          { n: 4, at: ['m15', 'm18'], minIntervalFromPrevDays: 28 },
+          {
+            n: 5,
+            at: ['y4', 'y5', 'y6'],
+            booster: true,
+            minAgeDays: 1461,
+            minIntervalFromPrevDays: 183,
+          },
+        ],
       },
     ],
     facts: [
+      {
+        claim:
+          'A combination product containing polio may push the count past 4 before ' +
+          'the 4th birthday, and that is expected rather than an error — but a dose ' +
+          'on or after age 4 is still recommended, so a Pentacel child ends on 5 ' +
+          'doses. CDC and AAP state this in identical words, so there is no ' +
+          'disagreement to resolve.',
+        source: 'cdc2025IpvNotes',
+        verified: '2026-09-28',
+        quote:
+          '4 or more doses of IPV can be administered before age 4 years when a ' +
+          'combination vaccine containing IPV is used. However, a dose is still ' +
+          'recommended on or after age 4 years and at least 6 months after the ' +
+          'previous dose.',
+      },
       {
         claim:
           '4-dose series: 2, 4, 6-18 months, 4-6 years. The final dose must be on or ' +

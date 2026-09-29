@@ -47,8 +47,16 @@ describe('buildPlan — full formulary (every current product stocked)', () => {
   it('the worked Pentacel example: DTaP dose 4 and Hib\'s booster land together at 15 months, not spread across 12 and 15/18', () => {
     const m15 = visit(plan, 'm15');
     expect(productsGiven(m15)).toEqual(['Pentacel']);
+    // All THREE of Pentacel's antigens are counted here, polio included.
+    // Pentacel contains IPV and is given at 15 months, so this shot is a
+    // real 4th polio dose; CDC and AAP both say so explicitly and both say
+    // a dose on or after the 4th birthday is still needed, which is why
+    // polio runs to 5 doses on this formulary (series.js, IPV
+    // `combination` variant). Until 2026-09-28 the planner counted only
+    // DTaP and Hib here and the polio dose was delivered but never shown.
     const seriesCovered = covers(m15, 'Pentacel').map((c) => c.seriesKey).sort();
-    expect(seriesCovered).toEqual(['DTaP', 'Hib']);
+    expect(seriesCovered).toEqual(['DTaP', 'Hib', 'IPV']);
+    expect(covers(m15, 'Pentacel').find((c) => c.seriesKey === 'IPV').dose.n).toBe(4);
     // and nothing was left behind at 12 months for either series
     const m12 = visit(plan, 'm12');
     expect(covers(m12, 'Pentacel')).toEqual([]);
