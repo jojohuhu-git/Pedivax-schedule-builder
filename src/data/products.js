@@ -30,7 +30,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 0,
     lineage: null,
     setsSeriesLength: { HepB: 3 },
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -55,7 +55,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 0,
     lineage: null,
     setsSeriesLength: { HepB: 3 },
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -78,7 +78,7 @@ export const PRODUCTS = [
     insertMaxAgeDays: 168,
     lineage: null,
     setsSeriesLength: { RV: 2 },
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -106,7 +106,7 @@ export const PRODUCTS = [
     insertMaxAgeDays: 224,
     lineage: null,
     setsSeriesLength: { RV: 3 },
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -133,7 +133,7 @@ export const PRODUCTS = [
     insertMinAgeDays: null,
     lineage: null,
     setsSeriesLength: { Hib: 4 },
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -159,7 +159,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 42,
     lineage: null,
     setsSeriesLength: { Hib: 4 },
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -191,7 +191,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 42,
     lineage: null,
     setsSeriesLength: { Hib: 3 },
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -220,7 +220,7 @@ export const PRODUCTS = [
     insertMaxAgeDays: 9131,
     lineage: null,
     setsSeriesLength: { MenB: 2 },
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -245,7 +245,7 @@ export const PRODUCTS = [
     insertMaxAgeDays: 9131,
     lineage: null,
     setsSeriesLength: { MenB: 2 },
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -270,7 +270,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 42,
     lineage: null,
     setsSeriesLength: null,
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -298,7 +298,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 42,
     lineage: null,
     setsSeriesLength: null,
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -324,7 +324,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 42,
     lineage: null,
     setsSeriesLength: null,
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -351,7 +351,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 42,
     lineage: null,
     setsSeriesLength: null,
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -384,7 +384,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 42,
     lineage: null,
     setsSeriesLength: { IPV: 4 },
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -424,7 +424,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 365,
     lineage: null,
     setsSeriesLength: null,
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -450,7 +450,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 365,
     lineage: null,
     setsSeriesLength: null,
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -474,7 +474,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 365,
     lineage: null,
     setsSeriesLength: null,
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -513,7 +513,7 @@ export const PRODUCTS = [
     insertMaxAgeDays: 4383,
     lineage: null,
     setsSeriesLength: null,
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -568,7 +568,7 @@ export const PRODUCTS = [
     insertMaxAgeDays: null,
     lineage: null,
     setsSeriesLength: null,
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -595,7 +595,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 365,
     lineage: null,
     setsSeriesLength: null,
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -622,7 +622,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 3653,
     lineage: null,
     setsSeriesLength: null,
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -646,7 +646,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 3653,
     lineage: null,
     setsSeriesLength: null,
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -672,7 +672,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 3287,
     lineage: null,
     setsSeriesLength: null,
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -702,7 +702,7 @@ export const PRODUCTS = [
     insertMaxAgeDays: 20089,
     lineage: null,
     setsSeriesLength: null,
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -731,7 +731,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 42,
     lineage: null,
     setsSeriesLength: null,
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -769,7 +769,7 @@ export const PRODUCTS = [
     insertMaxAgeDays: 2192,
     lineage: null,
     setsSeriesLength: { HepB: 4 },
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -827,7 +827,22 @@ export const PRODUCTS = [
     insertMaxAgeDays: 1461,
     lineage: null,
     setsSeriesLength: { Hib: 4 },
-    cannotBeBooster: [],
+    // Item C, 2026-09-29: "not the 4-6 year DTaP/IPV booster" below, wired
+    // as a real restriction instead of a sentence nobody enforced. It is
+    // deliberately NOT unconditional like Vaxelis's — Pentacel's own dose 4
+    // IS the correct 12-15-month DTaP/Hib/IPV booster, so the age floor
+    // (1,461 days = 4 years, the same threshold DTaP dose 5 and IPV's own
+    // 4-6-year dose already use) is what tells the two apart. Hib carries no
+    // matching entry: Hib has no 4-6-year booster for anything to restrict.
+    // The other half of the same fact below — "not for any primary-series
+    // dose at age 5+" — is already covered by this product's own
+    // `maxAgeDays: 1461` (tighter than the 1,826-day/5-year floor the fact
+    // names), checked by restrictions.test.js's prose test so it can't
+    // silently stop being true.
+    restrictions: [
+      { series: 'DTaP', rule: 'not-booster', minAgeDays: 1461, source: 'izPentacel' },
+      { series: 'IPV', rule: 'not-booster', minAgeDays: 1461, source: 'izPentacel' },
+    ],
     retired: null,
     facts: [
       {
@@ -844,8 +859,10 @@ export const PRODUCTS = [
       },
       {
         claim:
-          'Not for use as any primary-series dose at age 5+, and not the 4-6 year ' +
-          'DTaP/IPV booster — that role belongs to Kinrix/Quadracel.',
+          'Not for use as any primary-series dose at age 5+ (already covered by this ' +
+          "product's own maxAgeDays), and not the 4-6 year DTaP/IPV booster (wired " +
+          "above as this product's `restrictions`) — that role belongs to " +
+          'Kinrix/Quadracel.',
         source: 'izPentacel',
         verified: '2026-09-25',
         quote:
@@ -878,7 +895,19 @@ export const PRODUCTS = [
     insertMaxAgeDays: 1461,
     lineage: null,
     setsSeriesLength: { Hib: 4, HepB: 4 },
-    cannotBeBooster: ['DTaP', 'IPV', 'Hib'],
+    // Item C, 2026-09-29: for DTaP and IPV, Vaxelis's own dose-number licence
+    // ([1,3]) already excludes their booster doses (both are dose 4+), so
+    // these two entries mostly document the restriction for the rulebook —
+    // but for Hib, Vaxelis's licence ([1,3]) reaches all the way to the
+    // pedvax-variant booster (dose 3), so this IS the only thing standing
+    // between a stocked Vaxelis and an illegal Hib booster. See
+    // restrictions.test.js's reason-code test, which proves each entry
+    // fires for the reason named here, not a numeric coincidence.
+    restrictions: [
+      { series: 'DTaP', rule: 'not-booster', minAgeDays: null, source: 'izVaxelis' },
+      { series: 'IPV', rule: 'not-booster', minAgeDays: null, source: 'izVaxelis' },
+      { series: 'Hib', rule: 'not-booster', minAgeDays: null, source: 'izVaxelis' },
+    ],
     retired: null,
     facts: [
       {
@@ -897,8 +926,10 @@ export const PRODUCTS = [
         claim:
           'Not approved as the booster dose of DTaP, IPV, or Hib — broader than the ' +
           'Hib-only restriction the frozen mockup assumed; corrected here to all ' +
-          'three (in practice the dose-number licence above already excludes dose ' +
-          '4/5 for each, so this mainly documents the restriction for the rulebook).',
+          'three. For DTaP and IPV the dose-number licence above already excludes ' +
+          'dose 4/5, so this mostly documents the restriction for the rulebook — but ' +
+          "for Hib the licence's own dose 3 reaches the pedvax-variant booster, so " +
+          'this restriction is the only thing blocking it (item C, 2026-09-29).',
         source: 'izVaxelis',
         verified: '2026-09-25',
         quote: 'It is not approved as the booster dose of DTaP [dose 4 or 5] or IPV [dose 4] or Hib [dose 4].',
@@ -941,7 +972,7 @@ export const PRODUCTS = [
         'or when Kinrix or Quadracel is the only product stocked.',
     },
     setsSeriesLength: null,
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -993,7 +1024,7 @@ export const PRODUCTS = [
         'or when Kinrix or Quadracel is the only product stocked.',
     },
     setsSeriesLength: null,
-    cannotBeBooster: [],
+    restrictions: [],
     retired: null,
     facts: [
       {
@@ -1033,7 +1064,7 @@ export const PRODUCTS = [
     insertMinAgeDays: 42,
     lineage: null,
     setsSeriesLength: null,
-    cannotBeBooster: [],
+    restrictions: [],
     retired: '2024-04-30',
     facts: [
       {

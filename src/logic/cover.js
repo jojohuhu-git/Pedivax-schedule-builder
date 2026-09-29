@@ -7,14 +7,21 @@
 // Checks run in this order (docs/data-design.md's own list):
 //   1. the product is stocked and not retired
 //   2. the series matches something the product covers
-//   3. the dose number is inside that coverage's `doses` range
-//   4. the visit's age is inside the product's own min/max age
-//   5. the visit is one of the dose's nominal windows (`dose.at`), and the
+//   3. a written restriction (`product.restrictions[]`) names this series'
+//      booster dose, and the visit is old enough for that restriction to
+//      apply — checked BEFORE the dose-number licence below, on purpose:
+//      a written, sourced restriction must always be the reason reported
+//      when it is the reason, never buried behind a numeric coincidence
+//      that happens to reach the same answer for an unrelated cause (see
+//      restrictions.test.js's reason-code test, and docs/decisions.md,
+//      "Found while building item C")
+//   4. the dose number is inside that coverage's `doses` range
+//   5. the visit's age is inside the product's own min/max age
+//   6. the visit is one of the dose's nominal windows (`dose.at`), and the
 //      dose's own minAgeDays / maxAgeDays / minIntervalFromPrevDays hold —
 //      checked numerically, not just by list membership, because an earlier
 //      dose can shift (to catch a combination product) and change which of
 //      several nominal visits is actually legal
-//   6. the product is not barred from being this series' booster dose
 //
 // `dose` is the resolved dose definition for this dose number — either a
 // plain series' `doses[n-1]`, or (for Hib/RV/MenB) the chosen variant's
@@ -34,6 +41,13 @@ export function canCover({ product, ticked, seriesKey, dose, visit, prevVisit })
     return { ok: false, reason: 'series-not-covered' };
   }
 
+  if (dose.booster) {
+    const restriction = restrictionBlocking(product, seriesKey, visit);
+    if (restriction) {
+      return { ok: false, reason: 'restricted-booster', restriction };
+    }
+  }
+
   const [loDose, hiDose] = coverage.doses;
   if (dose.n < loDose || dose.n > hiDose) {
     return { ok: false, reason: 'dose-number-not-licensed' };
@@ -51,11 +65,25 @@ export function canCover({ product, ticked, seriesKey, dose, visit, prevVisit })
     return windowResult;
   }
 
-  if (dose.booster && product.cannotBeBooster.includes(seriesKey)) {
-    return { ok: false, reason: 'cannot-be-booster' };
-  }
-
   return { ok: true };
+}
+
+// Finds the written restriction (if any) that bars `product` from giving
+// `seriesKey`'s booster dose at `visit` — the replacement for the old blunt
+// `cannotBeBooster` flag (item C, 2026-09-29). A restriction with
+// `minAgeDays: null` applies to every booster of that series (Vaxelis: not
+// the booster at all, per immunize.org); one with a number applies only
+// from that age on (Pentacel: fine as the 15-month DTaP/Hib/IPV booster —
+// that IS its licensed booster — but not as the 4–6-year one). Exported so
+// restrictions.test.js's reason-code test can call it directly, isolated
+// from every other check in `canCover`.
+export function restrictionBlocking(product, seriesKey, visit) {
+  return (product.restrictions ?? []).find(
+    (r) =>
+      r.rule === 'not-booster' &&
+      r.series === seriesKey &&
+      (r.minAgeDays == null || visit.ageDays >= r.minAgeDays)
+  );
 }
 
 // Is `visit` a legal place for this dose, given where the previous dose in

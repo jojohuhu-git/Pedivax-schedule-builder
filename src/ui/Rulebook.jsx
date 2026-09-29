@@ -59,16 +59,36 @@ function coverageLine(product) {
     .join(', ');
 }
 
+// A written restriction may apply from birth (Vaxelis: never the booster) or
+// only from some age on (Pentacel: fine as the 15-month booster, barred from
+// the 4-6-year one) — grouped by that age so products with the same age
+// floor across several series print one sentence, not one per series.
+function boosterNotes(product) {
+  const bySeries = new Map();
+  for (const r of product.restrictions ?? []) {
+    if (r.rule !== 'not-booster') continue;
+    const key = r.minAgeDays ?? 'always';
+    if (!bySeries.has(key)) bySeries.set(key, []);
+    bySeries.get(key).push(SERIES[r.series]?.abbr ?? r.series);
+  }
+  return [...bySeries.entries()].map(([ageDays, series]) => {
+    const who = series.join(', ');
+    return ageDays === 'always'
+      ? `${product.name} may not be used as the booster dose for: ${who}.`
+      : `${product.name} may not be used as the booster dose for: ${who}, from the ` +
+          `${visitAtAge(ageDays)} visit on.`;
+  });
+}
+
+function visitAtAge(ageDays) {
+  return VISITS.find((v) => v.ageDays === ageDays)?.label ?? `day ${ageDays}`;
+}
+
 function ProductRule({ product }) {
   const lengthNotes = Object.entries(product.setsSeriesLength ?? {}).map(
     ([key, n]) => `Using ${product.name} commits ${SERIES[key]?.abbr ?? key} to a ${n}-dose series.`
   );
-  const boosterNote =
-    product.cannotBeBooster.length > 0
-      ? `${product.name} may not be used as the booster dose for: ${product.cannotBeBooster
-          .map((k) => SERIES[k]?.abbr ?? k)
-          .join(', ')}.`
-      : null;
+  const boosterLines = boosterNotes(product);
 
   return (
     <div className="rule-product">
@@ -85,7 +105,11 @@ function ProductRule({ product }) {
           {n}
         </p>
       ))}
-      {boosterNote && <p className="quiet">{boosterNote}</p>}
+      {boosterLines.map((n) => (
+        <p className="quiet" key={n}>
+          {n}
+        </p>
+      ))}
       {product.lineage && (
         <p className="quiet">
           Usually paired with: {product.lineage.prefer.join(', ')}. {product.lineage.escape}
