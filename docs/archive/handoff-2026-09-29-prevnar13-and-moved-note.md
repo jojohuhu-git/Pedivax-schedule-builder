@@ -1,3 +1,9 @@
+> **SUPERSEDED 2026-09-29 by `handoff-2026-09-29-colour-and-perf.md`.** Two more PRs
+> merged after this file was written: #22 (shared-decision doses count as injections, the
+> purple is gone) and #25 (the per-tick lag, 109-188 ms down to 1-41 ms on the live site).
+> `main` is at `ac29381` @ 717 tests, not `1afd71e` @ 703. This file's "no open queue" is
+> still true; read the newer one for the colour rule and the three performance traps.
+
 # Pedivax Schedule Builder — Handoff after PRs #19 and #20 (2026-09-29, session 2)
 
 Repo: `/Users/joannehuang/Downloads/Pedivax-schedule-builder`. Live at
