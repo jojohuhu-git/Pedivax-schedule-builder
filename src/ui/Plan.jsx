@@ -10,6 +10,7 @@ import { scorePlan } from '../logic/score.js';
 import { suggest } from '../logic/suggest.js';
 import { describeEmptyVisits } from '../logic/emptyVisits.js';
 import { fixesForSeries } from '../logic/fixGap.js';
+import { placementNote } from '../logic/placement.js';
 
 // A combination product's antigen count is always small (2-4) — spelled out
 // reads as a clinician's sentence rather than a template filling in a number.
@@ -27,21 +28,12 @@ function abbr(seriesKey) {
   return SERIES[seriesKey]?.abbr ?? seriesKey;
 }
 
-function visitLabel(id) {
-  return VISITS.find((v) => v.id === id)?.label ?? id;
-}
-
-function movedNote(covers, visitId) {
-  const moved = covers.find((c) => c.dose.at.length > 1 && c.dose.at[0] !== visitId);
-  if (!moved) return null;
-  const earliest = visitLabel(moved.dose.at[0]);
-  const here = visitLabel(visitId);
-  return `Earliest due at ${earliest}; scheduled at ${here} instead to combine with another vaccine due at that visit, without an extra injection or visit.`;
-}
-
-function Shot({ shot, visitId, index, placements }) {
+// Why this dose sits at this visit is `placement.js`'s to answer — reading
+// `dose.at[0]` as "earliest" and asserting a combination that was never
+// checked is exactly the pair of mistakes that lived here until 2026-09-29.
+function Shot({ shot, visitId, index, placements, otherDosesDueHere }) {
   const sdm = isSdmShot(shot);
-  const note = movedNote(shot.covers, visitId);
+  const note = placementNote({ covers: shot.covers, visitId, otherDosesDueHere });
   return (
     <div className={`shot${sdm ? ' sdmshot' : ''}`}>
       <div className="shot-n">{index + 1}</div>
@@ -216,8 +208,11 @@ export default function Plan({ ticked, onAddProduct }) {
       )}
 
       <div>
-        {plan.visits.map(({ visit, injections, oral }) => {
+        {plan.visits.map(({ visit, injections, oral, gaps }) => {
           const allShots = [...injections, ...oral];
+          // Anything else due at this visit — another shot, or a dose no
+          // stocked product covers (still due, listed in the gap panel).
+          const otherDosesDueHere = allShots.length > 1 || gaps.length > 0;
           const sdmOnly = allShots.length > 0 && allShots.every(isSdmShot);
           const n = injections.filter((s) => !isSdmShot(s)).length;
           const extras = [];
@@ -240,6 +235,7 @@ export default function Plan({ ticked, onAddProduct }) {
                     visitId={visit.id}
                     index={i}
                     placements={plan.placements}
+                    otherDosesDueHere={otherDosesDueHere}
                     key={`${shot.product.name}-${i}`}
                   />
                 ))}

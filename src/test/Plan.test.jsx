@@ -8,6 +8,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Plan from '../ui/Plan.jsx';
 import { PRODUCTS } from '../data/products.js';
+import { PRESETS } from '../data/presets.js';
 import { buildPlan } from '../logic/plan.js';
 import { scorePlan } from '../logic/score.js';
 
@@ -225,5 +226,66 @@ describe('Plan — a pentavalent MenABCWY product', () => {
     expect(y11).toBeDefined();
     expect(y11.textContent).toContain('MenQuadfi');
     expect(y11.textContent).not.toContain('Penbraya');
+  });
+});
+
+// 2026-09-29. The note under a shot ("Earliest due at …; scheduled at …
+// instead to combine with another vaccine…") was wrong in two independent
+// ways at the 17-year visit — see placement.test.js's header for both. These
+// are the rendering half of that fix: placement.test.js proves the sentence
+// is right, these prove the clinician is shown the right sentence.
+describe('Plan — why a dose sits at the visit it does', () => {
+  const FEWEST = new Set(PRESETS.find((p) => p.id === 'fewest').products);
+  const BASICS = new Set(PRESETS.find((p) => p.id === 'basics').products);
+
+  function visitCard(container, label) {
+    return [...container.querySelectorAll('.visit')].find(
+      (v) => v.querySelector('.v-age').textContent === label
+    );
+  }
+
+  it('does not tell the clinician MenB dose 2 could have been given at 16 years', () => {
+    const { container } = render(<Plan ticked={FEWEST} onAddProduct={() => {}} />);
+    const y17 = visitCard(container, '17 years');
+    expect(y17).toBeDefined();
+    expect(y17.textContent).toContain('Bexsero');
+    const note = y17.querySelector('.seriesnote');
+    expect(note).not.toBeNull();
+    expect(note.textContent).not.toMatch(/Earliest due at 16 years/);
+    expect(note.textContent).not.toMatch(/as early as 16 years/);
+  });
+
+  it('does not tell the clinician the 17-year dose was combined with anything', () => {
+    const { container } = render(<Plan ticked={FEWEST} onAddProduct={() => {}} />);
+    const y17 = visitCard(container, '17 years');
+    // One shot only, so there is nothing it could have been combined with.
+    expect(y17.querySelectorAll('.shot')).toHaveLength(1);
+    expect(y17.querySelector('.seriesnote').textContent).not.toMatch(/combine|one injection covers/i);
+  });
+
+  it('tells the clinician the real reason instead — the interval after the previous dose', () => {
+    const { container } = render(<Plan ticked={FEWEST} onAddProduct={() => {}} />);
+    const note = visitCard(container, '17 years').querySelector('.seriesnote').textContent;
+    expect(note).toMatch(/minimum interval/);
+    expect(note).toMatch(/17 years is the earliest visit that can give it/);
+  });
+
+  it('still explains a dose that really was held back to share one syringe (15-month Pentacel)', () => {
+    const { container } = render(<Plan ticked={FEWEST} onAddProduct={() => {}} />);
+    const note = visitCard(container, '15 months').querySelector('.seriesnote').textContent;
+    expect(note).toMatch(/as early as 12 months/);
+    expect(note).toMatch(/one injection covers it together with the other vaccines due at that visit/);
+  });
+
+  it('never claims a saved injection for a dose that is still its own shot (2-month hepatitis B)', () => {
+    const { container } = render(<Plan ticked={BASICS} onAddProduct={() => {}} />);
+    const m2 = visitCard(container, '2 months');
+    const engerix = [...m2.querySelectorAll('.shot')].find((s) =>
+      s.querySelector('.shot-nm').textContent.startsWith('Engerix-B')
+    );
+    expect(engerix).toBeDefined();
+    const note = engerix.querySelector('.seriesnote').textContent;
+    expect(note).toMatch(/where other vaccines are already due/);
+    expect(note).not.toMatch(/combine|one injection covers|without an extra injection/i);
   });
 });
