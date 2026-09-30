@@ -11,6 +11,7 @@ import { PRODUCTS } from '../data/products.js';
 import { PRESETS } from '../data/presets.js';
 import { buildPlan } from '../logic/plan.js';
 import { scorePlan } from '../logic/score.js';
+import { suggest } from '../logic/suggest.js';
 
 const ALL_PRODUCTS = new Set(PRODUCTS.filter((p) => !p.retired).map((p) => p.name));
 
@@ -163,6 +164,37 @@ describe('Plan — a shared-decision dose is counted and drawn like any other', 
   it('still says in words that the dose is not routine', () => {
     render(<Plan ticked={ALL_PRODUCTS} onAddProduct={() => {}} />);
     expect(screen.getAllByText(/shared clinical decision-making/).length).toBeGreaterThan(0);
+  });
+});
+
+// The two advisory panels are computed from a deferred copy of the
+// formulary so the schedule can paint immediately (see Plan.jsx's comment
+// for the measurements). That means they can briefly hold the previous
+// formulary's answer. The one case where stale advice would actually
+// mislead — being told to stock something already in the fridge — is closed
+// by filtering the list against the CURRENT formulary on the way out, and
+// this is that guard.
+describe('Plan — advice is never about a product you already stock', () => {
+  it.each([
+    ['nothing stocked', new Set()],
+    ['everything stocked', ALL_PRODUCTS],
+    ['one combination product only', new Set(['Pentacel'])],
+    ['a preset', new Set(PRESETS[0].products)],
+  ])('%s: no suggestion names a ticked product', (_label, ticked) => {
+    const { container } = render(<Plan ticked={ticked} onAddProduct={() => {}} />);
+    const named = [...container.querySelectorAll('.sugg-row .s-nm')].map((el) =>
+      el.childNodes[0].textContent.trim()
+    );
+    for (const name of named) expect(ticked.has(name)).toBe(false);
+  });
+
+  it('still reaches the right answer once settled — every suggestion matches suggest()', () => {
+    const ticked = new Set(PRESETS[0].products);
+    const { container } = render(<Plan ticked={ticked} onAddProduct={() => {}} />);
+    const shown = [...container.querySelectorAll('.sugg-row .s-nm')].map((el) =>
+      el.childNodes[0].textContent.trim()
+    );
+    expect(shown).toEqual(suggest(ticked).map((s) => s.product));
   });
 });
 
