@@ -1,3 +1,11 @@
+> **SUPERSEDED 2026-09-29 by `handoff-2026-09-29-prevnar13-and-moved-note.md`.**
+> Both loose ends this file listed are now closed: the `movedNote` bug it deferred was
+> fixed and merged (PR #19), and the Penmenvy authority question it raised was answered by
+> the owner — **Penmenvy stays in, no code change owed.** The Prevnar 13 date it flagged as
+> unverified has been abandoned entirely (PR #20): the card now says "No longer
+> recommended" with no date, because no organization source gives one. `main` is at
+> `ebdb407` @ 703 tests, not `5af2ce8` @ 679. Read the newer file.
+
 # Pedivax Schedule Builder — Handoff after item E, the last of the brand-indication queue (2026-09-29)
 
 Repo: `/Users/joannehuang/Downloads/Pedivax-schedule-builder`. Live at
