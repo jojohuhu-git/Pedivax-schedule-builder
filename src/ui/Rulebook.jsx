@@ -141,7 +141,7 @@ function ProductRule({ product }) {
         {product.commonName && <span className="tag valence">{product.commonName}</span>}
         {product.kind === 'combination' && <span className="tag combo">Combination</span>}
         {product.route === 'oral' && <span className="tag oral">Oral</span>}
-        {product.retired && <span className="tag retired">Retired {product.retired}</span>}
+        {product.retired && <span className="tag retired">No longer recommended</span>}
       </h4>
       <p className="quiet">Covers: {coverageLine(product)}</p>
       {lengthNotes.map((n) => (

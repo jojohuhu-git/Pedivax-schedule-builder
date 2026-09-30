@@ -46,6 +46,55 @@ describe('sources — every fact cites a real, complete source', () => {
   });
 });
 
+// Owner decision 2026-09-29: `retired` is a FLAG, never a date. It was
+// `'2024-04-30'` for four sessions, on the strength of a Medline PDF behind
+// an active bot wall that no tool could read. Re-reading the sources live
+// settled it: no organization source gives PCV13 a retirement date at all.
+// immunize.org says only that it "is FDA-licensed and may still be available
+// in some clinics. It is no longer routinely recommended." The one source
+// naming a year (2024) is Pfizer's own marketing page, and that sentence is
+// about adults while this app plans children. "Withdrawn on a date" is
+// therefore a stronger claim than anything supports; "no longer recommended"
+// is exactly what the source says, and is also the real reason the planner
+// refuses the product. These tests keep a date from creeping back in.
+describe('a withdrawn product states its status, never a date no source gives', () => {
+  const retiredProducts = PRODUCTS.filter((p) => p.retired);
+
+  it('has a withdrawn product to check at all', () => {
+    expect(retiredProducts.length).toBeGreaterThan(0);
+  });
+
+  it.each(retiredProducts.map((p) => [p.name, p]))(
+    "%s's `retired` is a plain flag, carrying no year or date",
+    (_name, product) => {
+      expect(product.retired).toBe(true);
+    }
+  );
+
+  it.each(retiredProducts.map((p) => [p.name, p]))(
+    '%s explains its withdrawal in a fact citing an organization source',
+    (_name, product) => {
+      const retirementFacts = product.facts.filter((f) =>
+        /no longer|retire|withdraw/i.test(f.claim)
+      );
+      expect(retirementFacts.length).toBeGreaterThan(0);
+      for (const fact of retirementFacts) {
+        expect(SOURCES[fact.source].tier).toBe('organization');
+      }
+    }
+  );
+
+  it('no fact anywhere states a retirement date for a withdrawn product', () => {
+    for (const product of retiredProducts) {
+      for (const fact of product.facts) {
+        expect(fact.claim).not.toMatch(
+          /(retired|withdrawn|discontinued)\s+(on\s+)?(in\s+)?\d{4}/i
+        );
+      }
+    }
+  });
+});
+
 // One dose per (product, series-coverage) pair, from either the plain
 // `doses[]` or every variant's `doses[]` — a flat pool is fine here since
 // we're only asking "does mutating the insert-only fields change the
