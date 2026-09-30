@@ -46,6 +46,50 @@ describe('sources — every fact cites a real, complete source', () => {
   });
 });
 
+// Owner decision 2026-09-29: "Can ignore Prevnar's exact retirement date, a
+// year is sufficient." A day-level date was carried for four sessions on a
+// source nobody could read (a Medline PDF behind an active bot wall). No
+// organization source gives PCV13 a retirement date at all — immunize.org
+// says only that it "is FDA-licensed and may still be available in some
+// clinics. It is no longer routinely recommended." The single source naming
+// a year is Pfizer's own marketing page, and it speaks about adults while
+// this app plans children. So a retirement value here may be a bare year;
+// a day may only be re-added alongside a sentence read live from an
+// organization source, which is what this test is here to make somebody
+// notice.
+describe('retirement dates are only as precise as a source supports', () => {
+  const retiredProducts = PRODUCTS.filter((p) => p.retired);
+
+  it('has a retired product to check at all', () => {
+    expect(retiredProducts.length).toBeGreaterThan(0);
+  });
+
+  it.each(retiredProducts.map((p) => [p.name, p]))(
+    "%s's retirement value is a bare year or a full date, nothing in between",
+    (_name, product) => {
+      expect(product.retired).toMatch(/^\d{4}(-\d{2}-\d{2})?$/);
+    }
+  );
+
+  it('Prevnar 13 records the year alone, with no unverifiable day', () => {
+    const pcv13 = PRODUCTS.find((p) => p.name === 'Prevnar 13');
+    expect(pcv13.retired).toBe('2024');
+  });
+
+  it.each(retiredProducts.map((p) => [p.name, p]))(
+    '%s explains its retirement in a fact citing an organization source',
+    (_name, product) => {
+      const retirementFacts = product.facts.filter((f) =>
+        /no longer|retire/i.test(f.claim)
+      );
+      expect(retirementFacts.length).toBeGreaterThan(0);
+      for (const fact of retirementFacts) {
+        expect(SOURCES[fact.source].tier).toBe('organization');
+      }
+    }
+  );
+});
+
 // One dose per (product, series-coverage) pair, from either the plain
 // `doses[]` or every variant's `doses[]` — a flat pool is fine here since
 // we're only asking "does mutating the insert-only fields change the

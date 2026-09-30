@@ -424,15 +424,19 @@ export const SERIES = {
       },
       {
         claim:
-          'PCV13 (Prevnar 13) is no longer the routinely-used product; the two current ' +
+          'PCV13 (Prevnar 13) is no longer routinely recommended; the two current ' +
           'products are PCV15 (Vaxneuvance) and PCV20 (Prevnar 20), both licensed from ' +
-          "6 weeks of age. PCV13's own retirement date (commonly cited as 30 April " +
-          "2024) rests on a document title and search summaries, not a sentence read " +
-          "live — the underlying PDF is bot-blocked (HTTP 403) both this session and " +
-          'last. Recorded as unverified rather than upgraded to a fact.',
-        source: 'cdc2025PcvNotes',
-        verified: '2026-09-25',
-        quote: 'minimum age: 6 weeks [PCV15], [PCV 20]; 2 years [PPSV23]',
+          '6 weeks of age. ACIP no longer recommends PCV13 for children, which is why ' +
+          'the planner never uses it. No organization source gives it a retirement ' +
+          'date — it remains FDA-licensed and may still be stocked somewhere. The ' +
+          'year shown against the product (2024) rests on a manufacturer page about ' +
+          'adults; see that product entry for the wording and the caveat.',
+        source: 'immunizePcvAskExperts',
+        verified: '2026-09-29',
+        quote:
+          'ACIP no longer recommends PCV13 for children or adults; however, PCV13 may ' +
+          'be given as previously recommended if it is the only PCV available and the ' +
+          'recipient would otherwise go without vaccination.',
       },
     ],
   },

@@ -1,7 +1,9 @@
 // One entry per product. `covers[].doses` is the dose-number licence and the
 // field everything else depends on — see docs/data-design.md. Products are
-// retired, never deleted (`retired: 'YYYY-MM-DD'`), so old printed plans stay
-// explainable.
+// retired, never deleted (`retired: 'YYYY'` or `'YYYY-MM-DD'`), so old printed
+// plans stay explainable. Record only the precision a source actually
+// supports: a bare year where no organization source names a day. See
+// sources.test.js's retirement-date guard.
 //
 // Two ages per product: `minAgeDays`/`maxAgeDays` are the CDC/ACIP/AAP-
 // governed floor and ceiling cover.js actually enforces; `insertMinAgeDays`/
@@ -1226,24 +1228,26 @@ export const PRODUCTS = [
     lineage: null,
     setsSeriesLength: null,
     restrictions: [],
-    retired: '2024-04-30',
+    retired: '2024',
     facts: [
       {
         claim:
-          'No longer the routinely-used pneumococcal product — replaced by PCV15/PCV20. ' +
-          'Kept here, not deleted, so an old saved plan can still be explained. Its own ' +
-          'retirement date (30 April 2024) is commonly cited but rests on a document ' +
-          "title and search summaries of a PDF that returns HTTP 403 across three " +
-          'sessions now (WebFetch, curl, and a real browser all hit an active bot-' +
-          'verification wall, not a dead link) — not a sentence read live. Pfizer\'s own ' +
-          'Prevnar 20 marketing page (adult.prevnar20.com/whyprevnar20, fetched live ' +
-          '2026-09-26) independently states "Prevnar 13 was available for adults from ' +
-          '2012 to 2024" — corroborates the year, but gives no day-level date and is a ' +
-          'marketing page, not an organization or insert source. The specific day (30 ' +
-          'April) remains recorded with a caveat, not as a plain verified fact.',
-        source: 'cdc2025PcvNotes',
-        verified: '2026-09-25',
-        quote: 'minimum age: 6 weeks [PCV15], [PCV 20]; 2 years [PPSV23]',
+          'No longer routinely recommended — PCV15 and PCV20 are the products in use. ' +
+          'Kept here, not deleted, so an old saved plan can still be explained; the ' +
+          'planner will not use it. No organization source gives a retirement date: ' +
+          'immunize.org says only that it remains FDA-licensed and may still sit in ' +
+          "some clinics' fridges. The year comes from Pfizer's own Prevnar 20 page " +
+          '(adult.prevnar20.com/whyprevnar20, read live 2026-09-29), which states ' +
+          '"Prevnar 13 was available for adults from 2012 to 2024" — a manufacturer ' +
+          'marketing page, and a sentence about adults rather than children, so it is ' +
+          'named here in prose instead of cited as a source. The day-level date once ' +
+          'carried here (30 April 2024) was dropped by owner decision on 2026-09-29: ' +
+          'no readable source supports it.',
+        source: 'immunizePcvAskExperts',
+        verified: '2026-09-29',
+        quote:
+          'PCV13 (Prevnar 13, Pfizer) is FDA-licensed and may still be available in ' +
+          'some clinics. It is no longer routinely recommended.',
       },
     ],
   },

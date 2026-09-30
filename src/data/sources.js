@@ -168,6 +168,13 @@ export const SOURCES = {
     snapshot: '2026-09-25-pcv.md',
     tier: 'organization',
   },
+  immunizePcvAskExperts: {
+    label: 'immunize.org Ask the Experts — Pneumococcal',
+    edition: 'page as published, fetched 2026-09-29',
+    url: 'https://www.immunize.org/ask-experts/topic/pneumococcal/',
+    snapshot: '2026-09-29-pcv13-status.md',
+    tier: 'organization',
+  },
   cdc2025PcvIntervals: {
     label: 'CDC child/adolescent catch-up table — Pneumococcal minimum intervals',
     edition: '2025 schedule cycle',

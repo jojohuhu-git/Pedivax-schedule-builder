@@ -27,9 +27,9 @@ describe('Rulebook', () => {
     expect(screen.getByText('PCV13')).toBeInTheDocument();
   });
 
-  it('marks a retired product as retired, with its date', () => {
+  it('marks a retired product as retired, with the year only', () => {
     render(<Rulebook />);
-    expect(screen.getByText('Retired 2024-04-30')).toBeInTheDocument();
+    expect(screen.getByText('Retired 2024')).toBeInTheDocument();
   });
 
   it('prints every fact\'s claim, quoted sentence, and checked-on date', () => {
