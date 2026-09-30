@@ -12,6 +12,7 @@ import { describe, it, expect } from 'vitest';
 import { SERIES } from '../data/series.js';
 import { PRODUCTS } from '../data/products.js';
 import { buildPlan } from '../logic/plan.js';
+import { scorePlan } from '../logic/score.js';
 
 const ALL_PRODUCTS = new Set(PRODUCTS.filter((p) => !p.retired).map((p) => p.name));
 
@@ -218,5 +219,51 @@ describe('buildPlan — nothing stocked', () => {
     const allGaps = plan.visits.flatMap((v) => v.gaps);
     expect(allGaps.some((g) => g.seriesKey === 'MenB')).toBe(false);
     expect(plan.unresolved).toContain('MenB');
+  });
+});
+
+
+// buildPlan now keeps its last 24 answers, because the screen asks for the
+// same plan several times per tick and a clinician ticking a box on and off
+// asks for plans already built. A cache is only ever as good as its key, and
+// a key that collided would hand one clinic another clinic's schedule — so
+// these test the key, not the speed.
+describe('buildPlan — the plan cache cannot hand back the wrong plan', () => {
+  const ALL = PRODUCTS.filter((p) => !p.retired).map((p) => p.name);
+
+  it('gives the same answer for the same formulary, however the set was built', () => {
+    const forwards = new Set(ALL);
+    const backwards = new Set([...ALL].reverse());
+    expect(buildPlan(backwards)).toEqual(buildPlan(forwards));
+  });
+
+  it('never returns one formulary answer for a different formulary', () => {
+    const seen = new Map();
+    // Every single-product-removed formulary: 31 near-identical keys, which
+    // is exactly where a sloppy key (size, or an unsorted join) would collide.
+    for (const dropped of ALL) {
+      const ticked = new Set(ALL.filter((n) => n !== dropped));
+      const plan = buildPlan(ticked);
+      const productsUsed = plan.visits
+        .flatMap((v) => [...v.injections, ...v.oral])
+        .map((s) => s.product.name);
+      expect(productsUsed).not.toContain(dropped);
+      seen.set(dropped, scorePlan(plan).injections);
+    }
+    expect(seen.size).toBe(ALL.length);
+  });
+
+  it('keeps the objective in the key — asking for fewest visits is a different question', () => {
+    const ticked = new Set(ALL);
+    const byInjections = buildPlan(ticked);
+    const byVisits = buildPlan(ticked, { objective: 'visits' });
+    expect(scorePlan(byVisits).visits).toBeLessThanOrEqual(scorePlan(byInjections).visits);
+    expect(buildPlan(ticked)).toEqual(byInjections);
+  });
+
+  it('survives more distinct formularies than it can hold', () => {
+    const first = buildPlan(new Set(ALL));
+    for (let i = 0; i < 40; i++) buildPlan(new Set(ALL.slice(0, (i % 28) + 3)));
+    expect(buildPlan(new Set(ALL))).toEqual(first);
   });
 });
