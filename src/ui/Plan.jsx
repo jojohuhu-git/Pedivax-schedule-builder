@@ -2,6 +2,7 @@
 // and `suggest` from the logic layer and renders them; makes no scheduling
 // decision of its own (CLAUDE.md: cover.js/plan.js are the only place a
 // decision is made).
+import { useDeferredValue, useMemo } from 'react';
 import { PRODUCTS } from '../data/products.js';
 import { SERIES } from '../data/series.js';
 import { VISITS } from '../data/visits.js';
@@ -70,14 +71,70 @@ function Shot({ shot, visitId, index, placements, otherDosesDueHere }) {
   );
 }
 
+// Two speeds on this page, because the work is two very different sizes.
+//
+// Building the schedule itself costs 2-19 ms. The two advisory panels below
+// it cost far more, because each one re-runs plan.js's whole search once per
+// candidate product: "products that would save injections" measured at 18 ms
+// with everything stocked but 334 ms on the "fewest injections" preset (19
+// unstocked products to test), and the per-gap Add buttons at up to 183 ms.
+// None of it was cached, so every render paid the full price again — the
+// tick-effect banner clearing itself after four seconds recomputed the lot.
+// Measured on the live site, ticking a box took 110-197 ms, which is well
+// past the ~100 ms where a click stops feeling instant, and it was WORST at
+// the start of a session when fewest products are ticked and there are most
+// candidates left to test.
+//
+// So: the schedule, the counts and the gap list are computed from `ticked`
+// and painted immediately. The two advisory panels are computed from
+// `useDeferredValue(ticked)`, which lets React commit the urgent render
+// first and do their work afterwards, reusing the memoised previous answer
+// in the meantime. Nothing is approximated and no search was made cheaper —
+// the same functions run with the same inputs, a beat later.
+//
+// The one visible consequence is that for a few hundred milliseconds after a
+// tick, those panels can still show the previous formulary's answer. The
+// suggestion list is filtered against the CURRENT `ticked` on the way out,
+// so the one genuinely confusing case — being offered a product you have
+// just stocked — cannot happen.
 export default function Plan({ ticked, onAddProduct }) {
-  const plan = buildPlan(ticked);
-  const score = scorePlan(plan);
-  const suggestions = suggest(ticked);
+  const plan = useMemo(() => buildPlan(ticked), [ticked]);
+  const score = useMemo(() => scorePlan(plan), [plan]);
+
+  const deferredTicked = useDeferredValue(ticked);
+  const deferredSuggestions = useMemo(() => suggest(deferredTicked), [deferredTicked]);
+  const suggestions = useMemo(
+    () => deferredSuggestions.filter((s) => !ticked.has(s.product)),
+    [deferredSuggestions, ticked]
+  );
 
   const allGaps = plan.visits.flatMap((v) => v.gaps);
   const gapsBySeries = {};
   for (const g of allGaps) (gapsBySeries[g.seriesKey] ??= []).push(g.dose.n);
+
+  // The gap ROWS come from the current plan above — what is missing is part
+  // of the answer, not advice about it. Only the "Add <product>" button on
+  // each row is deferred, since working out which product closes a gap is
+  // the expensive half.
+  //
+  // This memo depends on `deferredTicked` ALONE, and re-derives its own gap
+  // list from it. Keying it on the current gap list instead looks tidier and
+  // silently undoes the deferral: the gap list changes on every tick, so the
+  // memo missed every time and ran the expensive search back on the urgent
+  // path. Measured with a call counter in the built bundle, that mistake put
+  // 13 plan searches inside the click handler instead of 1.
+  const gapFixes = useMemo(() => {
+    const deferredPlan = buildPlan(deferredTicked);
+    const byySeries = {};
+    for (const v of deferredPlan.visits) {
+      for (const g of v.gaps) (byySeries[g.seriesKey] ??= []).push(g.dose.n);
+    }
+    const out = {};
+    for (const [key, doses] of Object.entries(byySeries)) {
+      out[key] = fixesForSeries(deferredTicked, key, doses);
+    }
+    return out;
+  }, [deferredTicked]);
 
   const dueVisitIds = new Set(plan.visits.map((v) => v.visit.id));
   const emptyVisits = VISITS.filter((v) => !dueVisitIds.has(v.id));
@@ -162,7 +219,7 @@ export default function Plan({ ticked, onAddProduct }) {
           <p>Add a product for each, or the series can't be finished with what you stock.</p>
           <ul className="gaplist">
             {Object.entries(gapsBySeries).map(([key, doses]) => {
-              const fixes = fixesForSeries(ticked, key, doses);
+              const fixes = gapFixes[key] ?? {};
               return (
               <li key={key}>
                 <b>{SERIES[key].name}</b>

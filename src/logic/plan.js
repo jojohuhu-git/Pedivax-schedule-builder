@@ -421,7 +421,32 @@ function searchCluster(clusterKeys, resolved, ticked, objective) {
 //                     came from the cluster search, corrected from
 //                     `resolved`'s note when the search overrode it (Hib/
 //                     HepB only — see clusterVariantOptions)
+// buildPlan is pure: the same formulary and objective always produce the
+// same plan, and no caller mutates what it returns. So the answers are
+// worth keeping. The screen asks for the same plan several times over —
+// Plan.jsx renders it, suggest.js takes it as its baseline, and App.jsx
+// needs the before-and-after counts for the tick-effect banner — and a
+// clinician ticking a box on and off again asks for plans already built.
+// A small bounded cache turns all of those into lookups. 24 entries is
+// comfortably more than one session's worth of back-and-forth and stays
+// trivial in memory; the oldest is dropped when it fills.
+const PLAN_CACHE = new Map();
+const PLAN_CACHE_MAX = 24;
+
+function planCacheKey(ticked, objective) {
+  return `${objective}|${[...ticked].sort().join('\u0000')}`;
+}
+
 export function buildPlan(ticked, { objective = 'injections' } = {}) {
+  const cacheKey = planCacheKey(ticked, objective);
+  if (PLAN_CACHE.has(cacheKey)) return PLAN_CACHE.get(cacheKey);
+  const built = buildPlanUncached(ticked, { objective });
+  if (PLAN_CACHE.size >= PLAN_CACHE_MAX) PLAN_CACHE.delete(PLAN_CACHE.keys().next().value);
+  PLAN_CACHE.set(cacheKey, built);
+  return built;
+}
+
+function buildPlanUncached(ticked, { objective = 'injections' } = {}) {
   // One plan, one cache — `ticked` is fixed for the whole of this call, so
   // nothing from a previous formulary may survive into this one.
   visitCache.clear();
