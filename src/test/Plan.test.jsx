@@ -114,6 +114,58 @@ describe('Plan — every current product stocked, including Bexsero (A5, E3)', (
   });
 });
 
+// Owner decision 2026-09-29: a shared-decision shot is a shot. It was the
+// one kind of dose the app singled out — tinted purple, and subtracted from
+// its own visit's injection count ("0 injections + 1 shared-decision") while
+// the total at the top of the page counted it all along. The owner's reason
+// for ending that is the cleanest argument available: a pentavalent
+// (Penbraya/Penmenvy) carries a routine MenACWY dose and a shared-decision
+// MenB dose in ONE syringe, and it has never been tinted or discounted,
+// because `isSdmShot` only fires when EVERY antigen in the shot is
+// shared-decision. So the same MenB antigen was being counted or not counted
+// depending on which product delivered it.
+//
+// Whether to give it is a conversation, and the sentence under the shot is
+// where that conversation belongs. How many times the child is injected is
+// not a matter of opinion.
+describe('Plan — a shared-decision dose is counted and drawn like any other', () => {
+  it('counts it in its own visit header instead of setting it to one side', () => {
+    const { container } = render(<Plan ticked={ALL_PRODUCTS} onAddProduct={() => {}} />);
+    const headers = [...container.querySelectorAll('.v-meta')].map((el) => el.textContent);
+    expect(headers.some((h) => /shared-decision/.test(h))).toBe(false);
+    expect(headers.some((h) => /^0 injections/.test(h))).toBe(false);
+  });
+
+  it("every visit's injection count adds up to the total at the top of the page", () => {
+    const { container } = render(<Plan ticked={ALL_PRODUCTS} onAddProduct={() => {}} />);
+    const perVisit = [...container.querySelectorAll('.v-meta')].map((el) => {
+      const m = el.textContent.match(/^(\d+) injections?/);
+      expect(m).not.toBeNull();
+      return Number(m[1]);
+    });
+    const summed = perVisit.reduce((a, b) => a + b, 0);
+    expect(summed).toBe(scorePlan(buildPlan(ALL_PRODUCTS)).injections);
+  });
+
+  it('gives it no tint of its own — the same treatment a pentavalent already gets', () => {
+    const { container } = render(<Plan ticked={ALL_PRODUCTS} onAddProduct={() => {}} />);
+    expect(container.querySelectorAll('.sdmvisit')).toHaveLength(0);
+    expect(container.querySelectorAll('.sdmshot')).toHaveLength(0);
+  });
+
+  it('drops the shared-decision entry from the colour legend, leaving three', () => {
+    const { container } = render(<Plan ticked={ALL_PRODUCTS} onAddProduct={() => {}} />);
+    const swatches = [...container.querySelectorAll('.legend .sw')];
+    expect(swatches).toHaveLength(3);
+    expect(container.querySelector('.legend').textContent).not.toMatch(/Shared decision/);
+  });
+
+  it('still says in words that the dose is not routine', () => {
+    render(<Plan ticked={ALL_PRODUCTS} onAddProduct={() => {}} />);
+    expect(screen.getAllByText(/shared clinical decision-making/).length).toBeGreaterThan(0);
+  });
+});
+
 describe('Plan — a formulary with a real gap names which antigens (E4)', () => {
   it('states the missing antigens in a sentence instead of a bare failing count', () => {
     render(<Plan ticked={new Set()} onAddProduct={() => {}} />);

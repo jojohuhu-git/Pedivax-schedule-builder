@@ -35,7 +35,7 @@ function Shot({ shot, visitId, index, placements, otherDosesDueHere }) {
   const sdm = isSdmShot(shot);
   const note = placementNote({ covers: shot.covers, visitId, otherDosesDueHere });
   return (
-    <div className={`shot${sdm ? ' sdmshot' : ''}`}>
+    <div className="shot">
       <div className="shot-n">{index + 1}</div>
       <div className="shot-body">
         <div className="shot-nm">
@@ -154,10 +154,6 @@ export default function Plan({ ticked, onAddProduct }) {
           <span className="sw o" />
           Oral
         </span>
-        <span>
-          <span className="sw s" />
-          Shared decision — not routine
-        </span>
       </div>
 
       {allGaps.length > 0 && (
@@ -213,14 +209,20 @@ export default function Plan({ ticked, onAddProduct }) {
           // Anything else due at this visit — another shot, or a dose no
           // stocked product covers (still due, listed in the gap panel).
           const otherDosesDueHere = allShots.length > 1 || gaps.length > 0;
-          const sdmOnly = allShots.length > 0 && allShots.every(isSdmShot);
-          const n = injections.filter((s) => !isSdmShot(s)).length;
+          // A shared-decision dose is still a needle, so it is counted here
+          // like any other (owner decision 2026-09-29). It used to be
+          // subtracted from this line and reported separately, which left
+          // the visit headers summing to less than the total at the top of
+          // the page — and which a pentavalent never suffered, since
+          // `isSdmShot` only fires when EVERY antigen in the syringe is
+          // shared-decision. Whether to give it is a conversation, and the
+          // sentence under the shot is where that lives; how many times the
+          // child is injected is not a matter of opinion.
+          const n = injections.length;
           const extras = [];
           if (oral.length) extras.push(`${oral.length} oral`);
-          const sd = injections.filter(isSdmShot).length;
-          if (sd) extras.push(`${sd} shared-decision`);
           return (
-            <div className={`visit${sdmOnly ? ' sdmvisit' : ''}`} key={visit.id}>
+            <div className="visit" key={visit.id}>
               <div className="v-head">
                 <span className="v-age">{visit.label}</span>
                 <span className="v-meta">

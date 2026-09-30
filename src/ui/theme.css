@@ -23,9 +23,6 @@
   --oral: #3d5a2b;
   --oral-soft: #eaf1e4;
   --oral-line: #a9c295;
-  --sdm: #4a4080;
-  --sdm-soft: #eceaf6;
-  --sdm-line: #a9a2cf;
   --r: 5px;
   --f-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --f-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -52,9 +49,6 @@
     --oral: #a3c78c;
     --oral-soft: #1b2617;
     --oral-line: #415633;
-    --sdm: #a8a0dc;
-    --sdm-soft: #1e1b2e;
-    --sdm-line: #453f6b;
   }
 }
 
@@ -442,7 +436,6 @@ label.chk input:focus-visible {
   margin-top: 2px;
 }
 .sum .sd .n {
-  color: var(--sdm);
   font-size: 22px;
   /* E2/E4: a status word ("Included"/"Optional"), not a number — don't
      dress it in the tabular-numeral font the two real counts use. */
@@ -502,10 +495,6 @@ label.chk input:focus-visible {
   background: var(--oral-soft);
   border-color: var(--oral-line);
 }
-.sw.s {
-  background: var(--sdm-soft);
-  border-color: var(--sdm-line);
-}
 
 .visit {
   border: 1px solid var(--line);
@@ -513,9 +502,6 @@ label.chk input:focus-visible {
   background: var(--surface);
   margin-bottom: 11px;
   overflow: hidden;
-}
-.visit.sdmvisit {
-  border-left: 3px solid var(--sdm-line);
 }
 .v-head {
   display: flex;
@@ -547,9 +533,6 @@ label.chk input:focus-visible {
 }
 .shot:first-child {
   border-top: none;
-}
-.shot.sdmshot {
-  background: var(--sdm-soft);
 }
 .shot-n {
   font-family: var(--f-mono);
@@ -588,11 +571,6 @@ label.chk input:focus-visible {
   background: var(--oral-soft);
   color: var(--oral);
   border: 1px solid var(--oral-line);
-}
-.tag.sdm {
-  background: var(--sdm-soft);
-  color: var(--sdm);
-  border: 1px solid var(--sdm-line);
 }
 .tag.valence {
   background: var(--surface-2);
@@ -641,11 +619,15 @@ label.chk input:focus-visible {
   line-height: 1.4;
   color: var(--warn);
 }
+/* The "not a routine dose" sentence. It carries the whole shared-decision
+   message now that the tint is gone (owner decision 2026-09-29) — so it is
+   ordinary secondary text, the same as every other explanatory line under a
+   shot, not a colour category of its own. */
 .sdmline {
   font-size: 11.5px;
   margin-top: 5px;
   line-height: 1.4;
-  color: var(--sdm);
+  color: var(--ink-2);
 }
 
 .panel {
