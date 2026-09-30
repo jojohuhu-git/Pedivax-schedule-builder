@@ -1,9 +1,9 @@
 // One entry per product. `covers[].doses` is the dose-number licence and the
 // field everything else depends on — see docs/data-design.md. Products are
-// retired, never deleted (`retired: 'YYYY'` or `'YYYY-MM-DD'`), so old printed
-// plans stay explainable. Record only the precision a source actually
-// supports: a bare year where no organization source names a day. See
-// sources.test.js's retirement-date guard.
+// retired, never deleted (`retired: true`), so old printed plans stay
+// explainable. The flag means only "the planner must not use this" — it
+// carries no date, because no organization source gives one. See
+// sources.test.js's withdrawn-product guard.
 //
 // Two ages per product: `minAgeDays`/`maxAgeDays` are the CDC/ACIP/AAP-
 // governed floor and ceiling cover.js actually enforces; `insertMinAgeDays`/
@@ -1228,21 +1228,19 @@ export const PRODUCTS = [
     lineage: null,
     setsSeriesLength: null,
     restrictions: [],
-    retired: '2024',
+    retired: true,
     facts: [
       {
         claim:
           'No longer routinely recommended — PCV15 and PCV20 are the products in use. ' +
           'Kept here, not deleted, so an old saved plan can still be explained; the ' +
-          'planner will not use it. No organization source gives a retirement date: ' +
-          'immunize.org says only that it remains FDA-licensed and may still sit in ' +
-          "some clinics' fridges. The year comes from Pfizer's own Prevnar 20 page " +
-          '(adult.prevnar20.com/whyprevnar20, read live 2026-09-29), which states ' +
-          '"Prevnar 13 was available for adults from 2012 to 2024" — a manufacturer ' +
-          'marketing page, and a sentence about adults rather than children, so it is ' +
-          'named here in prose instead of cited as a source. The day-level date once ' +
-          'carried here (30 April 2024) was dropped by owner decision on 2026-09-29: ' +
-          'no readable source supports it.',
+          'planner will not use it. This product is recorded by its status, not by a ' +
+          'date, because no organization source gives one: ACIP stopped recommending ' +
+          'it, but it remains FDA-licensed and may still sit in some clinics\' ' +
+          'fridges, so saying it was withdrawn on a particular day would claim more ' +
+          'than any source supports. (A commonly-seen 2024 traces to a manufacturer ' +
+          'marketing page describing when it stopped being available to ADULTS; this ' +
+          'app plans children, and the app prints no year.)',
         source: 'immunizePcvAskExperts',
         verified: '2026-09-29',
         quote:

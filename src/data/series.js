@@ -428,9 +428,8 @@ export const SERIES = {
           'products are PCV15 (Vaxneuvance) and PCV20 (Prevnar 20), both licensed from ' +
           '6 weeks of age. ACIP no longer recommends PCV13 for children, which is why ' +
           'the planner never uses it. No organization source gives it a retirement ' +
-          'date — it remains FDA-licensed and may still be stocked somewhere. The ' +
-          'year shown against the product (2024) rests on a manufacturer page about ' +
-          'adults; see that product entry for the wording and the caveat.',
+          'date — it remains FDA-licensed and may still be stocked somewhere, so it ' +
+          'is marked by its status rather than by a year. See that product entry.',
         source: 'immunizePcvAskExperts',
         verified: '2026-09-29',
         quote:
